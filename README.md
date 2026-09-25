@@ -15,6 +15,10 @@ npm run dev
 
 ## Deploy
 
-Push to `main`. GitHub Actions builds with Vite and publishes to GitHub Pages; `public/CNAME` binds `labs.xfina.dev`. No other infrastructure.
+Hosted on Cloudflare Pages (all new xfina projects use Cloudflare; only sakthipriyan.com stays on GitHub Pages). One site, one deployment: tools are paths, not separate projects.
+
+- Production: push to `main` → https://labs.xfina.dev
+- Previews: every branch/PR gets its own `*.pages.dev` URL
+- Cloudflare settings: build command `npm run build`, output directory `dist`, Node 22
 
 Adding a tool: create `<tool>/index.html`, then register it in `vite.config.ts`.
