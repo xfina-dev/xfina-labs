@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Backtester mocks · Xfina Labs</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<style>
+/* Tokens copied from xfina/web/src/style.css (shadcn zinc) so Labs matches Xfina. */
+:root{--background:0 0% 100%;--foreground:240 10% 3.9%;--card:0 0% 100%;--primary:240 5.9% 10%;--primary-foreground:0 0% 98%;--secondary:240 4.8% 95.9%;--muted:240 4.8% 95.9%;--muted-foreground:240 3.8% 46.1%;--accent:240 4.8% 95.9%;--destructive:0 84.2% 60.2%;--border:240 5.9% 90%;--radius:.5rem;
+ --ok:142 60% 32%;--warn:38 92% 42%;--c1:226 70% 55%;--c2:174 65% 40%;--c3:38 90% 50%;--c4:280 55% 58%;--c5:340 70% 55%}
+.dark{--background:240 10% 3.9%;--foreground:0 0% 98%;--card:240 10% 3.9%;--primary:0 0% 98%;--primary-foreground:240 5.9% 10%;--secondary:240 3.7% 15.9%;--muted:240 3.7% 15.9%;--muted-foreground:240 5% 64.9%;--accent:240 3.7% 15.9%;--destructive:0 62.8% 45%;--border:240 3.7% 15.9%;
+ --ok:142 55% 50%;--warn:38 92% 55%;--c1:226 85% 68%;--c2:174 65% 50%;--c3:38 90% 60%;--c4:280 65% 70%;--c5:340 75% 66%}
+*{box-sizing:border-box;border-color:hsl(var(--border))}
+body{margin:0;background:hsl(var(--background));color:hsl(var(--foreground));font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.muted{color:hsl(var(--muted-foreground))}
+.wrap{max-width:72rem;margin:0 auto;padding:1.5rem 1rem 4rem}
+header.top{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;gap:.9rem;align-items:center}
+.brand img{width:44px;height:44px}
+.brand h1{margin:0;font-size:1.5rem;letter-spacing:-.02em}
+.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:6px;border:1px solid hsl(var(--primary)/.25);background:hsl(var(--primary)/.08)}
+.tag.warn{border-color:hsl(var(--warn)/.5);background:hsl(var(--warn)/.12);color:hsl(var(--warn))}
+.tag.ok{border-color:hsl(var(--ok)/.5);background:hsl(var(--ok)/.12);color:hsl(var(--ok))}
+.tag.err{border-color:hsl(var(--destructive)/.6);background:hsl(var(--destructive)/.15);color:hsl(var(--destructive))}
+.tag.soon{border-style:dashed;color:hsl(var(--muted-foreground));background:none}
+button,.btn{font:inherit;cursor:pointer;height:36px;padding:0 .9rem;border-radius:calc(var(--radius) - 2px);border:1px solid hsl(var(--border));background:hsl(var(--background));color:hsl(var(--foreground));display:inline-flex;align-items:center;gap:.4rem;font-weight:500;text-decoration:none}
+button:hover{background:hsl(var(--accent))}
+button.primary{background:hsl(var(--primary));color:hsl(var(--primary-foreground));border-color:transparent}
+button.primary:hover{opacity:.9}
+button.sm{height:28px;padding:0 .6rem;font-size:12px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.banner{margin:1rem 0;padding:.6rem .9rem;border:1px dashed hsl(var(--warn)/.6);border-radius:var(--radius);background:hsl(var(--warn)/.07);font-size:12.5px}
+nav.tabs{display:flex;gap:.25rem;border-bottom:1px solid hsl(var(--border));margin:1.25rem 0 1.5rem;overflow-x:auto}
+nav.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;height:40px;background:none;color:hsl(var(--muted-foreground));white-space:nowrap}
+nav.tabs button[aria-selected=true]{color:hsl(var(--foreground));border-bottom-color:hsl(var(--primary))}
+nav.tabs .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:99px;font-size:11px;background:hsl(var(--muted))}
+.card{border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--card));padding:1.1rem 1.2rem;margin-bottom:1rem}
+.card h2{margin:0 0 .15rem;font-size:1.05rem}
+.card h3{margin:0 0 .5rem;font-size:.9rem}
+.card>.sub{margin:0 0 1rem;font-size:13px;color:hsl(var(--muted-foreground))}
+.grid{display:grid;gap:1rem}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g13{grid-template-columns:1.35fr 1fr}
+@media(max-width:820px){.g2,.g3,.g13{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:500;color:hsl(var(--muted-foreground));padding:.45rem .6rem;border-bottom:1px solid hsl(var(--border));white-space:nowrap}
+td{padding:.55rem .6rem;border-bottom:1px solid hsl(var(--border)/.6);vertical-align:middle}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+tr.sel td{background:hsl(var(--accent)/.6)}
+.tblwrap{overflow-x:auto}
+.drop{border:2px dashed hsl(var(--border));border-radius:var(--radius);padding:1.4rem;text-align:center}
+.drop b{display:block}
+label.f{display:block;font-size:12px;color:hsl(var(--muted-foreground));margin-bottom:.25rem}
+.inp,select{width:100%;height:36px;padding:0 .6rem;border:1px solid hsl(var(--border));border-radius:calc(var(--radius) - 2px);background:hsl(var(--background));color:inherit;font:inherit}
+.seg{display:inline-flex;border:1px solid hsl(var(--border));border-radius:calc(var(--radius) - 2px);overflow:hidden}
+.seg span{padding:.35rem .8rem;font-size:13px;cursor:pointer}
+.seg span.on{background:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem}
+.kpi{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:.7rem .85rem}
+.kpi .l{font-size:12px;color:hsl(var(--muted-foreground))}
+.kpi .v{font-size:1.35rem;font-weight:650;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.kpi.dim .v{color:hsl(var(--muted-foreground))}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:.45rem}
+.check{display:flex;gap:.6rem;align-items:flex-start;padding:.4rem 0;font-size:13px;border-bottom:1px solid hsl(var(--border)/.5)}
+.check:last-child{border:0}
+.check .tag{flex:none;margin-top:1px;min-width:56px;text-align:center}
+.bar{height:8px;border-radius:9px;background:hsl(var(--muted));overflow:hidden}
+.bar i{display:block;height:100%;background:hsl(var(--c1))}
+.opt{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:.9rem 1rem;cursor:pointer;position:relative}
+.opt.on{border-color:hsl(var(--primary));background:hsl(var(--primary)/.05)}
+.opt.off{opacity:.55;cursor:not-allowed}
+.opt h3{display:flex;justify-content:space-between;align-items:center}
+.opt p{margin:0;font-size:12.5px;color:hsl(var(--muted-foreground))}
+details{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:.5rem .8rem;margin-top:.75rem}
+summary{cursor:pointer;font-weight:500}
+.sub2{display:flex;gap:.25rem;margin-bottom:1rem;flex-wrap:wrap}
+.sub2 button{height:30px;font-size:13px;border-radius:99px}
+.sub2 button[aria-selected=true]{background:hsl(var(--primary));color:hsl(var(--primary-foreground))}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:12px;margin-top:.4rem}
+svg text{fill:hsl(var(--muted-foreground));font-size:10px}
+.foot{font-size:12px;color:hsl(var(--muted-foreground))}
+.roadmap{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+.roadmap .tag{font-size:11px;text-transform:none;letter-spacing:0;font-weight:600}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <a href="/"><img src="/favicon.svg" alt="Xfina" /></a>
+      <div>
+        <h1>Xfina Labs <span class="muted" style="font-weight:400">/ Backtest</span></h1>
+        <div class="muted">Bring your own data. Everything runs in your browser; nothing is uploaded.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <a class="btn" href="https://github.com/xfina-dev/xfina-labs">GitHub</a>
+      <button id="theme" title="Toggle theme">◐</button>
+    </div>
+  </header>
+
+  <div class="banner"><b>Design mock.</b> Screens are static and every number is illustrative, not a real backtest. Items tagged <span class="tag soon">later</span> are designed for but not in the first increments.
+    <div class="roadmap" id="roadmap"></div>
+  </div>
+
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+
+  <!-- ============ 1. DATA ============ -->
+  <section id="s-data">
+    <div class="card">
+      <h2>Datasets</h2>
+      <p class="sub">Download history from the original provider, drop the files here. Files are read and validated locally.</p>
+      <div class="drop"><b>Drop CSV files here, or click to browse</b><span class="muted">Minimum columns: <span class="mono">date,value</span> · one series per file</span></div>
+    </div>
+
+    <div class="grid g13">
+      <div class="card">
+        <h2>Datasets in this scenario</h2>
+        <p class="sub">Each asset needs a series. A USD series also needs USD/INR.</p>
+        <div class="tblwrap"><table>
+          <thead><tr><th>Asset</th><th>Series</th><th>Ccy</th><th>Range</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr class="sel"><td>Nifty 50</td><td>Nifty 50 TRI <span class="tag">total return</span></td><td>INR</td><td class="mono">1999 → 2026</td><td><span class="tag ok">valid</span></td></tr>
+            <tr><td>Nifty Next 50</td><td>Nifty Next 50 TRI <span class="tag">total return</span></td><td>INR</td><td class="mono">2003 → 2026</td><td><span class="tag ok">valid</span></td></tr>
+            <tr><td>Nasdaq 100</td><td>Irish UCITS ETF <span class="tag warn">proxy</span></td><td>USD</td><td class="mono">2010 → 2026</td><td><span class="tag warn">2 warnings</span></td></tr>
+            <tr><td>Gold</td><td>—</td><td>INR</td><td class="muted">—</td><td><span class="tag err">missing</span> <button class="sm">Upload</button></td></tr>
+            <tr><td>USD/INR</td><td>—</td><td>—</td><td class="muted">—</td><td><span class="tag err">missing</span> <button class="sm">Upload</button></td></tr>
+            <tr><td>India CPI</td><td class="muted">not needed for nominal returns</td><td></td><td></td><td><span class="tag soon">later</span></td></tr>
+          </tbody>
+        </table></div>
+
+        <h3 style="margin-top:1.25rem">Common date range</h3>
+        <svg viewBox="0 0 640 132" width="100%" role="img" aria-label="Date coverage per dataset">
+          <g id="cover"></g>
+        </svg>
+        <p class="foot" style="margin:.25rem 0 0">Backtests run on the overlap, <span class="mono">2010-01-04 → 2026-09-21</span>. No history is extrapolated.</p>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Nasdaq 100 · Irish UCITS ETF</h2>
+          <p class="sub"><span class="mono">nasdaq100-ucits.csv</span> · 4,142 rows · read locally</p>
+          <div class="grid g2" style="margin-bottom:.9rem">
+            <div><label class="f">Asset</label><select><option>Nasdaq 100</option></select></div>
+            <div><label class="f">Representation</label><select><option>Investable proxy (ETF)</option><option>Benchmark index</option></select></div>
+            <div><label class="f">Currency</label><select><option>USD</option><option>INR</option></select></div>
+            <div><label class="f">Return type</label><select><option>Total return</option><option>Adjusted price</option><option>Price only</option></select></div>
+          </div>
+          <p class="foot" style="margin:0 0 .8rem">Return type is never guessed. We suggest a value from the file and ask you to confirm it.</p>
+          <h3>Quality report <span class="tag warn">valid with warnings</span></h3>
+          <div class="check"><span class="tag err">error</span><span>None</span></div>
+          <div class="check"><span class="tag warn">warn</span><span>3 gaps longer than 5 trading days (2010-02, 2015-08, 2020-03).<br><span class="muted">Values carried forward; no return is created on those days.</span></span></div>
+          <div class="check"><span class="tag warn">warn</span><span>1 day-over-day move of +14.2% on 2020-03-24. <span class="muted">Plausible; check it against your source.</span></span></div>
+          <div class="check"><span class="tag">info</span><span>Sorted, 0 duplicate dates, all values positive.</span></div>
+          <div class="check"><span class="tag">info</span><span>Daily frequency, 4,142 observations, 2010-01-04 → 2026-09-21.</span></div>
+          <div style="display:flex;gap:.5rem;margin-top:.8rem"><button class="primary">Use this dataset</button><button>Replace file</button></div>
+        </div>
+
+        <div class="card">
+          <h3>How to obtain this dataset</h3>
+          <details open><summary>Nasdaq 100 (USD, total return)</summary>
+            <p class="muted" style="margin:.5rem 0">Source: the index or ETF provider's historical data page.<br>Download: daily NAV / total-return index.<br>Columns: <span class="mono">date,value</span> (extra columns ignored).<br>Date format: <span class="mono">YYYY-MM-DD</span>.</p>
+            <p class="foot" style="margin:0">Xfina does not host or redistribute provider data.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. PORTFOLIO ============ -->
+  <section id="s-portfolio" class="hide">
+    <div class="grid g13">
+      <div class="card">
+        <h2>Portfolio</h2>
+        <p class="sub">Target weights must total 100%.</p>
+        <div class="tblwrap"><table id="weights">
+          <thead><tr><th>Asset</th><th>Series used</th><th style="width:26%">Weight</th><th class="r" style="width:80px">%</th></tr></thead>
+          <tbody></tbody>
+          <tfoot><tr><td colspan="3"><b>Total</b></td><td class="r"><b id="wtotal">100.0</b> <span class="tag ok">ok</span></td></tr></tfoot>
+        </table></div>
+        <div style="margin-top:.8rem;display:flex;gap:.5rem"><button class="sm">+ Add asset</button><button class="sm">Equal weight</button></div>
+        <p class="foot" style="margin-top:.8rem"><span class="tag">benchmark</span> is an index. <span class="tag warn">proxy</span> is the fund or ETF you could have held. They are not the same and results differ by fees and tracking.</p>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Money</h2>
+          <p class="sub">Base currency and cash flows.</p>
+          <label class="f">Base currency</label>
+          <div class="seg" style="margin-bottom:.9rem"><span class="on">INR</span><span>USD</span></div>
+          <div class="grid g2">
+            <div><label class="f">Starting capital</label><input class="inp" value="₹10,00,000" /></div>
+            <div><label class="f">Monthly contribution</label><input class="inp" value="₹50,000" /></div>
+            <div><label class="f">Contribution growth / yr <span class="tag soon">later</span></label><input class="inp" value="10%" disabled /></div>
+            <div><label class="f">Withdrawals <span class="tag soon">later</span></label><input class="inp" value="None" disabled /></div>
+          </div>
+          <details><summary>Salary model <span class="tag soon">later</span></summary><p class="muted" style="margin:.5rem 0 0">Optional cash-flow generator: salary, growth and investment rate.</p></details>
+        </div>
+        <div class="card">
+          <h2>Coverage</h2>
+          <p class="sub">Common range from your datasets.</p>
+          <div class="kpi"><div class="l">Run period</div><div class="v mono" style="font-size:1rem">2010-01-04 → 2026-09-21</div></div>
+          <p class="foot" style="margin:.6rem 0 0">Limited by Nasdaq 100 (starts 2010). Add an earlier series to extend it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. STRATEGY ============ -->
+  <section id="s-strategy" class="hide">
+    <div class="card">
+      <h2>Strategy</h2>
+      <p class="sub">Pick how the portfolio is maintained. You can add several and compare them on the same data.</p>
+      <div class="grid g2" id="strategies">
+        <div class="opt"><h3>Buy and hold <span class="tag">v1</span></h3><p>Set weights once, never trade. Shows how far the portfolio drifts.</p></div>
+        <div class="opt"><h3>Calendar rebalance <span class="tag">v1</span></h3><p>Restore targets on a schedule: monthly, quarterly, half-yearly or annual.</p></div>
+        <div class="opt on"><h3>Threshold rebalance <span class="tag">v1</span></h3><p>Trade only when an asset drifts past a band around its target.</p></div>
+        <div class="opt off"><h3>Perpetual rebalance <span class="tag soon">later</span></h3><p>Cash-flow driven: buy underweights first, sell only when necessary, tax-aware.</p></div>
+      </div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <h2>Threshold settings</h2>
+        <p class="sub">The two band types are different, so the choice is explicit.</p>
+        <label class="f">Band type</label>
+        <div class="seg" style="margin-bottom:.9rem"><span class="on">Absolute (percentage points)</span><span>Relative (% of target)</span></div>
+        <label class="f">Band</label>
+        <input class="inp" value="± 5 percentage points" style="margin-bottom:.9rem" />
+        <label class="f">Check</label>
+        <select><option>Daily</option><option>Month-end</option></select>
+      </div>
+      <div class="card">
+        <h2>What this means</h2>
+        <p class="sub">For a target of 40%:</p>
+        <svg viewBox="0 0 360 96" width="100%" aria-label="Band example">
+          <rect x="10" y="40" width="340" height="14" rx="7" fill="hsl(var(--muted))"/>
+          <rect x="130" y="40" width="100" height="14" rx="7" fill="hsl(var(--c2)/.5)"/>
+          <line x1="180" x2="180" y1="30" y2="64" stroke="hsl(var(--foreground))" stroke-width="2"/>
+          <text x="180" y="22" text-anchor="middle">target 40%</text>
+          <text x="130" y="80" text-anchor="middle">35%</text><text x="230" y="80" text-anchor="middle">45%</text>
+          <text x="20" y="80">rebalance</text><text x="290" y="80">rebalance</text>
+        </svg>
+        <p class="foot" style="margin:.4rem 0 0">Relative ±10% on the same target would be 36%–44%.</p>
+        <h3 style="margin-top:1rem">Realism</h3>
+        <div class="seg"><span class="on">Benchmark</span><span>Investable</span><span>Tax-aware</span><span>Realistic</span></div>
+        <p class="foot" style="margin:.4rem 0 0">Only Benchmark is in the first increments: no costs or tax.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. TAX ============ -->
+  <section id="s-tax" class="hide">
+    <div class="card">
+      <h2>Tax <span class="tag soon">later</span></h2>
+      <p class="sub">A separate, versioned engine that reads the transaction ledger. Not part of the first increments.</p>
+      <div class="grid g3">
+        <div><label class="f">Country</label><select disabled><option>India</option></select></div>
+        <div><label class="f">Financial year</label><select disabled><option>FY 2026-27</option></select></div>
+        <div><label class="f">Investor profile</label><select disabled><option>Resident individual</option></select></div>
+      </div>
+      <div class="seg" style="margin-top:1rem"><span class="on">Simple</span><span>Detailed (tax lots)</span></div>
+      <p class="foot" style="margin:.8rem 0 0">This is a simulation, not a tax computation for filing.</p>
+    </div>
+  </section>
+
+  <!-- ============ 5. RESULTS ============ -->
+  <section id="s-results" class="hide">
+    <div class="card" style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center">
+      <div><h2 style="margin:0">Threshold ±5pp · India 40 / Nasdaq 40 / Gold 10 / Debt 10</h2>
+        <div class="muted mono" style="font-size:12px">2010-01-04 → 2026-09-21 · INR · benchmark realism</div></div>
+      <div style="display:flex;gap:.5rem"><button>Edit</button><button class="primary">Run again</button></div>
+    </div>
+
+    <div class="kpis" style="margin-bottom:1rem">
+      <div class="kpi"><div class="l">Final value</div><div class="v">₹2.84 Cr</div></div>
+      <div class="kpi"><div class="l">Invested</div><div class="v">₹1.36 Cr</div></div>
+      <div class="kpi"><div class="l">CAGR</div><div class="v">12.8%</div></div>
+      <div class="kpi"><div class="l">XIRR</div><div class="v">13.1%</div></div>
+      <div class="kpi"><div class="l">Volatility</div><div class="v">13.6%</div></div>
+      <div class="kpi"><div class="l">Max drawdown</div><div class="v">−27.4%</div></div>
+      <div class="kpi"><div class="l">Sharpe</div><div class="v">0.82</div></div>
+      <div class="kpi"><div class="l">Turnover</div><div class="v">18.3%</div></div>
+      <div class="kpi dim"><div class="l">Tax paid</div><div class="v">— <span class="tag soon">later</span></div></div>
+    </div>
+
+    <div class="sub2" id="rsubs"></div>
+
+    <div id="r-overview">
+      <div class="card"><h3>Portfolio value</h3><div id="ch-value"></div>
+        <div class="legend"><span><i class="dot" style="background:hsl(var(--c1))"></i>Portfolio value</span><span><i class="dot" style="background:hsl(var(--muted-foreground))"></i>Invested capital</span><span><i class="dot" style="background:hsl(var(--c3))"></i>Rebalance</span></div></div>
+      <div class="grid g2">
+        <div class="card"><h3>Drawdown</h3><div id="ch-dd"></div></div>
+        <div class="card"><h3>Allocation over time</h3><div id="ch-alloc"></div>
+          <div class="legend" id="alloc-legend"></div></div>
+      </div>
+    </div>
+
+    <div id="r-drawdown" class="hide">
+      <div class="card"><h3>Largest drawdowns</h3><div class="tblwrap"><table>
+        <thead><tr><th>#</th><th>Peak</th><th>Trough</th><th>Recovered</th><th class="r">Depth</th><th class="r">Peak → trough</th><th class="r">Recovery</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="mono">2020-01-17</td><td class="mono">2020-03-23</td><td class="mono">2020-08-11</td><td class="r">−27.4%</td><td class="r">2.2 mo</td><td class="r">4.6 mo</td></tr>
+          <tr><td>2</td><td class="mono">2021-11-19</td><td class="mono">2022-06-17</td><td class="mono">2023-01-06</td><td class="r">−19.8%</td><td class="r">7.0 mo</td><td class="r">6.6 mo</td></tr>
+          <tr><td>3</td><td class="mono">2015-03-04</td><td class="mono">2016-02-29</td><td class="mono">2016-10-21</td><td class="r">−14.1%</td><td class="r">11.8 mo</td><td class="r">7.7 mo</td></tr>
+        </tbody></table></div></div>
+    </div>
+
+    <div id="r-tx" class="hide">
+      <div class="card"><h3>Transaction ledger <span class="muted" style="font-weight:400">· every simulated trade, the base for turnover, XIRR and later tax</span></h3>
+        <div class="tblwrap"><table>
+          <thead><tr><th>Date</th><th>Event</th><th>Asset</th><th class="r">Amount (₹)</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">2024-01-01</td><td>Contribution</td><td>—</td><td class="r">50,000</td><td class="muted">monthly</td></tr>
+            <tr><td class="mono">2024-01-01</td><td>Buy</td><td>Nifty 50</td><td class="r">20,000</td><td class="muted">to target</td></tr>
+            <tr><td class="mono">2024-01-01</td><td>Buy</td><td>Nasdaq 100</td><td class="r">20,000</td><td class="muted">to target</td></tr>
+            <tr><td class="mono">2024-01-01</td><td>Buy</td><td>Gold</td><td class="r">5,000</td><td class="muted">to target</td></tr>
+            <tr><td class="mono">2024-01-01</td><td>Buy</td><td>Debt</td><td class="r">5,000</td><td class="muted">to target</td></tr>
+            <tr><td class="mono">2024-03-14</td><td>Rebalance</td><td>Nasdaq 100</td><td class="r">−3,42,180</td><td class="muted">45.2% &gt; 45% band</td></tr>
+            <tr><td class="mono">2024-03-14</td><td>Rebalance</td><td>Gold</td><td class="r">+1,71,090</td><td class="muted">to target</td></tr>
+          </tbody></table></div>
+        <div style="margin-top:.8rem;display:flex;gap:.5rem"><button class="sm">Export transactions.csv</button></div></div>
+    </div>
+
+    <div id="r-compare" class="hide">
+      <div class="card"><h3>Compare strategies on the same data</h3>
+        <p class="sub">Measurements, not a ranking. Nothing here is marked as best.</p>
+        <div class="tblwrap"><table>
+          <thead><tr><th></th><th class="r">Buy &amp; hold</th><th class="r">Annual</th><th class="r">Threshold ±5pp</th><th class="r">Perpetual <span class="tag soon">later</span></th></tr></thead>
+          <tbody>
+            <tr><td>Final value</td><td class="r">₹2.91 Cr</td><td class="r">₹2.80 Cr</td><td class="r">₹2.84 Cr</td><td class="r muted">—</td></tr>
+            <tr><td>CAGR</td><td class="r">13.1%</td><td class="r">12.6%</td><td class="r">12.8%</td><td class="r muted">—</td></tr>
+            <tr><td>Volatility</td><td class="r">15.2%</td><td class="r">13.1%</td><td class="r">13.6%</td><td class="r muted">—</td></tr>
+            <tr><td>Max drawdown</td><td class="r">−31.0%</td><td class="r">−26.2%</td><td class="r">−27.4%</td><td class="r muted">—</td></tr>
+            <tr><td>Sharpe</td><td class="r">0.79</td><td class="r">0.83</td><td class="r">0.82</td><td class="r muted">—</td></tr>
+            <tr><td>Turnover</td><td class="r">0%</td><td class="r">21.4%</td><td class="r">18.3%</td><td class="r muted">—</td></tr>
+            <tr><td>Trades</td><td class="r">0</td><td class="r">68</td><td class="r">41</td><td class="r muted">—</td></tr>
+          </tbody></table></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Reproducibility</h3>
+      <div class="mono foot" style="line-height:1.7">engine 0.1.0 (xfingine) · config <span>sha256 9f3a…c21e</span> · nifty50-tri.csv <span>sha256 41bd…07aa</span> · nasdaq100-ucits.csv <span>sha256 c8e0…5d13</span></div>
+      <div style="margin-top:.8rem;display:flex;gap:.5rem;flex-wrap:wrap"><button class="sm">Export config (.json)</button><button class="sm">Export results (.json)</button><button class="sm">Export transactions (.csv)</button></div>
+      <p class="foot" style="margin:.8rem 0 0">Same data + same config + same engine version gives the same result. Historical results are not a forecast.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const TABS=[["data","Data"],["portfolio","Portfolio"],["strategy","Strategy"],["tax","Tax"],["results","Results"]];
+const tabs=$("#tabs");
+TABS.forEach(([id,label],i)=>{const b=document.createElement("button");b.setAttribute("role","tab");b.dataset.id=id;
+  b.innerHTML=`<span class="n">${i+1}</span> ${label}${id==="tax"?' <span class="tag soon">later</span>':''}`;b.onclick=()=>show(id);tabs.append(b)});
+function show(id){TABS.forEach(([t])=>$("#s-"+t).classList.toggle("hide",t!==id));
+  $$("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.id===id));
+  try{history.replaceState(null,"","#"+id)}catch(e){}}
+$("#theme").onclick=()=>document.documentElement.classList.toggle("dark");
+
+// Increment plan
+[["1 · Data: upload + validate","ok"],["2 · Buy & hold, 2+ assets","" ],["3 · Weights + annual rebalance + ledger",""],["4 · Contributions + XIRR",""],["5 · Threshold + compare",""],["6 · FX / INR base",""],["V2 · Perpetual, tax, inflation","soon"]]
+ .forEach(([t,c])=>{const s=document.createElement("span");s.className="tag "+c;s.textContent=t;$("#roadmap").append(s)});
+
+// Coverage chart
+(()=>{const rows=[["Nifty 50 TRI",1999.5,2026.7],["Nifty Next 50 TRI",2003.2,2026.7],["Nasdaq 100 UCITS",2010,2026.7]];
+ const x=v=>110+(v-1999)/(2027-1999)*510;let h="";
+ rows.forEach(([n,a,b],i)=>{const y=14+i*30;h+=`<text x="0" y="${y+11}">${n}</text><rect x="${x(a)}" y="${y}" width="${x(b)-x(a)}" height="14" rx="4" fill="hsl(var(--muted-foreground)/.35)"/>`});
+ h+=`<rect x="${x(2010)}" y="6" width="${x(2026.7)-x(2010)}" height="92" rx="4" fill="hsl(var(--c2)/.12)" stroke="hsl(var(--c2))" stroke-dasharray="4 3"/>`;
+ [2000,2005,2010,2015,2020,2025].forEach(v=>h+=`<text x="${x(v)}" y="118" text-anchor="middle">${v}</text>`);
+ $("#cover").innerHTML=h})();
+
+// Portfolio weights
+const ASSETS=[["Nifty 50","Nifty 50 TRI","benchmark",20,"c1"],["Nifty Next 50","Nifty Next 50 TRI","benchmark",10,"c4"],["Nifty Midcap 150","Nifty Midcap 150 TRI","benchmark",10,"c5"],["Nasdaq 100","Irish UCITS ETF","proxy",40,"c2"],["Gold","Gold ETF (INR)","proxy",10,"c3"],["India debt — short","Liquid fund","proxy",10,"c1"]];
+$("#weights tbody").innerHTML=ASSETS.map(a=>`<tr><td><i class="dot" style="background:hsl(var(--${a[4]}))"></i>${a[0]}</td><td>${a[1]} <span class="tag ${a[2]==="proxy"?"warn":""}">${a[2]}</span></td><td><div class="bar"><i style="width:${a[3]*2}%;background:hsl(var(--${a[4]}))"></i></div></td><td class="r"><input class="inp" style="width:70px;text-align:right;height:30px" value="${a[3]}"></td></tr>`).join("");
+
+// Charts (illustrative data, seeded)
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const r=rng(7),N=200;let val=10,inv=10;const V=[],I=[],D=[];let peak=10;
+for(let i=0;i<N;i++){const ret=0.0095+ (r()-.5)*0.05 - (i>122&&i<128?.05:0);val=(val+(i?.64:0))*(1+ret);inv+=i?.64:0;V.push(val);I.push(inv);peak=Math.max(peak,val);D.push(val/peak-1)}
+const k=284/V[N-1];V.forEach((v,i)=>V[i]=v*k);// scale so the chart ends at the KPI value (illustrative)
+const W=640,H=200,P={l:40,r:8,t:8,b:20};
+function path(a,min,max,w=W,h=H){const sx=i=>P.l+i/(a.length-1)*(w-P.l-P.r),sy=v=>P.t+(1-(v-min)/(max-min))*(h-P.t-P.b);return[sx,sy,a.map((v,i)=>(i?"L":"M")+sx(i).toFixed(1)+" "+sy(v).toFixed(1)).join("")]}
+function axes(min,max,fmt,w=W,h=H){let s="";for(let k=0;k<=4;k++){const v=min+(max-min)*k/4,y=P.t+(1-k/4)*(h-P.t-P.b);s+=`<line x1="${P.l}" x2="${w-P.r}" y1="${y}" y2="${y}" stroke="hsl(var(--border))"/><text x="${P.l-5}" y="${y+3}" text-anchor="end">${fmt(v)}</text>`}
+ [2010,2014,2018,2022,2026].forEach((yv,k)=>s+=`<text x="${P.l+k/4*(w-P.l-P.r)}" y="${h-4}" text-anchor="${k===4?"end":"middle"}">${yv}</text>`);return s}
+{const max=Math.max(...V)*1.05,[sx,sy,p]=path(V,0,max),[,,q]=path(I,0,max);
+ const marks=[30,58,84,118,152,181].map(i=>`<circle cx="${sx(i)}" cy="${sy(V[i])}" r="3.5" fill="hsl(var(--c3))"/>`).join("");
+ $("#ch-value").innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%">${axes(0,max,v=>"₹"+v.toFixed(0)+"L")}<path d="${q}" fill="none" stroke="hsl(var(--muted-foreground))" stroke-width="1.5" stroke-dasharray="4 3"/><path d="${p}" fill="none" stroke="hsl(var(--c1))" stroke-width="2"/>${marks}</svg>`}
+{const min=-.32,[,sy,p]=path(D,min,0,W/1.6,150),w=W/1.6;
+ const area=p+`L${w-P.r} ${sy(0)}L${P.l} ${sy(0)}Z`;
+ $("#ch-dd").innerHTML=`<svg viewBox="0 0 ${w} 150" width="100%">${axes(min,0,v=>(v*100).toFixed(0)+"%",w,150)}<path d="${area}" fill="hsl(var(--destructive)/.3)" stroke="hsl(var(--destructive))"/></svg>`}
+{const w=W/1.6,h=150,cols=ASSETS.map(a=>a[4]),tg=ASSETS.map(a=>a[3]/100);let s="";const n=60;
+ const pts=[];for(let i=0;i<n;i++){const d=tg.map((t,k)=>Math.max(.02,t+Math.sin(i/6+k*1.7)*.04*(k===3?2:1)));const z=d.reduce((a,b)=>a+b);pts.push(d.map(x=>x/z))}
+ const sx=i=>P.l+i/(n-1)*(w-P.l-P.r),sy=v=>P.t+(1-v)*(h-P.t-P.b);
+ for(let k=ASSETS.length-1;k>=0;k--){const top=pts.map(p=>p.slice(0,k+1).reduce((a,b)=>a+b,0)),bot=pts.map(p=>p.slice(0,k).reduce((a,b)=>a+b,0));
+  s+=`<path d="${top.map((v,i)=>(i?"L":"M")+sx(i)+" "+sy(v)).join("")}${bot.map((v,i)=>"L"+sx(n-1-i)+" "+sy(bot[n-1-i])).join("")}Z" fill="hsl(var(--${cols[k]}) / ${.85-k*.08})"/>`}
+ $("#ch-alloc").innerHTML=`<svg viewBox="0 0 ${w} ${h}" width="100%">${axes(0,1,v=>(v*100).toFixed(0)+"%",w,h)}${s}</svg>`;
+ $("#alloc-legend").innerHTML=ASSETS.map(a=>`<span><i class="dot" style="background:hsl(var(--${a[4]}))"></i>${a[0]}</span>`).join("")}
+
+// Result sub tabs
+const RS=[["overview","Overview"],["drawdown","Drawdown"],["tx","Transactions"],["compare","Comparison"],["risk","Risk"],["tax","Taxes"]];
+RS.forEach(([id,l])=>{const b=document.createElement("button");b.dataset.id=id;b.textContent=l;
+  if(id==="risk"||id==="tax"){b.disabled=true;b.innerHTML=l+' <span class="tag soon">later</span>'}
+  b.onclick=()=>{RS.forEach(([t])=>{const e=$("#r-"+t);if(e)e.classList.toggle("hide",t!==id)});$$("#rsubs button").forEach(x=>x.setAttribute("aria-selected",x.dataset.id===id))};$("#rsubs").append(b)});
+$("#rsubs button").click();
+$$("#strategies .opt:not(.off)").forEach(o=>o.onclick=()=>{$$("#strategies .opt").forEach(x=>x.classList.remove("on"));o.classList.add("on")});
+$$(".seg").forEach(s=>[...s.children].forEach(c=>c.onclick=()=>{[...s.children].forEach(x=>x.classList.remove("on"));c.classList.add("on")}));
+show(location.hash.slice(1)&&TABS.some(t=>t[0]===location.hash.slice(1))?location.hash.slice(1):"data");
+</script>
+</body>
+</html>

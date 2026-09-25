@@ -8,6 +8,7 @@ export default defineConfig({
       input: {
         main: "index.html",
         backtest: "backtest/index.html",
+        backtestMocks: "backtest/mocks/index.html",
       },
     },
   },
