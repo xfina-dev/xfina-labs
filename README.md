@@ -15,10 +15,11 @@ npm run dev
 
 ## Deploy
 
-Hosted on Cloudflare Pages (all new xfina projects use Cloudflare; only sakthipriyan.com stays on GitHub Pages). One site, one deployment: tools are paths, not separate projects.
+Cloudflare, as an assets-only Worker (same pattern as xsteer; all new xfina projects use Cloudflare, only sakthipriyan.com stays on GitHub Pages). One site, one deployment: tools are paths, not separate projects.
 
-- Production: push to `main` → https://labs.xfina.dev
-- Previews: every branch/PR gets its own `*.pages.dev` URL
-- Cloudflare settings: build command `npm run build`, output directory `dist`, Node 22
+- Push to `main` → `.github/workflows/deploy.yml` builds and runs `wrangler deploy` → https://labs.xfina.dev
+- `wrangler.jsonc` binds the custom domain; Cloudflare creates the DNS record.
+- Repo secrets required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
+- Manual deploy: `npm run build && npx wrangler deploy`
 
 Adding a tool: create `<tool>/index.html`, then register it in `vite.config.ts`.
