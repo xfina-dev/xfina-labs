@@ -5,6 +5,7 @@ import AppShell from '@/components/AppShell.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Tag from './Tag.vue';
+import GifPreview from './GifPreview.vue';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, datasetsFor, hasListings, findDataset } from './guide.js';
 
 // The wizard: asset class → region → vehicle → (US or Irish ETFs) → datasets. The path lives in
@@ -76,13 +77,14 @@ const groups = computed(() => {
   return [...m.entries()];
 });
 
+const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 </script>
 
 <template>
   <AppShell tool="/portfolio-engine/">
     <template #tagline>
-      Answer three questions and get the exact page to download each dataset from.<br />
+      Answer a few questions and get the exact page to download each dataset from.<br />
       Xfina reads the file as the source publishes it. Nothing is uploaded to any server.
     </template>
 
@@ -92,58 +94,61 @@ const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 
       </a>
     </div>
 
-    <div class="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] items-start">
-      <!-- Wizard -->
-      <Card class="bg-card border-border shadow-sm">
-        <CardHeader class="pb-4">
-          <CardTitle>Find your data</CardTitle>
-          <CardDescription>Pick as many datasets as you need. They collect in your download list.</CardDescription>
-        </CardHeader>
-        <CardContent class="space-y-6">
+    <!-- 1. Picker, full width -->
+    <Card class="bg-card border-border shadow-sm">
+      <CardHeader class="pb-4">
+        <CardTitle>Find your data</CardTitle>
+        <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
+      </CardHeader>
+      <CardContent class="space-y-6">
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">1</span>Asset class</h3>
-            <div class="grid gap-2 sm:grid-cols-3">
+            <div class="grid gap-2">
               <button v-for="c in CLASSES" :key="c.id" type="button" :class="tile(cls === c.id)" @click="pick('cls', c.id)">
                 <div class="font-medium">{{ c.title }}</div><div class="text-xs text-muted-foreground">{{ c.blurb }}</div>
               </button>
             </div>
           </section>
 
-          <section v-if="cls" class="space-y-2">
+          <section class="space-y-2" :class="!cls && 'opacity-50 pointer-events-none'">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">2</span>Region</h3>
-            <div class="grid gap-2 sm:grid-cols-3">
+            <div class="grid gap-2">
               <button v-for="r in REGIONS" :key="r.id" type="button" :class="tile(region === r.id)" @click="pick('region', r.id)">
                 <div class="font-medium">{{ r.title }}</div><div class="text-xs text-muted-foreground">{{ r.blurb }}</div>
               </button>
             </div>
           </section>
 
-          <section v-if="region" class="space-y-2">
-            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">3</span>How do you want to model it?</h3>
-            <div class="grid gap-2 sm:grid-cols-3">
+          <section class="space-y-2" :class="!region && 'opacity-50 pointer-events-none'">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">3</span>Model it as</h3>
+            <div class="grid gap-2">
               <button v-for="v in VEHICLES" :key="v.id" type="button" :class="tile(vehicle === v.id)" @click="pick('vehicle', v.id)">
-                <div class="flex items-center justify-between font-medium">{{ v.title }}<span class="text-xs font-normal text-muted-foreground">{{ count(v.id) || 'none' }}</span></div>
+                <div class="flex items-center justify-between font-medium">{{ v.title }}<span v-if="region" class="text-xs font-normal text-muted-foreground">{{ count(v.id) || 'none' }}</span></div>
                 <div class="text-xs text-muted-foreground">{{ v.blurb }}</div>
               </button>
             </div>
           </section>
 
-          <section v-if="needsListing" class="space-y-2">
-            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>Which ETFs?</h3>
-            <div class="grid gap-2 sm:grid-cols-2">
+          <section class="space-y-2" :class="!needsListing && 'opacity-50 pointer-events-none'">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>Which ETFs</h3>
+            <div class="grid gap-2">
               <button v-for="l in LISTINGS" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
                 <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground">{{ l.blurb }}</div>
               </button>
+              <p v-if="!needsListing" class="text-xs text-muted-foreground">For US and Global ETFs only.</p>
             </div>
           </section>
+        </div>
 
-          <section v-if="ready" class="space-y-4 border-t pt-6">
-            <h3 class="text-sm font-semibold">Datasets</h3>
-            <p v-if="!result.items.length" class="rounded-md border border-dashed bg-muted/30 p-6 text-sm text-muted-foreground text-center">
-              {{ result.note || 'Nothing is listed here yet.' }}
-            </p>
-            <template v-else>
-              <p v-if="result.note" class="text-xs text-muted-foreground">{{ result.note }}</p>
+        <section v-if="ready" class="space-y-4 border-t pt-6">
+          <h3 class="text-sm font-semibold">Datasets</h3>
+          <p v-if="!result.items.length" class="rounded-md border border-dashed bg-muted/30 p-6 text-sm text-muted-foreground text-center">
+            {{ result.note || 'Nothing is listed here yet.' }}
+          </p>
+          <template v-else>
+            <p v-if="result.note" class="text-xs text-muted-foreground">{{ result.note }}</p>
+            <div class="grid gap-6 md:grid-cols-2">
               <div v-for="[g, items] in groups" :key="g" class="space-y-2">
                 <div class="text-sm text-muted-foreground">{{ g }}</div>
                 <ul class="divide-y rounded-md border">
@@ -158,34 +163,53 @@ const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 
                   </li>
                 </ul>
               </div>
-            </template>
-          </section>
-        </CardContent>
-      </Card>
+            </div>
+          </template>
+        </section>
+      </CardContent>
+    </Card>
 
-      <!-- Download list -->
-      <Card class="bg-card border-border shadow-sm lg:sticky lg:top-8">
-        <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
-          <div class="space-y-1.5">
-            <CardTitle>Your download list</CardTitle>
-            <CardDescription>{{ list.length ? `${list.length} dataset${list.length > 1 ? 's' : ''} across ${bySite.length} website${bySite.length > 1 ? 's' : ''}. Visit each site once, then import the files.` : 'Add datasets and they are grouped here by website.' }}</CardDescription>
-          </div>
-          <Button v-if="list.length" variant="ghost" size="sm" @click="picked = []">Clear all</Button>
+    <!-- 2. Everything selected -->
+    <Card class="bg-card border-border shadow-sm">
+      <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
+        <div class="space-y-1.5">
+          <CardTitle>Selected</CardTitle>
+          <CardDescription>{{ list.length ? `${list.length} dataset${list.length > 1 ? 's' : ''} across ${bySite.length} website${bySite.length > 1 ? 's' : ''}.` : 'Nothing selected yet. Add datasets above.' }}</CardDescription>
+        </div>
+        <Button v-if="list.length" variant="ghost" size="sm" @click="picked = []">Clear all</Button>
+      </CardHeader>
+      <CardContent>
+        <div v-if="!list.length" class="rounded-md border border-dashed bg-muted/30 p-8 text-center text-sm text-muted-foreground">Nothing added yet.</div>
+        <ul v-else class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+          <li v-for="i in list" :key="i.id" class="flex items-start justify-between gap-2 rounded-md border p-3">
+            <div class="min-w-0 text-sm">
+              <div class="font-medium">{{ i.name }} <Tag v-if="i.code">{{ i.code }}</Tag></div>
+              <div class="text-xs text-muted-foreground mt-0.5">{{ i.group }} · {{ HOW[i.how].site }} · {{ i.ccy }}</div>
+            </div>
+            <Button variant="ghost" size="sm" class="h-7 px-2 -mr-1 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+          </li>
+        </ul>
+      </CardContent>
+    </Card>
+
+    <!-- 3. Download list, by website -->
+    <div v-if="list.length" class="space-y-8">
+      <h2 class="text-xl font-semibold tracking-tight">Download list</h2>
+      <Card v-for="g in bySite" :key="g.site" class="bg-card border-border shadow-sm">
+        <CardHeader class="pb-4">
+          <CardTitle class="text-xl">{{ g.site }}</CardTitle>
+          <CardDescription>{{ g.items.length }} to download here. Open the page, follow the steps, then import the files.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div v-if="!list.length" class="rounded-md border border-dashed bg-muted/30 p-10 text-center text-sm text-muted-foreground">Nothing added yet.</div>
-          <ul v-else class="space-y-4">
-            <li v-for="g in bySite" :key="g.site" class="rounded-md border p-4 space-y-4">
-              <div class="flex items-start justify-between gap-3">
-                <div class="font-semibold">{{ g.site }} <span class="text-xs font-normal text-muted-foreground">{{ g.items.length }} to download</span></div>
-              </div>
+        <CardContent class="space-y-6">
+          <GifPreview :slug="slug(g.site)" :title="g.site" />
 
+          <div class="grid gap-6 lg:grid-cols-2 items-start">
+            <div class="space-y-4">
               <div v-if="g.shared.length" class="flex flex-wrap gap-2">
                 <a v-for="l in g.shared" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
                   <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
                 </a>
               </div>
-
               <div v-for="h in g.hows" :key="h.title" class="text-sm">
                 <div class="font-medium text-muted-foreground text-xs mb-1">{{ g.hows.length > 1 ? h.title : 'Steps' }}</div>
                 <ol class="list-decimal pl-5 space-y-1">
@@ -193,26 +217,26 @@ const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 
                 </ol>
                 <p class="text-xs text-muted-foreground mt-1">You will get: {{ h.format }} Import it as it is.</p>
               </div>
+            </div>
 
-              <div>
-                <div class="font-medium text-muted-foreground text-xs mb-1">Download</div>
-                <ul class="divide-y rounded-md border">
-                  <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
-                    <div class="min-w-0 text-sm">
-                      <span class="font-medium">{{ i.name }}</span> <Tag v-if="i.code">{{ i.code }}</Tag>
-                      <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.ret }}</div>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
-                        <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
-                      </a>
-                      <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
+            <div>
+              <div class="font-medium text-muted-foreground text-xs mb-1">Download</div>
+              <ul class="divide-y rounded-md border">
+                <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
+                  <div class="min-w-0 text-sm">
+                    <span class="font-medium">{{ i.name }}</span> <Tag v-if="i.code">{{ i.code }}</Tag>
+                    <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.ret }}</div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
+                      <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
+                    </a>
+                    <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
