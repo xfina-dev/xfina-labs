@@ -316,8 +316,41 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               </div>
               <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>
               <p class="text-xs text-muted-foreground">
-                Covers {{ PERIODS.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). Current and Previous FY are worked out again each time you click the bookmark, so running it later covers whatever is current then, and importing a newer file replaces the same dates from older ones.
+                One file per financial year (April to March), because the site exports at most a year at a time. Current and Previous FY are worked out again each time you click the bookmark.
               </p>
+            </div>
+
+            <!-- The indexes and the files each will produce for the chosen period -->
+            <div v-if="g.bookmarklet.rows.length" class="overflow-x-auto rounded-md border bg-background">
+              <table class="w-full text-sm">
+                <thead class="text-muted-foreground">
+                  <tr class="border-b">
+                    <th class="text-left font-medium px-3 py-2">Index</th>
+                    <th class="text-right font-medium px-3 py-2">Files</th>
+                    <th class="text-left font-medium px-3 py-2">Start and end dates</th>
+                    <th class="text-right font-medium px-3 py-2">Full years</th>
+                    <th class="text-right font-medium px-3 py-2">Partial years</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y">
+                  <tr v-for="r in g.bookmarklet.rows" :key="r.index">
+                    <td class="px-3 py-2 font-medium">{{ r.index }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ r.files }}</td>
+                    <td class="px-3 py-2 font-mono text-xs whitespace-nowrap">{{ r.files ? `${r.start} → ${r.end}` : 'Not in this period' }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ r.fullYears }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ r.partialYears }}</td>
+                  </tr>
+                </tbody>
+                <tfoot v-if="g.bookmarklet.rows.length > 1">
+                  <tr class="border-t font-medium">
+                    <td class="px-3 py-2">Total</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.files }}</td>
+                    <td class="px-3 py-2" />
+                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.fullYears, 0) }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.partialYears, 0) }}</td>
+                  </tr>
+                </tfoot>
+              </table>
             </div>
 
             <ol class="list-decimal pl-5 space-y-2 text-sm border-t pt-4">
@@ -331,7 +364,6 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                     @click.prevent="dragHint = true"
                   >{{ g.bookmarklet.label }}</a>
                   <span v-if="dragHint" class="ml-2 text-xs text-muted-foreground">Drag it, don't click it here.</span>
-                  <div class="text-xs text-muted-foreground mt-1">It does {{ g.bookmarklet.indexes.join(', ') }}: about {{ g.bookmarklet.files }} {{ g.bookmarklet.files === 1 ? 'file' : 'files' }}, one after another.</div>
                 </div>
               </li>
               <li>
@@ -342,7 +374,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               </li>
               <li>Click the bookmark and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
               <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, one financial year at a time and one index after another, with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
-              <li>Your browser saves the files as it does for any download: in its usual folder, or wherever it asks you. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
+              <li>Your browser saves the files as it does for any download: in its usual folder, or wherever it asks you. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date, and a newer file replaces older data for the same dates.</li>
             </ol>
 
             <p class="text-xs text-muted-foreground border-t pt-3">

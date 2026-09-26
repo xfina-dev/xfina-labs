@@ -8,6 +8,7 @@ import { bookmarkletHref } from './bookmarklet.js';
 // The indexes the NSE Indices page lists under Total Returns (Broad Market). Debt indices are not among them.
 const NSE_SUPPORTED = ['Nifty 50', 'Nifty Next 50', 'Nifty Midcap 150', 'Nifty Smallcap 250'];
 
+const parseIso = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 // First day of the financial year (April to March) that contains `d`.
@@ -37,18 +38,43 @@ export function periodDates(from, now = new Date()) {
 // index itself) to where it ends (never after today).
 function span(indexStart, { from, start, end }, now = new Date()) {
   const cur = yearStart(now);
-  const wanted = from === 'CURRENT' ? cur : from === 'PREVIOUS' ? new Date(cur.getFullYear() - 1, cur.getMonth(), 1) : from === 'CUSTOM' && start ? new Date(start) : null;
-  let s0 = new Date(indexStart);
+  const wanted = from === 'CURRENT' ? cur : from === 'PREVIOUS' ? new Date(cur.getFullYear() - 1, cur.getMonth(), 1) : from === 'CUSTOM' && start ? parseIso(start) : null;
+  let s0 = parseIso(indexStart);
   if (wanted && wanted > s0) s0 = wanted;
-  let e0 = from === 'CUSTOM' && end ? new Date(end) : now;
-  if (e0 > now) e0 = now;
+  let e0 = from === 'CUSTOM' && end ? parseIso(end) : new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (e0 > now) e0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   return s0 <= e0 ? [s0, e0] : null;
 }
 
-// How many files one run makes for one index: one per financial year in the period.
-function files(indexStart, period) {
+// The files one run makes for one index: one per financial year in the period, cut at the period's ends. Same
+// rule as the bookmark script. A file is a full year when it covers 1 April to 31 March.
+function fileWindows(indexStart, period) {
   const r = span(indexStart, period);
-  return r ? yearStart(r[1]).getFullYear() - yearStart(r[0]).getFullYear() + 1 : 0;
+  if (!r) return [];
+  const out = [];
+  let cursor = r[0];
+  while (cursor <= r[1]) {
+    const y = cursor.getFullYear();
+    let end = new Date(cursor.getMonth() >= 3 ? y + 1 : y, 2, 31);
+    if (end > r[1]) end = r[1];
+    const full = cursor.getMonth() === 3 && cursor.getDate() === 1 && end.getMonth() === 2 && end.getDate() === 31;
+    out.push({ start: cursor, end, full });
+    cursor = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1);
+  }
+  return out;
+}
+
+// One row of the Files table for one index.
+function fileRow(name, indexStart, period) {
+  const w = fileWindows(indexStart, period);
+  return {
+    index: name,
+    files: w.length,
+    start: w.length ? iso(w[0].start) : '',
+    end: w.length ? iso(w.at(-1).end) : '',
+    fullYears: w.filter((x) => x.full).length,
+    partialYears: w.filter((x) => !x.full).length,
+  };
 }
 
 const BUILDERS = {
@@ -70,7 +96,8 @@ const BUILDERS = {
       indexes: picked.map((i) => i.asset),
       // The earliest start among the picked indexes: what Full history shows as its start date.
       earliest: picked.map((i) => i.inception).sort()[0],
-      files: invalid ? 0 : picked.reduce((n, i) => n + files(i.inception, period), 0),
+      rows: invalid ? [] : picked.map((i) => fileRow(i.asset, i.inception, period)),
+      files: invalid ? 0 : picked.reduce((n, i) => n + fileWindows(i.inception, period).length, 0),
       skipped: items.length - picked.length,
     };
   },
