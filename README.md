@@ -4,7 +4,13 @@ Experimental finance tools at [labs.xfina.dev](https://labs.xfina.dev). Static, 
 
 | Tool | Path | Status |
 |---|---|---|
-| Multi-asset portfolio backtester (bring your own data) | `/backtest/` | placeholder |
+| Multi-asset portfolio backtester (bring your own data) | `/backtest/` | design mock |
+
+## Stack and theme
+
+Vue 3 + Tailwind 3 + shadcn-vue, the same stack as [Xfina](https://github.com/xfina-dev/xfina) so every xfina.dev subdomain looks identical.
+
+Copied verbatim from `xfina/web`: `tailwind.config.js`, `postcss.config.js`, `components.json`, `src/style.css` (theme tokens), `src/components/ui/*`, `src/lib/utils.js`. Labs-only additions live in separate files (`src/charts.css`, `src/components/AppShell.vue`, `AppHeader.vue`, `PrivacyDialog.vue`). When Xfina's theme changes, re-copy those files.
 
 ## Develop
 
@@ -22,4 +28,4 @@ Cloudflare, as an assets-only Worker (same pattern as xsteer; all new xfina proj
 - Repo secrets required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 - Manual deploy: `npm run build && npx wrangler deploy`
 
-Adding a tool: create `<tool>/index.html`, then register it in `vite.config.ts`.
+Adding a tool: create `<tool>/index.html` and `main.js` (mount a component inside `AppShell`), register it in `vite.config.js`, and add it to `TOOLS` in `AppHeader.vue`.
