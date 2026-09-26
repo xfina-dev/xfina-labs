@@ -205,14 +205,14 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
       </CardHeader>
       <CardContent>
         <div v-if="!list.length" class="rounded-md border border-dashed bg-muted/30 p-8 text-center text-sm text-muted-foreground">Nothing added yet.</div>
-        <!-- Asset classes across, the way each is modelled down. -->
+        <!-- How each is modelled across, asset classes down. -->
         <div v-else class="overflow-x-auto">
           <div class="grid gap-2 min-w-[720px] grid-cols-[4rem_repeat(3,minmax(0,1fr))]">
             <div />
-            <div v-for="c in CLASSES" :key="c.id" class="px-1 text-sm font-semibold">{{ c.title }}</div>
-            <template v-for="v in VEHICLES" :key="v.id">
-              <div class="pt-2 text-sm font-semibold">{{ v.title }}</div>
-              <div v-for="c in CLASSES" :key="c.id" class="min-h-12 space-y-2 rounded-md border border-dashed p-2">
+            <div v-for="v in VEHICLES" :key="v.id" class="px-1 text-sm font-semibold">{{ v.title }}</div>
+            <template v-for="c in CLASSES" :key="c.id">
+              <div class="pt-2 text-sm font-semibold">{{ c.title }}</div>
+              <div v-for="v in VEHICLES" :key="v.id" class="min-h-12 space-y-2 rounded-md border border-dashed p-2">
                 <div v-for="i in cell(c.id, v.id)" :key="i.id" class="flex items-start justify-between gap-2 rounded-md border bg-card p-2.5">
                   <div class="min-w-0 text-sm">
                     <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></div>
