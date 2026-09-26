@@ -234,10 +234,14 @@ async function fromSchemes(def, region, cls, { etfs: withEtfs = true } = {}) {
   const etfs = pool_.filter((s) => isEtf(s.schemeName));
   // Equity: index funds only. Indian funds that feed a US index are usually fund-of-funds, so those are allowed there.
   const mfs = pool_.filter((s) => !isEtf(s.schemeName) && (cls !== 'equity' || /index/i.test(s.schemeName) || (def.feeder && FOF.test(s.schemeName))));
-  const cap = (a) => a.slice(0, 80);
+  const cap = (a) => a.slice(0, 160);
   const [me, mm] = [withEtfs ? await measure(cap(etfs)) : [], await measure(cap(mfs))];
   if (withEtfs) node(cls, region, 'etf', null, def.asset).instruments.push(...oldestFirst(me, 'etf'));
-  node(cls, region, 'mf', null, def.asset).instruments.push(...oldestFirst(mm, 'mf'));
+  // Regular and Direct plans are kept apart: Regular carries the longer history (Direct plans only exist
+  // from 2013-01-01), Direct costs less. The guide lets the user choose between them.
+  const isDirect = (r) => /direct/i.test(r.c.schemeName);
+  node(cls, region, 'mf', 'regular', def.asset).instruments.push(...oldestFirst(mm.filter((r) => !isDirect(r)), 'mf'));
+  node(cls, region, 'mf', 'direct', def.asset).instruments.push(...oldestFirst(mm.filter(isDirect), 'mf'));
   console.log(`  ${cls}/${region}/${def.asset}: ${etfs.length} ETF candidates → ${me.length} live, ${mfs.length} fund candidates → ${mm.length} live`);
 }
 // Indian ETFs come from NSE (below), so from AMFI only the mutual funds are taken here.

@@ -6,6 +6,7 @@
    "class": "equity",
    "region": "india",
    "vehicle": "mf",
+   "listing": "regular",
    "asset": "Nifty 50",
    "instruments": [
     {
@@ -86,6 +87,88 @@
    "class": "equity",
    "region": "india",
    "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nifty 50",
+   "instruments": [
+    {
+     "id": "mf118581",
+     "name": "Franklin India NSE Nifty 50 Index Fund - Direct Plan - Growth",
+     "code": "118581",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3381,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/118581"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119063",
+     "name": "HDFC Nifty 50 Index Fund - Direct Plan - Growth Option",
+     "code": "119063",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3381,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/119063"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119648",
+     "name": "Aditya Birla Sun Life Nifty 50 Index Fund - Direct Plan - GROWTH",
+     "code": "119648",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3379,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/119648"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
    "asset": "Nifty Next 50",
    "instruments": [
     {
@@ -166,6 +249,88 @@
    "class": "equity",
    "region": "india",
    "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nifty Next 50",
+   "instruments": [
+    {
+     "id": "mf120684",
+     "name": "ICICI Prudential Nifty Next 50 Index Fund - Direct Plan - Growth",
+     "code": "120684",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3380,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/120684"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf143341",
+     "name": "UTI - Nifty Next 50 Index Fund - Direct Plan - Growth",
+     "code": "143341",
+     "plan": "Direct",
+     "inception": "2018-06-29",
+     "lastNav": "2026-09-25",
+     "observations": 2029,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/143341"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf146381",
+     "name": "DSP Nifty Next 50 Index Fund - Direct Plan - Growth",
+     "code": "146381",
+     "plan": "Direct",
+     "inception": "2019-02-22",
+     "lastNav": "2026-09-25",
+     "observations": 1869,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/146381"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
    "asset": "Nifty Midcap 150",
    "instruments": [
     {
@@ -246,12 +411,13 @@
    "class": "equity",
    "region": "india",
    "vehicle": "mf",
-   "asset": "Nifty Smallcap 250",
+   "listing": "direct",
+   "asset": "Nifty Midcap 150",
    "instruments": [
     {
-     "id": "mf147623",
-     "name": "Motilal Oswal Nifty Smallcap 250 Index Fund - Direct Plan - Growth",
-     "code": "147623",
+     "id": "mf147622",
+     "name": "Motilal Oswal Nifty Midcap 150 Index Fund - Direct Plan - Growth",
+     "code": "147622",
      "plan": "Direct",
      "inception": "2019-09-11",
      "lastNav": "2026-09-25",
@@ -264,7 +430,88 @@
      "links": [
       {
        "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/147623"
+       "url": "https://api.mfapi.in/mf/147622"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148726",
+     "name": "Nippon India Nifty Midcap 150 Index Fund - Direct Plan - Growth Option",
+     "code": "148726",
+     "plan": "Direct",
+     "inception": "2021-02-23",
+     "lastNav": "2026-09-25",
+     "observations": 1377,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/148726"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148807",
+     "name": "Aditya Birla Sun Life Nifty Midcap 150 Index Fund - Direct Plan - GROWTH",
+     "code": "148807",
+     "plan": "Direct",
+     "inception": "2021-04-06",
+     "lastNav": "2026-09-25",
+     "observations": 1350,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/148807"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Nifty Smallcap 250",
+   "instruments": [
+    {
+     "id": "mf147624",
+     "name": "Motilal Oswal Nifty Smallcap 250 Index Fund - Regular Plan - GROWTH",
+     "code": "147624",
+     "plan": "Regular",
+     "inception": "2019-09-11",
+     "lastNav": "2026-09-25",
+     "observations": 1737,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/147624"
       },
       {
        "label": "AMFI NAV history",
@@ -323,9 +570,91 @@
    ]
   },
   {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nifty Smallcap 250",
+   "instruments": [
+    {
+     "id": "mf147623",
+     "name": "Motilal Oswal Nifty Smallcap 250 Index Fund - Direct Plan - Growth",
+     "code": "147623",
+     "plan": "Direct",
+     "inception": "2019-09-11",
+     "lastNav": "2026-09-25",
+     "observations": 1737,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/147623"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148519",
+     "name": "Nippon India Nifty Smallcap 250 Index Fund - Direct Plan - Growth Option",
+     "code": "148519",
+     "plan": "Direct",
+     "inception": "2020-10-19",
+     "lastNav": "2026-09-25",
+     "observations": 1464,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/148519"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149283",
+     "name": "ICICI Prudential Nifty Smallcap 250 Index Fund - Direct Plan - Growth",
+     "code": "149283",
+     "plan": "Direct",
+     "inception": "2021-11-03",
+     "lastNav": "2026-09-25",
+     "observations": 1206,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/149283"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
    "class": "gold",
    "region": "india",
    "vehicle": "mf",
+   "listing": "regular",
    "asset": "Gold",
    "instruments": [
     {
@@ -377,6 +706,39 @@
      ]
     },
     {
+     "id": "mf115676",
+     "name": "SBI GOLD FUND - Regular Plan - Growth",
+     "code": "115676",
+     "plan": "Regular",
+     "inception": "2011-09-19",
+     "lastNav": "2026-09-25",
+     "observations": 3639,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/115676"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Gold",
+   "instruments": [
+    {
      "id": "mf115132",
      "name": "Quantum Gold ETF FOF - Direct Plan - Growth Option",
      "code": "115132",
@@ -399,6 +761,54 @@
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
      ]
+    },
+    {
+     "id": "mf119132",
+     "name": "HDFC Gold ETF Fund of Fund - Direct Plan - Growth Option",
+     "code": "119132",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3382,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/119132"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf120546",
+     "name": "Aditya Birla Sun Life Gold Fund - Direct Plan - GROWTH",
+     "code": "120546",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3369,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/120546"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
     }
    ]
   },
@@ -406,6 +816,7 @@
    "class": "debt",
    "region": "india",
    "vehicle": "mf",
+   "listing": "regular",
    "asset": "Short duration",
    "instruments": [
     {
@@ -485,6 +896,88 @@
    "class": "debt",
    "region": "india",
    "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "mf103734",
+     "name": "Quantum Liquid Fund - Direct Plan - Growth Option",
+     "code": "103734",
+     "plan": "Direct",
+     "inception": "2006-04-09",
+     "lastNav": "2026-09-26",
+     "observations": 6063,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/103734"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119091",
+     "name": "HDFC Liquid Fund - Direct Plan - Growth Option",
+     "code": "119091",
+     "plan": "Direct",
+     "inception": "2012-12-31",
+     "lastNav": "2026-09-25",
+     "observations": 4240,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/119091"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119568",
+     "name": "Aditya Birla Sun Life Liquid Fund - Direct Plan - GROWTH",
+     "code": "119568",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 4376,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/119568"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
    "asset": "Long duration",
    "instruments": [
     {
@@ -552,6 +1045,87 @@
       {
        "label": "NAV data (JSON)",
        "url": "https://api.mfapi.in/mf/100058"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "mf118498",
+     "name": "Franklin India Gilt Fund - Direct Plan - Growth",
+     "code": "118498",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3316,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/118498"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119116",
+     "name": "HDFC Gilt Fund - Direct Plan - Growth Option",
+     "code": "119116",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3318,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/119116"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119605",
+     "name": "Aditya Birla Sun Life Gilt Fund - Direct Plan - GROWTH",
+     "code": "119605",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3317,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/119605"
       },
       {
        "label": "AMFI NAV history",
@@ -1062,6 +1636,40 @@
    "class": "equity",
    "region": "us",
    "vehicle": "mf",
+   "listing": "regular",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "mf148382",
+     "name": "Motilal Oswal S&P 500 Index Fund - Regular Plan - GROWTH",
+     "code": "148382",
+     "plan": "Regular",
+     "inception": "2020-04-29",
+     "lastNav": "2026-09-25",
+     "observations": 1583,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/148382"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "direct",
    "asset": "S&P 500",
    "instruments": [
     {
@@ -1094,6 +1702,7 @@
    "class": "equity",
    "region": "us",
    "vehicle": "mf",
+   "listing": "regular",
    "asset": "Nasdaq 100",
    "instruments": [
     {
@@ -1159,6 +1768,87 @@
       {
        "label": "NAV data (JSON)",
        "url": "https://api.mfapi.in/mf/149910"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "mf149219",
+     "name": "ICICI Prudential NASDAQ 100 Index Fund - Direct Plan - Growth",
+     "code": "149219",
+     "plan": "Direct",
+     "inception": "2021-10-19",
+     "lastNav": "2026-09-25",
+     "observations": 1173,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/149219"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149961",
+     "name": "Invesco India - Invesco EQQQ Nasdaq-100 ETF Fund of Fund - Direct Plan - Growth",
+     "code": "149961",
+     "plan": "Direct",
+     "inception": "2022-04-25",
+     "lastNav": "2026-09-25",
+     "observations": 992,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/149961"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf150751",
+     "name": "Axis NASDAQ 100 US Specific Equity Passive FOF - Direct Plan - Growth Option",
+     "code": "150751",
+     "plan": "Direct",
+     "inception": "2022-11-04",
+     "lastNav": "2026-09-25",
+     "observations": 940,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/150751"
       },
       {
        "label": "AMFI NAV history",

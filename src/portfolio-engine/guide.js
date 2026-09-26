@@ -21,6 +21,11 @@ export const REGIONS = [
   { id: 'us', title: 'US', blurb: 'USD, US markets' },
   { id: 'global', title: 'Global', blurb: 'USD, world-wide markets' },
 ];
+// Mutual fund plans. Regular first: it is the default because it has the longer history.
+export const PLANS = [
+  { id: 'regular', title: 'Regular', blurb: 'More history, higher cost' },
+  { id: 'direct', title: 'Direct', blurb: 'Cheaper, history from 2013' },
+];
 export const VEHICLES = [
   { id: 'index', title: 'Index', blurb: 'The benchmark itself (total return)' },
   { id: 'etf', title: 'ETF', blurb: 'What you could have held on an exchange' },
@@ -109,8 +114,9 @@ const same = (n, cls, region, vehicle, listing) => n.class === cls && n.region =
 
 // What each step of the wizard offers, given the choices before it.
 export const vehiclesFor = (cls, region) => VEHICLES.filter((v) => nodes.some((n) => n.class === cls && n.region === region && n.vehicle === v.id)).map((v) => ({ ...v, count: nodes.filter((n) => n.class === cls && n.region === region && n.vehicle === v.id).reduce((s, n) => s + n.instruments.length, 0) }));
-export const listingsFor = (cls, region) => LISTINGS.filter((l) => nodes.some((n) => n.class === cls && n.region === region && n.vehicle === 'etf' && n.listing === l.id));
-export const hasListings = (cls, region) => listingsFor(cls, region).length > 0;
+// Lane 4 holds a listing for ETFs (Irish, US, Indian) and a plan for mutual funds (Regular, Direct).
+export const listingsFor = (cls, region, vehicle = 'etf') => (vehicle === 'mf' ? PLANS : vehicle === 'etf' ? LISTINGS : []).filter((l) => nodes.some((n) => n.class === cls && n.region === region && n.vehicle === vehicle && n.listing === l.id));
+export const hasListings = (cls, region, vehicle) => listingsFor(cls, region, vehicle).length > 0;
 export const assetsFor = (cls, region, vehicle, listing) => [...new Set(nodes.filter((n) => same(n, cls, region, vehicle, listing)).map((n) => n.asset))];
 // Oldest first, three at most (the tree is built that way).
 export const instrumentsFor = (cls, region, vehicle, listing, asset) => nodes.find((n) => same(n, cls, region, vehicle, listing) && n.asset === asset)?.instruments || [];

@@ -21,8 +21,8 @@ const listing = ref(null);
 
 const vehicles = computed(() => vehiclesFor(cls.value, region.value));
 const offers = (id) => vehicles.value.some((v) => v.id === id);
-const listings = computed(() => (vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : []));
-// The fourth lane has content only when there is a listing to choose: US and Global ETFs.
+const listings = computed(() => listingsFor(cls.value, region.value, vehicle.value));
+// The fourth lane has content only when there is something to choose: the ETF listing for US and Global ETFs, or the plan for mutual funds.
 const showListing = computed(() => listings.value.length > 0);
 const groups = computed(() => {
   const g = groupsFor(cls.value, region.value, vehicle.value, listing.value);
@@ -33,8 +33,8 @@ const groups = computed(() => {
 // Bring the lanes back to a valid state after any change. Irish ETFs are the default listing.
 function settle(wantListing = null) {
   if (!offers(vehicle.value)) vehicle.value = vehicles.value.find((v) => v.id === 'index')?.id || vehicles.value[0]?.id || vehicle.value;
-  const ls = listingsFor(cls.value, region.value);
-  listing.value = vehicle.value === 'etf' && ls.length ? (ls.some((x) => x.id === wantListing) ? wantListing : ls[0].id) : null;
+  const ls = listingsFor(cls.value, region.value, vehicle.value);
+  listing.value = ls.length ? (ls.some((x) => x.id === wantListing) ? wantListing : ls[0].id) : null;
 }
 const pick = (which, v) => {
   const keepListing = listing.value;
@@ -145,7 +145,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                Global ETFs, where Irish ETFs are the default; otherwise the lane is simply empty. -->
           <section class="space-y-2">
             <template v-if="showListing">
-              <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>Which ETFs</h3>
+              <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>{{ vehicle === 'mf' ? 'Which plan' : 'Which ETFs' }}</h3>
               <div class="grid gap-2">
                 <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
                   <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground">{{ l.blurb }}</div>
