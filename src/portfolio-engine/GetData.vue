@@ -61,6 +61,8 @@ const picked = ref([]);
 const has = (id) => picked.value.includes(id);
 const toggle = (id) => (picked.value = has(id) ? picked.value.filter((x) => x !== id) : [...picked.value, id]);
 const list = computed(() => picked.value.map(findDataset).filter(Boolean));
+const cell = (c, v) => list.value.filter((i) => i.cls === c && i.vehicle === v);
+const regionTitle = (id) => REGIONS.find((r) => r.id === id)?.title || id;
 
 onMounted(() => {
   fromHash();
@@ -203,15 +205,25 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
       </CardHeader>
       <CardContent>
         <div v-if="!list.length" class="rounded-md border border-dashed bg-muted/30 p-8 text-center text-sm text-muted-foreground">Nothing added yet.</div>
-        <ul v-else class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-          <li v-for="i in list" :key="i.id" class="flex items-start justify-between gap-2 rounded-md border p-3">
-            <div class="min-w-0 text-sm">
-              <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></div>
-              <div class="text-xs text-muted-foreground mt-0.5">{{ i.asset }} · {{ HOW[i.how].site }} · {{ i.ccy }}</div>
-            </div>
-            <Button variant="ghost" size="sm" class="h-7 px-2 -mr-1 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
-          </li>
-        </ul>
+        <!-- Asset classes across, the way each is modelled down. -->
+        <div v-else class="overflow-x-auto">
+          <div class="grid gap-2 min-w-[720px] grid-cols-[4rem_repeat(3,minmax(0,1fr))]">
+            <div />
+            <div v-for="c in CLASSES" :key="c.id" class="px-1 text-sm font-semibold">{{ c.title }}</div>
+            <template v-for="v in VEHICLES" :key="v.id">
+              <div class="pt-2 text-sm font-semibold">{{ v.title }}</div>
+              <div v-for="c in CLASSES" :key="c.id" class="min-h-12 space-y-2 rounded-md border border-dashed p-2">
+                <div v-for="i in cell(c.id, v.id)" :key="i.id" class="flex items-start justify-between gap-2 rounded-md border bg-card p-2.5">
+                  <div class="min-w-0 text-sm">
+                    <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></div>
+                    <div class="text-xs text-muted-foreground mt-0.5">{{ i.asset }} · {{ regionTitle(i.region) }} · {{ HOW[i.how].site }}</div>
+                  </div>
+                  <Button variant="ghost" size="sm" class="h-7 px-2 -mr-1 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
       </CardContent>
     </Card>
 
