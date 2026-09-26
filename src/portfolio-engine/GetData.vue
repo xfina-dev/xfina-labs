@@ -226,27 +226,30 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
             <ol class="list-decimal pl-5 space-y-2 text-sm">
               <li>
-                Drag this button to your bookmarks bar:
-                <a
-                  :href="g.bookmarklet.href" draggable="true" title="Drag me to your bookmarks bar"
-                  class="ml-2 inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline align-middle"
-                  @click.prevent="dragHint = true"
-                >{{ g.bookmarklet.label }}</a>
-                <span v-if="dragHint" class="ml-2 text-xs text-muted-foreground">Drag it, don't click it here.</span>
+                Drag {{ g.bookmarklet.bookmarks.length > 1 ? 'these buttons' : 'this button' }} to your bookmarks bar, one per index:
+                <div class="mt-2 flex flex-wrap gap-2">
+                  <a
+                    v-for="b in g.bookmarklet.bookmarks" :key="b.label" :href="b.href" draggable="true" :title="`Drag me to your bookmarks bar. ${b.years} one-year files from ${b.since}`"
+                    class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
+                    @click.prevent="dragHint = true"
+                  >{{ b.label }}</a>
+                </div>
+                <span v-if="dragHint" class="text-xs text-muted-foreground">Drag them, don't click them here.</span>
               </li>
               <li>
-                Open the site:
+                Open the site, once per index, each in its own tab:
                 <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
                   <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
                 </a>
               </li>
-              <li>Click the bookmark. It downloads exactly the datasets you added here. The files save to your Downloads folder. Allow multiple downloads if the browser asks.</li>
-              <li>Come back to Portfolio Engine and use <strong>Import Files</strong>.</li>
+              <li>In each tab, click that index's bookmark. Each shows its own progress bar and runs alongside the others.</li>
+              <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one year at a time, pausing between files like a person would. The page won't export more than a year at once, so a long index takes a few minutes.</li>
+              <li>The files land in your Downloads folder, the same as downloading by hand. Allow multiple downloads if the browser asks. Then use <strong>Import Files</strong> in Portfolio Engine: it merges the yearly files by date.</li>
             </ol>
             <p class="text-xs text-muted-foreground">
-              Downloads: {{ g.bookmarklet.covers }}. It runs only on that site and sends nothing to Xfina.
+              Runs only on that site and sends nothing to Xfina.
               <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
-              Changed your list? Drag the button again to update the bookmark.
+              Changed your list? Drag the buttons again to update your bookmarks.
             </p>
           </div>
 
