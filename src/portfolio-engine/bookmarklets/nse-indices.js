@@ -32,7 +32,7 @@
   var DAY = 864e5;
   var FAST = 3;
   var WAIT = 15;
-  var GAP = 8;
+  var GAP = '6-9';
   var MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
   var host = location.hostname;
   if (host.replace(/^www\./, '') !== HOST) { alert('Xfina: open niftyindices.com (Reports, Historical Data) and click this bookmark again.'); return; }
@@ -181,7 +181,7 @@
       say('Choose a folder for the files (asked once)...');
       try { dir = await window.showDirectoryPicker({ mode: 'readwrite' }); } catch (e0) { dir = null; }
     }
-    var gentle = function () { return pause(1000); };
+    var gentle = function () { return pause(300); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
       document.querySelector('li.form5').click();
@@ -227,7 +227,7 @@
                 skip = 0;
                 for (var s = WAIT; s > 0 && !skip && !stop; s--) { q('xk').textContent = s; turn('xz', s / WAIT, s); await pause(1000); }
                 q('xn').style.display = 'none'; turn('xz', 1, GAP);
-              } else await nap(GAP);
+              } else await nap(6 + Math.floor(Math.random() * 4));
             }
           }
           done++;
