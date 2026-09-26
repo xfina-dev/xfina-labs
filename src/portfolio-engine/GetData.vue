@@ -164,7 +164,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                Global ETFs, where Irish ETFs are the default; otherwise the lane is simply empty. -->
           <section class="space-y-2">
             <template v-if="showListing">
-              <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>{{ vehicle === 'mf' ? 'Which plan' : 'Which ETFs' }}</h3>
+              <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>{{ vehicle === 'mf' ? 'Which plan' : 'ETF Domicile' }}</h3>
               <div class="grid gap-2">
                 <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
                   <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground">{{ l.blurb }}</div>
