@@ -16,6 +16,11 @@
                           and clicking twice in a day is harmless.
     Full history          every index from its own start, to redo everything.
     Custom                a start and an end date you choose.
+  The memory lives in the browser's storage for the site, which is kept separately for niftyindices.com and
+  www.niftyindices.com (NSE serves both). So the bookmark always works on the www address: if it is clicked on
+  the other one it moves the page there and asks for another click. If the browser blocks storage, the panel
+  says so, and Update then fetches the full history each time.
+
   The end is always today unless a custom end is set. The importer merges files by date, newer files replacing
   older data for the same dates, so overlap and repeats are harmless.
 
@@ -46,6 +51,11 @@
     alert('Xfina: open niftyindices.com (Reports, Historical Data) and click this bookmark again.');
     return;
   }
+  if (location.hostname === HOST) {
+    alert('Xfina: your browser keeps its memory separately for each address of this site, so this moves to the www address. Click the bookmark again once the page has loaded.');
+    location.replace(location.href.replace('//' + HOST, '//www.' + HOST));
+    return;
+  }
   if (typeof $ !== 'function' || !$.fn || !$.fn.datepicker || !document.querySelector('li.form5')) {
     alert('Xfina: this page has changed, so the bookmark cannot use it. Download by hand from Historical Data.');
     return;
@@ -63,6 +73,8 @@
     try { var m = JSON.parse(localStorage.getItem(STORE) || '{}'); m.last = m.last || {}; return m; } catch (e) { return { last: {} }; }
   };
   var write = function (m) { try { localStorage.setItem(STORE, JSON.stringify(m)); } catch (e) { } };
+  var storageOk = true;
+  try { localStorage.setItem(STORE + '.t', '1'); localStorage.removeItem(STORE + '.t'); } catch (e) { storageOk = false; }
   var memory = read();
 
   var picked = INDEXES.map(function () { return true; });
@@ -137,6 +149,7 @@
     picks +
     '<div style="display:flex;gap:6px;margin:10px 0 6px">' + modeBtn('UPDATE', 'Update') + modeBtn('FULL', 'Full history') + modeBtn('CUSTOM', 'Custom') + '</div>' +
     '<div id="xfina-custom" style="display:none;gap:8px;align-items:center;margin-bottom:6px;font-size:12px;color:#a1a1aa">Start ' + dateInput('xfina-from') + ' End ' + dateInput('xfina-to') + '</div>' +
+    '<div id="xfina-mem" style="display:none;margin:6px 0;padding:8px;border:1px solid #f59e0b;border-radius:6px;font-size:12px">Your browser is blocking storage for this site, so I can\'t remember what you have downloaded. Update will fetch the full history each time.</div>' +
     '<div id="xfina-plan" style="font-size:12px;color:#a1a1aa;margin:6px 0"></div>' +
     '<button id="xfina-go" style="width:100%;height:36px;border:0;border-radius:6px;background:#fafafa;color:#0a0a0b;font-weight:600;cursor:pointer">Start</button>' +
     '<div style="height:8px;background:#27272a;border-radius:9px;overflow:hidden;margin-top:10px"><div id="xfina-bar" style="height:100%;width:0;background:#4ade80;transition:width .3s"></div></div>' +
@@ -178,6 +191,7 @@
   };
 
   var renderPlan = function () {
+    el('xfina-mem').style.display = storageOk ? 'none' : 'block';
     INDEXES.forEach(function (x, i) {
       var l = memory.last[x[0]];
       el('xfina-last-' + i).textContent = l ? 'up to ' + nice(parse(l)) : 'not downloaded yet';
