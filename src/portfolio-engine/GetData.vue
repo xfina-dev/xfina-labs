@@ -21,7 +21,12 @@ const vehicles = computed(() => (cls.value && region.value ? vehiclesFor(cls.val
 const listings = computed(() => (cls.value && region.value && vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : []));
 // The fourth lane exists only when there is a listing to choose: US and Global ETFs.
 const showListing = computed(() => listings.value.length > 0);
-const groups = computed(() => (vehicle.value && (!showListing.value || listing.value) ? groupsFor(cls.value, region.value, vehicle.value, listing.value) : []));
+const groups = computed(() => {
+  if (!vehicle.value || (showListing.value && !listing.value)) return [];
+  const g = groupsFor(cls.value, region.value, vehicle.value, listing.value);
+  // An index is named after its asset ("Nifty 50" then "Nifty 50 TRI"), so a heading only repeats it: one flat list.
+  return vehicle.value === 'index' ? (g.length ? [{ asset: null, instruments: g.flatMap((x) => x.instruments) }] : []) : g;
+});
 
 // Choosing a step clears the ones after it, because their options depend on it. Irish ETFs are the
 // default for US and Global.
@@ -150,8 +155,8 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <span v-if="vehicle !== 'index'" class="text-xs text-muted-foreground">The three with the longest history for each, oldest first</span>
           </div>
           <p v-if="!groups.length" class="text-sm text-muted-foreground">Nothing is listed for this yet.</p>
-          <div v-for="g in groups" :key="g.asset" class="space-y-2">
-            <div class="text-sm font-medium">{{ g.asset }}</div>
+          <div v-for="g in groups" :key="g.asset || 'indexes'" class="space-y-2">
+            <div v-if="g.asset" class="text-sm font-medium">{{ g.asset }}</div>
             <ol class="divide-y rounded-md border">
               <li v-for="(i, k) in g.instruments" :key="i.id" class="flex flex-wrap items-center justify-between gap-3 p-3">
                 <div class="flex items-start gap-3 min-w-0">

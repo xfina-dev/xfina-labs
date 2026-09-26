@@ -95,12 +95,6 @@ export const HOW = {
     steps: ['Open Precious Metal Prices.', 'Choose the Gold Price (PM), in USD.', 'Download the full history.'],
     format: 'A date and a USD price, as LBMA publishes it.',
   },
-  ibja: {
-    site: 'IBJA',
-    title: 'IBJA: domestic gold rates',
-    steps: ['Open the IBJA rates page.', 'Use its archive or history option for the date range you need.', 'Download it. Only some ranges may be offered; if so, import each part.'],
-    format: 'Daily INR gold rates, as IBJA publishes them.',
-  },
 };
 
 

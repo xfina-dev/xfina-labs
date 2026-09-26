@@ -2138,37 +2138,13 @@
    ]
   },
   {
-   "class": "gold",
-   "region": "india",
-   "vehicle": "index",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "idx-12",
-     "name": "Domestic gold rate (INR)",
-     "inception": null,
-     "dateSource": null,
-     "ccy": "INR",
-     "returnType": "Price only",
-     "how": "ibja",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "IBJA rates",
-       "url": "https://ibjarates.com/"
-      }
-     ]
-    }
-   ]
-  },
-  {
    "class": "debt",
    "region": "india",
    "vehicle": "index",
    "asset": "Short duration",
    "instruments": [
     {
-     "id": "idx-13",
+     "id": "idx-12",
      "name": "NSE short-duration debt index (Liquid or 1D Rate)",
      "inception": null,
      "dateSource": null,
@@ -2192,7 +2168,7 @@
    "asset": "Long duration",
    "instruments": [
     {
-     "id": "idx-14",
+     "id": "idx-13",
      "name": "Nifty 10 yr Benchmark G-Sec Index",
      "inception": null,
      "dateSource": null,
