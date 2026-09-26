@@ -71,19 +71,21 @@ const returnType = ref('Total return');
 
 <template>
   <Card class="bg-card border-border shadow-sm">
-    <CardHeader class="pb-4">
-      <CardTitle>Datasets</CardTitle>
-      <CardDescription>Everything the run needs. Uploaded files are read and validated in your browser; nothing leaves it.</CardDescription>
+    <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
+      <div class="space-y-1.5">
+        <CardTitle>Datasets</CardTitle>
+        <CardDescription>
+          {{ fully }} of {{ rows.length }} datasets are fully loaded from <span class="font-mono">{{ startDate }}</span>.
+        </CardDescription>
+      </div>
+      <Button @click="fileInput.click()"><Upload class="h-4 w-4 mr-2" />Import CSV</Button>
+      <input ref="fileInput" type="file" accept=".csv" multiple class="sr-only" />
     </CardHeader>
     <CardContent class="space-y-4">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <div class="flex flex-wrap items-end gap-4">
-          <Button @click="fileInput.click()"><Upload class="h-4 w-4 mr-2" />Upload CSV</Button>
-          <input ref="fileInput" type="file" accept=".csv" multiple class="sr-only" />
-          <div class="space-y-1.5">
-            <Label class="text-muted-foreground">Start date</Label>
-            <Input v-model="startDate" type="date" class="h-9 w-44" />
-          </div>
+        <div class="space-y-1.5">
+          <Label class="text-muted-foreground">Start date</Label>
+          <Input v-model="startDate" type="date" class="h-9 w-44" />
         </div>
         <HelpDataDialog>
           <Button variant="outline"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
@@ -166,7 +168,7 @@ const returnType = ref('Total return');
       </Table>
 
       <p class="text-xs text-muted-foreground">
-        {{ fully }} of {{ rows.length }} datasets are fully loaded from <span class="font-mono">{{ startDate }}</span>. Nothing is extrapolated: a run only uses dates every dataset covers.
+        Files are read and validated in your browser; nothing leaves it. Nothing is extrapolated: a run only uses dates every dataset covers.
       </p>
     </CardContent>
   </Card>
