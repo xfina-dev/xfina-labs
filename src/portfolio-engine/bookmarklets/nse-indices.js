@@ -207,9 +207,16 @@
     var gentle = function () { return pause(300); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
+      var tap = function (el) { ['mousedown', 'mouseup', 'click'].forEach(function (t) { el.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })); }); };
+      var menu = document.querySelector('a.btn-select');
       var li = document.querySelector('li.form5');
+      if (menu && !menu.classList.contains('active')) {
+        await look(menu);
+        tap(menu);
+        await pause(700);
+      }
       await look(li);
-      ['mousedown', 'mouseup', 'click'].forEach(function (t) { li.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })); });
+      tap(li);
       await pause(800);
       await look('#ddlHistoricalreturntypee');
       $('#ddlHistoricalreturntypee').val('Equity').trigger('change');
