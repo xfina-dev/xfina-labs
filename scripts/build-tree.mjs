@@ -169,7 +169,7 @@ const yahoo = (t) => `https://finance.yahoo.com/quote/${t}/history/`;
 const ishUk = (id, slug) => `https://www.ishares.com/uk/individual/en/products/${id}/${slug}`;
 const ishUs = (id, slug) => `https://www.ishares.com/us/products/${id}/${slug}`;
 
-// listing: 'irish' | 'us'. `page` is scraped for the inception date; `manual` is a typed date.
+// listing: 'irish' | 'us' | 'canada'. `page` is scraped for the inception date; `manual` is a typed date.
 const ETFS = [
   // Equity / US
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'SPDR S&P 500 ETF Trust', code: 'SPY', manual: '1993-01-22', links: [L('SPY price history', yahoo('SPY'))] },
@@ -191,6 +191,8 @@ const ETFS = [
     { cls: 'gold', region, asset: 'Gold', listing: 'us', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
     { cls: 'gold', region, asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') },
   ]),
+  // Gold, Canada domiciled (Global only): a physically backed trust that also trades on the NYSE in USD.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-25', links: [L('PHYS price history', yahoo('PHYS'))] },
   // Debt / US
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf'), links: [L('SGOV price history', yahoo('SGOV'))] },
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'SPDR Bloomberg 1-3 Month T-Bill ETF', code: 'BIL', manual: '2007-05-30', links: [L('BIL price history', yahoo('BIL'))] },

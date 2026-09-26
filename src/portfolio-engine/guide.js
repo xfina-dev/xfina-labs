@@ -35,6 +35,7 @@ export const VEHICLES = [
 export const LISTINGS = [
   { id: 'irish', title: 'Ireland domiciled', blurb: 'UCITS ETFs, usually listed in London' },
   { id: 'us', title: 'US domiciled', blurb: 'US-listed ETFs, in USD' },
+  { id: 'canada', title: 'Canada domiciled', blurb: 'Canadian trusts and funds, priced in USD or CAD' },
   { id: 'india', title: 'India domiciled', blurb: 'Indian ETFs on foreign indices, in INR' },
 ];
 

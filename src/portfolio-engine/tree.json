@@ -2124,6 +2124,33 @@
    ]
   },
   {
+   "class": "gold",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "canada",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "etf-phys",
+     "name": "Sprott Physical Gold Trust",
+     "code": "PHYS",
+     "inception": "2010-02-25",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "Adjusted price",
+     "how": "yahoo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "PHYS price history",
+       "url": "https://finance.yahoo.com/quote/PHYS/history/"
+      }
+     ],
+     "asset": "Gold"
+    }
+   ]
+  },
+  {
    "class": "debt",
    "region": "us",
    "vehicle": "etf",
