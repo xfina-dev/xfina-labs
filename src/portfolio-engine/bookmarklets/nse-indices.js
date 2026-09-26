@@ -156,7 +156,7 @@
     q('xg').style.opacity = n ? 1 : 0.5;
     return { p: p, n: n };
   };
-  ['U', 'F', 'C'].forEach(function (m) { q('xm' + m).onclick = function () { if (!busy) { mode = m; render(); } }; });
+  ['U', 'F', 'C'].forEach(function (m) { q('xm' + m).onclick = function () { if (!busy) { mode = m; fin = 0; q('xg').textContent = 'Start'; render(); } }; });
   q('xf').oninput = function () { if (!busy) { cf = this.value; render(); } };
   q('xt').oninput = function () { if (!busy) { ct = this.value; render(); } };
   var skip = 0;
@@ -185,12 +185,15 @@
     return null;
   };
 
+  var fin = 0;
   q('xg').onclick = async function () {
+    if (fin) { window.alert = realAlert; box.remove(); return; }
     if (busy) { stop = 1; q('xg').textContent = 'Stopping...'; return; }
     var r = render();
     if (!r.n) { q('xs').textContent = 'Nothing to download for this choice.'; return; }
     busy = 1;
     stop = 0;
+    fin = 0;
     q('xg').textContent = 'Cancel';
     var saved = 0;
     var done = 0;
@@ -274,14 +277,16 @@
           q('xb').style.width = Math.round((100 * done) / r.n) + '%';
         }
       }
+      fin = !stop;
       say(stop ? 'Stopped.' : 'Done: ' + saved + ' files saved' + (dir ? ' to the folder you chose.' : ' by your browser.'));
     } catch (e2) {
       say('Stopped: ' + e2.message);
     }
     window.alert = realAlert;
     busy = 0;
-    q('xg').textContent = 'Start';
+    q('xg').textContent = fin ? 'Done' : 'Start';
     render();
+    if (fin) q('xg').style.opacity = 1;
   };
 
   render();
