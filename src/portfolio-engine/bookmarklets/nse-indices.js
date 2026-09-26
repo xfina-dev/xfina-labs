@@ -160,13 +160,15 @@
     q('xg').textContent = 'Cancel';
     var saved = 0;
     var done = 0;
-    var say = function (t) { q('xs').textContent = t; };
+    var cur = '';
+    var say = function (t) { cur = t; q('xs').textContent = t; };
+    var nap = async function (n) { for (; n > 0 && !stop; n--) { q('xs').textContent = cur + ' · saved, next file in ' + n + 's'; await pause(1000); } };
     var dir = null;
     if (window.showDirectoryPicker) {
       say('Choose a folder for the files (asked once)...');
       try { dir = await window.showDirectoryPicker({ mode: 'readwrite' }); } catch (e0) { dir = null; }
     }
-    var gentle = function (a, b) { return pause(saved >= FAST ? a + Math.random() * (b - a) : 250); };
+    var gentle = function (a, b) { return pause(saved >= FAST || dir ? a + Math.random() * (b - a) : 250); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
       say('Opening the page\'s Total Returns section...');
@@ -207,7 +209,8 @@
             saved++;
             if (!mem[p.n] || e > mem[p.n]) { mem[p.n] = e; save(); }
             if (!(i === todo.length - 1 && k === p.w.length - 1)) {
-              if (saved === FAST && !dir) {
+              if (dir) await nap(4 + Math.floor(Math.random() * 4));
+              else if (saved === FAST) {
                 q('xn').style.display = 'block';
                 skip = 0;
                 for (var s = WAIT; s > 0 && !skip && !stop; s--) { q('xk').textContent = s; await pause(1000); }
@@ -219,7 +222,7 @@
           q('xb').style.width = Math.round((100 * done) / r.n) + '%';
         }
       }
-      say(stop ? 'Stopped.' : 'Done: ' + saved + ' files saved' + (dir ? ' to the folder you chose' : ' by your browser') + '. Import them in Portfolio Engine.');
+      say(stop ? 'Stopped.' : 'Done: ' + saved + ' files saved' + (dir ? ' to the folder you chose.' : ' by your browser.'));
     } catch (e2) {
       say('Stopped: ' + e2.message);
     }
