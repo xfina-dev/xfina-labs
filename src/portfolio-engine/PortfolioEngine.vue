@@ -21,7 +21,7 @@ const plan = [
 </script>
 
 <template>
-  <AppShell tool="/backtest/">
+  <AppShell tool="/portfolio-engine/">
     <template #tagline>
       Multi-asset portfolio engine with bring-your-own data.<br />
       Everything runs in your browser; nothing is uploaded to any server.

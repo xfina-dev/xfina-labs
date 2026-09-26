@@ -7,12 +7,12 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import PrivacyDialog from '@/components/PrivacyDialog.vue';
 
 const props = defineProps({
-  // Path of the current tool, e.g. "/backtest/". Empty on the Labs home page.
+  // Path of the current tool, e.g. "/portfolio-engine/". Empty on the Labs home page.
   tool: { type: String, default: '' },
 });
 
 // Add a tool here and it appears in every page's switcher.
-const TOOLS = [{ path: '/backtest/', label: 'Portfolio Engine' }];
+const TOOLS = [{ path: '/portfolio-engine/', label: 'Portfolio Engine' }];
 const HOME = '/';
 
 const selected = ref(props.tool || HOME);

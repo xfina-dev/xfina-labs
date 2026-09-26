@@ -13,7 +13,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(import.meta.dirname, 'index.html'),
-        backtest: path.resolve(import.meta.dirname, 'backtest/index.html'),
+        portfolioEngine: path.resolve(import.meta.dirname, 'portfolio-engine/index.html'),
       },
     },
   },

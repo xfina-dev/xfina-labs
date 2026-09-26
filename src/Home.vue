@@ -1,10 +1,10 @@
 <script setup>
 import AppShell from '@/components/AppShell.vue';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Tag from '@/backtest/Tag.vue';
+import Tag from '@/portfolio-engine/Tag.vue';
 
 const tools = [
-  { path: '/backtest/', name: 'Portfolio Engine', desc: 'Multi-asset portfolio engine. Bring your own price data; test weights, rebalancing and cash flows.', status: 'design mock' },
+  { path: '/portfolio-engine/', name: 'Portfolio Engine', desc: 'Multi-asset portfolio engine. Bring your own price data; test weights, rebalancing and cash flows.', status: 'design mock' },
 ];
 </script>
 

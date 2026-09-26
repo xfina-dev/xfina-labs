@@ -4,7 +4,7 @@ Experimental finance tools at [labs.xfina.dev](https://labs.xfina.dev). Static, 
 
 | Tool | Path | Status |
 |---|---|---|
-| Portfolio Engine: multi-asset portfolio backtesting (bring your own data) | `/backtest/` | design mock |
+| Portfolio Engine: multi-asset portfolio backtesting (bring your own data) | `/portfolio-engine/` | design mock |
 
 ## Stack and theme
 
