@@ -49,10 +49,16 @@ const sections = [
     ],
   },
   {
-    id: 'provided', title: 'Provided', note: 'Supplied by Xfina, nothing to import',
+    id: 'provided', title: 'Provided', note: 'Supplied by Xfina, nothing to import. Each series is filled from several sources, oldest first.',
     assets: [
-      { name: 'USD/INR', since: '1990-01-01', series: [{ name: 'BIS + SBI TT rates', type: 'Provided', origin: 'provided', ccy: 'USD → INR', segments: [{ src: 'BIS', from: '1990-01-01', to: '2019-12-31' }, { src: 'SBI', from: '2020-01-04', to: END }], status: ['ok', 'provided'], note: 'BIS pre-fills the history before SBI card rates begin on 2020-01-04. Used to convert USD series to INR.' }] },
-      { name: 'Inflation', since: '1960-01-01', series: [{ name: 'World Bank + MoSPI CPI', type: 'Provided', origin: 'provided', ccy: 'INR', segments: [{ src: 'World Bank', from: '1960-01-01', to: '2012-12-31' }, { src: 'MoSPI', from: '2013-01-01', to: END }], status: ['ok', 'provided'], note: 'World Bank pre-fills the years before MoSPI CPI starts in 2013-01. Monthly, latest month Jun 2026, carried forward to the end date.' }] },
+      { name: 'USD/INR', since: '1990-01-01', series: [
+        { name: 'BIS', type: 'FX', origin: 'provided', ccy: 'USD → INR', from: '1990-01-01', to: '2019-12-31', note: 'Pre-fills the history before SBI card rates begin.' },
+        { name: 'SBI TT rates', type: 'FX', origin: 'provided', ccy: 'USD → INR', from: '2020-01-04', to: END, note: 'SBI forex card TT rates from 2020-01-04. Used to convert USD series to INR.' },
+      ] },
+      { name: 'Inflation', since: '1960-01-01', series: [
+        { name: 'World Bank CPI', type: 'CPI', origin: 'provided', ccy: 'INR', from: '1960-01-01', to: '2012-12-31', note: 'Pre-fills the years before MoSPI CPI starts.' },
+        { name: 'MoSPI CPI', type: 'CPI', origin: 'provided', ccy: 'INR', from: '2013-01-01', to: END, note: 'Monthly. Latest month Jun 2026, carried forward to the end date.' },
+      ] },
     ],
   },
 ];
@@ -70,40 +76,38 @@ const checks = {
   ],
 };
 
-// Share of the asset's full history this series covers, as a whole percent.
-function loaded(asset, s) {
-  const segs = s.segments || [{ from: s.from, to: s.to }];
-  const from = day(asset.since), to = day(END);
-  const span = to - from;
-  if (!(span > 0)) return 0;
-  const first = Math.min(...segs.map((x) => day(x.from)));
-  const last = Math.max(...segs.map((x) => day(x.to)));
-  return Math.min(100, Math.floor((Math.max(0, Math.min(to, last) - Math.max(from, first)) / span) * 100));
+// The part of the asset's full history [since, END] a date range covers: a whole percent, and where
+// it sits along the bar. A gap between two sources of one asset is carried forward, so the asset as
+// a whole is measured from its earliest source to its latest.
+function coverage(asset, from, to) {
+  const lo = day(asset.since), hi = day(END), span = hi - lo;
+  if (!(span > 0)) return { pct: 0, left: 0, width: 0 };
+  const a = Math.max(lo, day(from)), b = Math.min(hi, day(to));
+  const width = Math.max(0, b - a);
+  return { pct: Math.min(100, Math.floor((width / span) * 100)), left: ((a - lo) / span) * 100, width: (width / span) * 100 };
 }
-const startOf = (s) => (s.segments ? s.segments[0].from : s.from);
+const loaded = (asset, s) => coverage(asset, s.from, s.to);
+const assetLoaded = (a) => (a.series.length ? coverage(a, a.series.map((s) => s.from).sort()[0], a.series.map((s) => s.to).sort().at(-1)).pct : 0);
 
 // Flatten sections → assets → series into the rows the table draws.
 const region = ref('india');
-const regions = sections.filter((s) => s.id !== 'provided');
+const regions = sections;
 const current = computed(() => regions.find((s) => s.id === region.value));
-const ready = (sec) => sec.assets.filter((a) => a.series.some((s) => loaded(a, s) === 100)).length;
+// Provided assets are built from several sources, so they are ready when the sources together cover the history.
+const ready = (sec) => sec.assets.filter((a) => (sec.id === 'provided' ? assetLoaded(a) === 100 : a.series.some((s) => loaded(a, s).pct === 100))).length;
 
 const rows = computed(() => {
   const out = [];
-  for (const sec of [current.value, sections.find((s) => s.id === 'provided')]) {
-    // Regions are chosen with the tabs, so only the Provided block needs its own heading.
-    if (sec.id === 'provided') out.push({ kind: 'section', key: `s:${sec.id}`, sec });
-    for (const a of sec.assets) {
-      out.push({ kind: 'asset', key: `a:${sec.id}:${a.name}`, a });
-      if (!a.series.length) out.push({ kind: 'empty', key: `e:${sec.id}:${a.name}`, a });
-      for (const s of a.series) out.push({ kind: 'series', key: `r:${sec.id}:${a.name}:${s.name}`, a, s, pct: loaded(a, s) });
-    }
+  for (const a of current.value.assets) {
+    out.push({ kind: 'asset', key: `a:${a.name}`, a });
+    if (!a.series.length) out.push({ kind: 'empty', key: `e:${a.name}`, a });
+    for (const s of a.series) out.push({ kind: 'series', key: `r:${a.name}:${s.name}`, a, s, ...loaded(a, s) });
   }
   return out;
 });
 
 const importable = sections.filter((s) => s.id !== 'provided').flatMap((s) => s.assets);
-const assetsReady = computed(() => importable.filter((a) => a.series.some((s) => loaded(a, s) === 100)).length);
+const assetsReady = computed(() => importable.filter((a) => a.series.some((s) => loaded(a, s).pct === 100)).length);
 
 const expanded = ref(null);
 const edit = reactive({ type: '', ccy: '', ret: '' });
@@ -159,19 +163,14 @@ const pick = () => fileInput.value.click();
         </TableHeader>
         <TableBody>
           <template v-for="r in rows" :key="r.key">
-            <!-- Section -->
-            <TableRow v-if="r.kind === 'section'" class="hover:bg-transparent">
-              <TableCell colspan="5" class="pt-6 pb-2 px-0">
-                <span class="text-base font-semibold">{{ r.sec.title }}</span>
-                <span class="ml-2 text-sm text-muted-foreground">{{ r.sec.note }}</span>
-              </TableCell>
-            </TableRow>
-
             <!-- Asset -->
-            <TableRow v-else-if="r.kind === 'asset'" class="bg-muted/30 hover:bg-muted/30">
+            <TableRow v-if="r.kind === 'asset'" class="bg-muted/30 hover:bg-muted/30">
               <TableCell colspan="4" class="py-2">
                 <span class="font-semibold">{{ r.a.name }}</span>
                 <span class="ml-2 text-xs text-muted-foreground">full history from <span class="font-mono">{{ r.a.since }}</span></span>
+                <span v-if="current.id === 'provided'" class="ml-3 text-xs font-medium" :class="assetLoaded(r.a) === 100 ? 'text-[hsl(var(--ok))]' : 'text-[hsl(var(--warn))]'">
+                  Combined {{ assetLoaded(r.a) }}%<template v-if="assetLoaded(r.a) === 100"> · Fully loaded</template>
+                </span>
               </TableCell>
               <TableCell class="py-2 text-right" colspan="1">
                 <Button v-if="r.a.series.length && r.a.series[0].origin !== 'provided'" variant="ghost" size="sm" class="h-7 px-2 -mr-2" title="Add another series for this asset" @click="pick"><Plus class="h-4 w-4" /></Button>
@@ -190,14 +189,15 @@ const pick = () => fileInput.value.click();
             <template v-else>
               <TableRow :class="['cursor-pointer', expanded === r.key && 'bg-muted/50']" @click="toggle(r)">
                 <TableCell class="pl-6">{{ r.s.name }}</TableCell>
-                <TableCell class="whitespace-nowrap"><Tag :variant="r.s.type === 'Index' || r.s.type === 'Provided' ? 'default' : 'warn'">{{ r.s.type }}</Tag></TableCell>
+                <TableCell class="whitespace-nowrap"><Tag :variant="r.s.type === 'ETF' || r.s.type === 'MF' ? 'warn' : 'default'">{{ r.s.type }}</Tag></TableCell>
                 <TableCell>
                   <div class="h-2 rounded-full bg-muted overflow-hidden" role="progressbar" :aria-valuenow="r.pct" aria-valuemin="0" aria-valuemax="100" :aria-label="`${r.s.name} loaded`">
-                    <div class="h-full transition-all" :class="r.pct === 100 ? 'bg-[hsl(var(--ok))]' : 'bg-[hsl(var(--warn))]'" :style="{ width: `${r.pct}%` }" />
+                    <div class="h-full relative transition-all" :class="r.pct === 100 ? 'bg-[hsl(var(--ok))]' : 'bg-[hsl(var(--warn))]'" :style="{ marginLeft: `${r.left}%`, width: `${r.width}%` }" />
                   </div>
                   <div class="mt-1 text-xs" :class="r.pct === 100 ? 'text-[hsl(var(--ok))] font-medium' : 'text-muted-foreground'">
                     <template v-if="r.pct === 100">100% · Fully loaded</template>
-                    <template v-else>{{ r.pct }}% · starts {{ startOf(r.s) }}</template>
+                    <template v-else-if="r.s.origin === 'provided'">{{ r.s.from }} → {{ r.s.to }}</template>
+                    <template v-else>{{ r.pct }}% · starts {{ r.s.from }}</template>
                   </div>
                 </TableCell>
                 <TableCell class="whitespace-nowrap">
@@ -211,9 +211,7 @@ const pick = () => fileInput.value.click();
                 <TableCell colspan="5" class="bg-muted/20">
                   <div v-if="r.s.origin === 'provided'" class="space-y-3 py-2">
                     <p class="text-sm text-muted-foreground">{{ r.s.note }}</p>
-                    <ul class="text-sm font-mono space-y-1">
-                      <li v-for="g in r.s.segments" :key="g.src"><span class="inline-block w-24 font-sans font-medium">{{ g.src }}</span>{{ g.from }} → {{ g.to }}</li>
-                    </ul>
+                    <p class="text-sm font-mono">{{ r.s.from }} → {{ r.s.to }}</p>
                   </div>
                   <div v-else class="grid gap-6 lg:grid-cols-2 py-2">
                     <div class="space-y-4">
