@@ -6,24 +6,23 @@ import Seg from './Seg.vue';
 import Field from './Field.vue';
 
 const strategies = [
-  { id: 'hold', name: 'Buy and hold', desc: 'Set weights once, never trade. Shows how far the portfolio drifts.', tag: 'v1' },
+  { id: 'hold', name: 'No rebalancing (buy and hold)', desc: 'Set weights once, never trade. Shows how far the portfolio drifts.', tag: 'v1' },
   { id: 'calendar', name: 'Calendar rebalance', desc: 'Restore targets on a schedule: monthly, quarterly, half-yearly or annual.', tag: 'v1' },
   { id: 'threshold', name: 'Threshold rebalance', desc: 'Trade only when an asset drifts past a band around its target.', tag: 'v1' },
-  { id: 'perpetual', name: 'Perpetual rebalance', desc: 'Cash-flow driven: buy underweights first, sell only when necessary, tax-aware.', tag: 'later', off: true },
+  { id: 'perpetual', name: 'Perpetual rebalance', desc: 'Cash-flow driven: buy underweights first, sell only when necessary.', tag: 'later', off: true },
 ];
 const selected = ref('threshold');
 const band = ref('Absolute (pp)');
 const bandValue = ref('± 5 percentage points');
 const check = ref('Daily');
-const realism = ref('Benchmark');
 </script>
 
 <template>
   <div class="space-y-8">
     <Card class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
-        <CardTitle>Strategy</CardTitle>
-        <CardDescription>Pick how the portfolio is maintained. You can add several and compare them on the same data.</CardDescription>
+        <CardTitle>Rebalancing</CardTitle>
+        <CardDescription>Pick how the portfolio is kept on target. You can add several and compare them on the same data.</CardDescription>
       </CardHeader>
       <CardContent>
         <div class="grid gap-4 md:grid-cols-2">
@@ -63,11 +62,6 @@ const realism = ref('Benchmark');
             </g>
           </svg>
           <p class="text-xs text-muted-foreground">Relative ±10% on the same target would be 36%–44%.</p>
-          <div class="space-y-1.5">
-            <div class="text-sm font-medium">Realism</div>
-            <Seg v-model="realism" :options="['Benchmark', 'Investable', 'Tax-aware', 'Realistic']" :disabled="['Investable', 'Tax-aware', 'Realistic']" />
-            <p class="text-xs text-muted-foreground">Only Benchmark is in the first increments: no costs or tax.</p>
-          </div>
         </CardContent>
       </Card>
     </div>

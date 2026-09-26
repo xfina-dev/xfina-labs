@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -13,8 +12,6 @@ const kpis = [
   ['Final value', '₹2.84 Cr'], ['Invested', '₹1.36 Cr'], ['CAGR', '12.8%'], ['XIRR', '13.1%'], ['Volatility', '13.6%'],
   ['Max drawdown', '−27.4%'], ['Sharpe', '0.82'], ['Turnover', '18.3%'],
 ];
-const subs = [['overview', 'Overview'], ['drawdown', 'Drawdown'], ['tx', 'Transactions'], ['compare', 'Comparison'], ['risk', 'Risk', true], ['tax', 'Taxes', true]];
-const sub = ref('overview');
 
 const drawdowns = [
   ['1', '2020-01-17', '2020-03-23', '2020-08-11', '−27.4%', '2.2 mo', '4.6 mo'],
@@ -41,10 +38,9 @@ const compare = [
     <Card class="bg-card border-border shadow-sm">
       <CardHeader class="flex flex-row items-start justify-between space-y-0 pb-4">
         <div class="space-y-1.5">
-          <CardTitle class="text-xl">Threshold ±5pp · India 40 / Nasdaq 40 / Gold 10 / Debt 10</CardTitle>
+          <CardTitle class="text-xl">Results · Threshold ±5pp · India 40 / Nasdaq 40 / Gold 10 / Debt 10</CardTitle>
           <CardDescription class="font-mono text-xs">2010-01-04 → 2026-09-21 · INR · benchmark realism</CardDescription>
         </div>
-        <div class="flex gap-2"><Button variant="outline">Edit</Button><Button>Run again</Button></div>
       </CardHeader>
     </Card>
 
@@ -53,19 +49,9 @@ const compare = [
         <div class="text-sm text-muted-foreground">{{ l }}</div>
         <div class="text-2xl font-semibold tracking-tight tabular-nums">{{ v }}</div>
       </div>
-      <div class="rounded-lg border bg-card shadow-sm p-4">
-        <div class="text-sm text-muted-foreground">Tax paid</div>
-        <div class="text-2xl font-semibold text-muted-foreground">— <Tag variant="soon">later</Tag></div>
-      </div>
     </div>
 
-    <div class="flex flex-wrap gap-2">
-      <Button v-for="[id, label, off] in subs" :key="id" :variant="sub === id ? 'default' : 'outline'" size="sm" class="rounded-full" :disabled="off" @click="sub = id">
-        {{ label }} <Tag v-if="off" variant="soon" class="ml-1.5">later</Tag>
-      </Button>
-    </div>
-
-    <div v-if="sub === 'overview'" class="space-y-8">
+    <div class="space-y-8">
       <Card class="bg-card border-border shadow-sm">
         <CardHeader class="pb-4"><CardTitle class="text-xl">Portfolio value</CardTitle></CardHeader>
         <CardContent>
@@ -91,7 +77,7 @@ const compare = [
       </div>
     </div>
 
-    <Card v-if="sub === 'drawdown'" class="bg-card border-border shadow-sm">
+    <Card class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4"><CardTitle class="text-xl">Largest drawdowns</CardTitle></CardHeader>
       <CardContent>
         <Table>
@@ -106,10 +92,10 @@ const compare = [
       </CardContent>
     </Card>
 
-    <Card v-if="sub === 'tx'" class="bg-card border-border shadow-sm">
+    <Card class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
         <CardTitle class="text-xl">Transaction ledger</CardTitle>
-        <CardDescription>Every simulated trade. The base for turnover, XIRR and later tax.</CardDescription>
+        <CardDescription>Every simulated trade. The base for turnover and XIRR.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
         <Table>
@@ -125,7 +111,7 @@ const compare = [
       </CardContent>
     </Card>
 
-    <Card v-if="sub === 'compare'" class="bg-card border-border shadow-sm">
+    <Card class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
         <CardTitle class="text-xl">Compare strategies on the same data</CardTitle>
         <CardDescription>Measurements, not a ranking. Nothing here is marked as best.</CardDescription>
