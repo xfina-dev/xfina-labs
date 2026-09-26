@@ -55,7 +55,6 @@
   try { mem = JSON.parse(localStorage.getItem(KEY) || '{}'); localStorage.setItem(KEY + '.t', 1); localStorage.removeItem(KEY + '.t'); } catch (e) { stored = false; }
   var save = function () { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) { } };
 
-  var pick = X.map(function () { return 1; });
   var mode = 'U';
   var cf = '';
   var ct = '';
@@ -75,7 +74,6 @@
   var wins = function (f, t) { return f > t ? [] : Math.round((t - f) / DAY) <= 365 ? [[f, t]] : fy(f, t); };
   var plan = function () {
     return X.map(function (x, i) {
-      if (!pick[i]) return null;
       var s = parse(x[2]);
       var l = mem[x[0]] ? parse(mem[x[0]]) : null;
       var f = s;
@@ -96,12 +94,12 @@
   box.id = 'xfina-bm';
   box.innerHTML =
     '<style>#xfina-bm{position:fixed;top:16px;right:16px;z-index:2147483647;width:400px;max-height:92vh;overflow:auto;background:#0a0a0b;color:#fafafa;font:13px/1.5 system-ui,sans-serif;border:1px solid #3f3f46;border-radius:8px;padding:14px;box-shadow:0 8px 30px #0008}' +
-    '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm label{display:flex;gap:8px;align-items:baseline;margin:2px 0;cursor:pointer}#xfina-bm label .g{margin-left:auto;text-align:right}' +
+    '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm label{display:flex;gap:8px;align-items:baseline;margin:2px 0;}#xfina-bm label .g{margin-left:auto;text-align:right}' +
     '#xfina-bm button{height:28px;padding:0 10px;border:1px solid #3f3f46;border-radius:6px;background:0;color:#fafafa;cursor:pointer}#xfina-bm .on,#xfina-bm #xg{background:#fafafa;color:#0a0a0b;border:0;font-weight:600}' +
     '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark}#xfina-bm .w{border:1px solid #f59e0b;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:12px}</style>' +
     '<div style="display:flex;justify-content:space-between;font-weight:600;font-size:15px">Xfina - NSE Indices - Download<span id="xx" style="cursor:pointer" class="g" title="Stop and close">✕</span></div>' +
     '<div class="g" style="margin:2px 0 8px">Saves NSE\'s own CSV files. Keep this tab in front. Nothing goes to Xfina.</div>' +
-    X.map(function (x, i) { return '<label><input type="checkbox" checked id="xp' + i + '"><span>' + x[1] + '</span><span class="g" id="xr' + i + '"></span></label>'; }).join('') +
+    X.map(function (x, i) { return '<label><span>' + x[1] + '</span><span class="g" id="xr' + i + '"></span></label>'; }).join('') +
     '<div id="xc" class="g" style="display:none;margin:6px 0">From <input type="date" id="xf"> to <input type="date" id="xt"></div>' +
     '<div id="xs" style="margin-top:8px;font-size:12px"></div>' +
     '<div style="height:4px;background:#27272a;border-radius:4px;margin:4px 0 8px"><div id="xb" style="height:100%;width:0;background:#4ade80"></div></div>' +
@@ -124,7 +122,6 @@
     q('xg').style.opacity = n ? 1 : 0.5;
     return { p: p, n: n };
   };
-  X.forEach(function (x, i) { q('xp' + i).onchange = function () { if (!busy) { pick[i] = this.checked ? 1 : 0; render(); } }; });
   ['U', 'F', 'C'].forEach(function (m) { q('xm' + m).onclick = function () { if (!busy) { mode = m; render(); } }; });
   q('xf').oninput = function () { if (!busy) { cf = this.value; render(); } };
   q('xt').oninput = function () { if (!busy) { ct = this.value; render(); } };
