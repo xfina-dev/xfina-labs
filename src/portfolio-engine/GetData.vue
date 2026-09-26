@@ -84,7 +84,7 @@ const bySite = computed(() => {
     const shared = its.length > 1 ? [...urls.values()].filter((u) => u.n === its.length).map((u) => u.l) : [];
     const sharedUrls = new Set(shared.map((l) => l.url));
     const hows = [...new Set(its.map((i) => i.how))].map((h) => HOW[h]);
-    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its, { split: split.value, from: from.value, date: fromDate.value }) };
+    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its, { from: from.value, date: fromDate.value }) };
   });
 });
 
@@ -93,12 +93,10 @@ const dragHint = ref(false);
 // Manual or assisted, per website. Assisted exists only where a bookmarklet does.
 const modes = ref({});
 const mode = (site) => modes.value[site] || 'manual';
-// How the bookmarklet splits a long history into files: financial year (April to March) or calendar year.
-const split = ref('FY');
 // Where a run starts: the current year (the default, so a repeat run refreshes it), the previous one, the full history, or a date.
 const from = ref('CURRENT');
 const fromDate = ref('');
-const fromChoices = computed(() => fromOptions(split.value));
+const fromChoices = computed(() => fromOptions());
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
@@ -283,20 +281,13 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="rounded-md border p-4 space-y-4">
               <div class="font-semibold">Bookmarklet settings</div>
               <div class="space-y-1.5">
-                <div class="text-sm text-muted-foreground">Split files by</div>
-                <span class="inline-flex rounded-md border border-border overflow-hidden">
-                  <button v-for="o in [['FY', 'Financial year'], ['CY', 'Calendar year']]" :key="o[0]" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="split === o[0] ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="split = o[0]">{{ o[1] }}</button>
-                </span>
-                <p class="text-xs text-muted-foreground">The site exports at most a year at a time, so a long history comes as one file per {{ split === 'FY' ? 'financial year (April to March)' : 'calendar year' }}.</p>
-              </div>
-              <div class="space-y-1.5">
                 <div class="text-sm text-muted-foreground">Start from</div>
                 <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden">
                   <button v-for="o in fromChoices" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="from = o.id">{{ o.label }}</button>
                 </span>
                 <div v-if="from === 'DATE'" class="pt-1"><input v-model="fromDate" type="date" class="h-8 w-44 rounded-md border border-input bg-background px-2 text-sm" /></div>
                 <p class="text-xs text-muted-foreground">
-                  {{ fromChoices.find((o) => o.id === from)?.hint }}. It's worked out when you click the bookmark, so the same bookmark run later covers whatever is current then. Importing a newer file replaces the same dates from older ones, so a repeat run just refreshes recent data.
+                  {{ fromChoices.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). It's worked out when you click the bookmark, so the same bookmark run later covers whatever is current then. Importing a newer file replaces the same dates from older ones, so a repeat run just refreshes recent data.
                 </p>
               </div>
               <p class="text-xs text-muted-foreground">The bookmark below is generated from these choices, so drag it again if you change them.</p>
@@ -322,7 +313,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   </a>
                 </li>
                 <li>Click the bookmark and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
-                <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one {{ split === 'FY' ? 'financial' : 'calendar' }} year at a time, index after index, pausing between files to go easy on the site. One progress bar covers the whole run.</li>
+                <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one financial year at a time, index after index, pausing between files to go easy on the site. One progress bar covers the whole run.</li>
                 <li>Your browser saves the files exactly as it does for any download: in its usual folder, or wherever it asks you, depending on your settings. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
               </ol>
               <p class="text-xs text-muted-foreground">
