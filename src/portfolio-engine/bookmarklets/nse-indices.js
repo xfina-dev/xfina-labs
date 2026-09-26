@@ -1,7 +1,7 @@
 /*
   Xfina bookmarklet: NSE Indices, Total Returns Index history. Made once, used again and again.
 
-  Runs on niftyindices.com only. It opens a small panel, one row per index (showing 2/12 files while running; two small rings at the top right show files done and the wait before the next file, always 8 seconds), and on Start does what a person does on
+  Runs on niftyindices.com only. It opens a small panel, one row per index (showing 2/12 files while running; a ring at the top right counts down the 6 to 9 second wait taken after the form is filled and before Submit; a bar above the buttons shows overall progress), and on Start does what a person does on
   the Historical Data page: opens "Total returns Index Values", picks an index, sets a date range, presses Submit,
   then presses the page's own "csv format" button. The files are the ones the page produces, named by the page,
   exactly as a manual download. Where the browser allows it (Chrome, Edge) Start asks for a folder once and the files
@@ -202,7 +202,7 @@
           var before = first();
           $('#datepickerFromtotalindex').datepicker('setDate', w[0]);
           $('#datepickerTototalindex').datepicker('setDate', w[1]);
-          await gentle(600, 1400);
+          await nap(6 + Math.floor(Math.random() * 4));
           alerts = [];
           document.getElementById('submit_totalindexhistorical').click();
           var got = await wait(function () { return alerts.length || (first() && first() !== before); }, 20000);
@@ -227,7 +227,7 @@
                 skip = 0;
                 for (var s = WAIT; s > 0 && !skip && !stop; s--) { q('xk').textContent = s; turn('xz', s / WAIT, s); await pause(1000); }
                 q('xn').style.display = 'none'; turn('xz', 1, GAP);
-              } else await nap(6 + Math.floor(Math.random() * 4));
+              }
             }
           }
           done++;
