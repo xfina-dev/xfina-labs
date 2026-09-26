@@ -107,16 +107,16 @@
     '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm label{display:flex;gap:8px;align-items:baseline;margin:2px 0;}#xfina-bm label .g{margin-left:auto;text-align:right}' +
     '#xfina-bm button{height:28px;padding:0 10px;border:1px solid #3f3f46;border-radius:6px;background:0;color:#fafafa;cursor:pointer}#xfina-bm .on,#xfina-bm #xg{background:#fafafa;color:#0a0a0b;border:0;font-weight:600}' +
     '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark}#xfina-bm #xs:empty{display:none}#xfina-bm .w{border:1px solid #f59e0b;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:12px}</style>' +
-    '<div style="display:flex;justify-content:space-between;font-weight:600;font-size:15px">Xfina - NSE Indices - Download<span style="display:flex;gap:8px;align-items:center">' + ring('xo', 'Files done') + ring('xz', 'Next file in (seconds)') + '<span id="xx" style="cursor:pointer" class="g" title="Stop and close">✕</span></span></div>' +
+    '<div style="display:flex;justify-content:space-between;font-weight:600;font-size:15px">Xfina - NSE Indices - Download<span style="display:flex;gap:8px;align-items:center">' + ring('xz', 'Next file in (seconds)') + '<span id="xx" style="cursor:pointer" class="g" title="Stop and close">✕</span></span></div>' +
     '<div class="g" style="margin:2px 0 8px">Keep this tab in front. Nothing goes to Xfina.</div>' +
     X.map(function (x, i) { return '<label><span>' + x[1] + '</span><span class="g" id="xr' + i + '"></span></label>'; }).join('') +
     '<div id="xc" class="g" style="display:none;margin:6px 0">From <input type="date" id="xf"> to <input type="date" id="xt"></div>' +
     '<div id="xs" style="margin-top:8px;font-size:12px"></div>' +
+    '<div style="height:6px;background:#27272a;border-radius:6px;margin:6px 0"><div id="xb" style="height:100%;width:0;background:#4ade80"></div></div>' +
     '<div class="w" id="xn" style="display:none">Your browser may ask to allow multiple downloads: choose <b>Allow</b>. Carrying on in <b id="xk"></b>s. <u id="xu" style="cursor:pointer">Continue now</u></div>' +
     '<div class="w" id="xw" style="display:none">Your browser blocks storage for this site, so Update will fetch the full history each time.</div>' +
     '<div style="display:flex;gap:6px;margin-top:8px">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (m) { return '<button id="xm' + m[0] + '">' + m[1] + '</button>'; }).join('') + '<button id="xg" style="margin-left:auto;padding:0 18px">Start</button></div>';
   document.body.appendChild(box);
-  turn('xo', 0, 0);
   turn('xz', 1, GAP);
 
   var render = function () {
@@ -174,7 +174,7 @@
     var say = function (t) { q('xs').textContent = t; };
     var nap = async function (m) { for (var n = m; n > 0 && !stop; n -= 0.25) { turn('xz', n / m, Math.ceil(n)); await pause(250); } turn('xz', 1, GAP); };
     say('');
-    turn('xo', 0, 0);
+    q('xb').style.width = 0;
     turn('xz', 1, GAP);
     var dir = null;
     if (window.showDirectoryPicker) {
@@ -231,7 +231,7 @@
             }
           }
           done++;
-          turn('xo', done / r.n, done);
+          q('xb').style.width = Math.round((100 * done) / r.n) + '%';
         }
       }
       say(stop ? 'Stopped.' : 'Done: ' + saved + ' files saved' + (dir ? ' to the folder you chose.' : ' by your browser.'));
