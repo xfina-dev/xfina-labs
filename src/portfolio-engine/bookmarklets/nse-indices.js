@@ -152,11 +152,12 @@
   };
 
   q('xg').onclick = async function () {
-    if (busy) return;
+    if (busy) { stop = 1; q('xg').textContent = 'Stopping...'; return; }
     var r = render();
     if (!r.n) { q('xs').textContent = 'Nothing to download for this choice.'; return; }
     busy = 1;
     stop = 0;
+    q('xg').textContent = 'Cancel';
     var saved = 0;
     var done = 0;
     var say = function (t) { q('xs').textContent = t; };
@@ -224,6 +225,7 @@
     }
     window.alert = realAlert;
     busy = 0;
+    q('xg').textContent = 'Start';
     render();
   };
 
