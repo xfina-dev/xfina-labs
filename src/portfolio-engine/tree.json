@@ -5,83 +5,6 @@
   {
    "class": "equity",
    "region": "india",
-   "vehicle": "etf",
-   "asset": "Nifty 50",
-   "instruments": [
-    {
-     "id": "mf108479",
-     "name": "Quantum Nifty 50 ETF",
-     "code": "108479",
-     "inception": "2008-07-17",
-     "lastNav": "2026-09-25",
-     "observations": 4479,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/108479"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf112351",
-     "name": "Kotak Nifty 50 ETF",
-     "code": "112351",
-     "inception": "2010-02-08",
-     "lastNav": "2026-09-25",
-     "observations": 4103,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/112351"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf113069",
-     "name": "Motilal Oswal Nifty 50 ETF",
-     "code": "113069",
-     "inception": "2010-07-30",
-     "lastNav": "2026-09-25",
-     "observations": 3984,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/113069"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "india",
    "vehicle": "mf",
    "asset": "Nifty 50",
    "instruments": [
@@ -150,85 +73,6 @@
       {
        "label": "NAV data (JSON)",
        "url": "https://api.mfapi.in/mf/100484"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "india",
-   "vehicle": "etf",
-   "asset": "Nifty Next 50",
-   "instruments": [
-    {
-     "id": "mf140085",
-     "name": "Nippon India ETF Nifty Next 50 Junior BeES - Direct Plan",
-     "code": "140085",
-     "plan": "Direct",
-     "inception": "2016-11-07",
-     "lastNav": "2026-09-25",
-     "observations": 2442,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/140085"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf141665",
-     "name": "UTI - Nifty Next 50 Exchange Traded Fund - Direct Plan - Growth",
-     "code": "141665",
-     "plan": "Direct",
-     "inception": "2017-08-07",
-     "lastNav": "2026-09-25",
-     "observations": 2255,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/141665"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf144587",
-     "name": "ICICI Prudential Nifty Next 50 ETF",
-     "code": "144587",
-     "inception": "2018-08-24",
-     "lastNav": "2026-09-25",
-     "observations": 1995,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/144587"
       },
       {
        "label": "AMFI NAV history",
@@ -321,84 +165,6 @@
   {
    "class": "equity",
    "region": "india",
-   "vehicle": "etf",
-   "asset": "Nifty Midcap 150",
-   "instruments": [
-    {
-     "id": "mf146271",
-     "name": "Nippon India ETF Nifty Midcap 150 - Direct Plan",
-     "code": "146271",
-     "plan": "Direct",
-     "inception": "2019-02-01",
-     "lastNav": "2026-09-25",
-     "observations": 1888,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/146271"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf147921",
-     "name": "ICICI Prudential Nifty Midcap 150 ETF",
-     "code": "147921",
-     "inception": "2020-01-27",
-     "lastNav": "2026-09-25",
-     "observations": 1649,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/147921"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf149918",
-     "name": "Mirae Asset Nifty Midcap 150 ETF",
-     "code": "149918",
-     "inception": "2022-03-10",
-     "lastNav": "2026-09-25",
-     "observations": 1124,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/149918"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "india",
    "vehicle": "mf",
    "asset": "Nifty Midcap 150",
    "instruments": [
@@ -467,83 +233,6 @@
       {
        "label": "NAV data (JSON)",
        "url": "https://api.mfapi.in/mf/148805"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "india",
-   "vehicle": "etf",
-   "asset": "Nifty Smallcap 250",
-   "instruments": [
-    {
-     "id": "mf151375",
-     "name": "HDFC NIFTY Smallcap 250 ETF - Growth Option",
-     "code": "151375",
-     "inception": "2023-02-15",
-     "lastNav": "2026-09-25",
-     "observations": 892,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/151375"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf152546",
-     "name": "Motilal Oswal Nifty Smallcap 250 ETF",
-     "code": "152546",
-     "inception": "2024-03-21",
-     "lastNav": "2026-09-25",
-     "observations": 622,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/152546"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf153923",
-     "name": "Groww Nifty Smallcap 250 ETF",
-     "code": "153923",
-     "inception": "2025-10-29",
-     "lastNav": "2026-09-25",
-     "observations": 227,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/153923"
       },
       {
        "label": "AMFI NAV history",
@@ -636,84 +325,6 @@
   {
    "class": "gold",
    "region": "india",
-   "vehicle": "etf",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "mf105463",
-     "name": "UTI - Gold Exchange Traded Fund - Direct Plan - Growth",
-     "code": "105463",
-     "plan": "Direct",
-     "inception": "2007-04-13",
-     "lastNav": "2026-09-25",
-     "observations": 4788,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/105463"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf106193",
-     "name": "KOTAK GOLD ETF",
-     "code": "106193",
-     "inception": "2007-07-30",
-     "lastNav": "2026-09-25",
-     "observations": 4636,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/106193"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf107693",
-     "name": "Quantum Gold ETF",
-     "code": "107693",
-     "inception": "2008-02-27",
-     "lastNav": "2026-09-25",
-     "observations": 4572,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/107693"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "gold",
-   "region": "india",
    "vehicle": "mf",
    "asset": "Gold",
    "instruments": [
@@ -782,84 +393,6 @@
       {
        "label": "NAV data (JSON)",
        "url": "https://api.mfapi.in/mf/115132"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "debt",
-   "region": "india",
-   "vehicle": "etf",
-   "asset": "Short duration",
-   "instruments": [
-    {
-     "id": "mf140086",
-     "name": "Nippon India ETF Nifty 1D Rate Liquid BeES - Direct Plan",
-     "code": "140086",
-     "plan": "Direct",
-     "inception": "2016-11-06",
-     "lastNav": "2026-09-25",
-     "observations": 3011,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/140086"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf142589",
-     "name": "DSP NIFTY 1D Rate Liquid ETF",
-     "code": "142589",
-     "inception": "2018-03-19",
-     "lastNav": "2026-09-25",
-     "observations": 2594,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/142589"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf151358",
-     "name": "Kotak Nifty 1D Rate Liquid ETF",
-     "code": "151358",
-     "inception": "2023-01-31",
-     "lastNav": "2026-09-25",
-     "observations": 1138,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/151358"
       },
       {
        "label": "AMFI NAV history",
@@ -951,84 +484,6 @@
   {
    "class": "debt",
    "region": "india",
-   "vehicle": "etf",
-   "asset": "Long duration",
-   "instruments": [
-    {
-     "id": "mf133307",
-     "name": "LIC MF Nifty 8-13 yr G-Sec ETF",
-     "code": "133307",
-     "inception": "2014-12-26",
-     "lastNav": "2026-09-25",
-     "observations": 2843,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/133307"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf139496",
-     "name": "Nippon India ETF Nifty 8-13 yr G-Sec Long Term Gilt - Direct Plan",
-     "code": "139496",
-     "plan": "Direct",
-     "inception": "2016-07-07",
-     "lastNav": "2026-09-25",
-     "observations": 2476,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/139496"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf148620",
-     "name": "Motilal Oswal Nifty 5 year benchmark G-Sec ETF",
-     "code": "148620",
-     "inception": "2020-12-15",
-     "lastNav": "2026-09-25",
-     "observations": 1402,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148620"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "debt",
-   "region": "india",
    "vehicle": "mf",
    "asset": "Long duration",
    "instruments": [
@@ -1101,6 +556,503 @@
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty 50",
+   "instruments": [
+    {
+     "id": "nse-niftybees",
+     "name": "Nippon India ETF Nifty 50 BeES",
+     "code": "NIFTYBEES",
+     "inception": "2002-01-08",
+     "dateSource": "manual",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "NIFTYBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=NIFTYBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-qnifty",
+     "name": "Quantum Nifty 50 ETF",
+     "code": "QNIFTY",
+     "inception": "2008-07-17",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "QNIFTY on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=QNIFTY"
+      }
+     ]
+    },
+    {
+     "id": "nse-mom50",
+     "name": "Motilal Oswal Nifty 50 ETF",
+     "code": "MOM50",
+     "inception": "2010-07-30",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MOM50 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MOM50"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty Next 50",
+   "instruments": [
+    {
+     "id": "nse-juniorbees",
+     "name": "Nippon India ETF Nifty Next 50 Junior BeES",
+     "code": "JUNIORBEES",
+     "inception": "2003-02-21",
+     "dateSource": "manual",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "JUNIORBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=JUNIORBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-next50ietf",
+     "name": "ICICI Prudential Nifty Next 50 ETF",
+     "code": "NEXT50IETF",
+     "inception": "2018-08-24",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "NEXT50IETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=NEXT50IETF"
+      }
+     ]
+    },
+    {
+     "id": "nse-setfnn50",
+     "name": "SETFNN50",
+     "code": "SETFNN50",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "SETFNN50 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=SETFNN50"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty Midcap 150",
+   "instruments": [
+    {
+     "id": "nse-mid150bees",
+     "name": "Nippon India ETF Nifty Midcap 150",
+     "code": "MID150BEES",
+     "inception": "2019-02-01",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MID150BEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MID150BEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-midcapetf",
+     "name": "MIDCAPETF",
+     "code": "MIDCAPETF",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MIDCAPETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MIDCAPETF"
+      }
+     ]
+    },
+    {
+     "id": "nse-midcapietf",
+     "name": "MIDCAPIETF",
+     "code": "MIDCAPIETF",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MIDCAPIETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MIDCAPIETF"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty Smallcap 250",
+   "instruments": [
+    {
+     "id": "nse-hdfcsml250",
+     "name": "HDFCSML250",
+     "code": "HDFCSML250",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "HDFCSML250 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=HDFCSML250"
+      }
+     ]
+    },
+    {
+     "id": "nse-mosmall250",
+     "name": "MOSMALL250",
+     "code": "MOSMALL250",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MOSMALL250 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MOSMALL250"
+      }
+     ]
+    },
+    {
+     "id": "nse-small250",
+     "name": "SMALL250",
+     "code": "SMALL250",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "SMALL250 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=SMALL250"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "nse-goldbees",
+     "name": "Nippon India ETF Gold BeES",
+     "code": "GOLDBEES",
+     "inception": "2007-03-08",
+     "dateSource": "manual",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "GOLDBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=GOLDBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-qgoldhalf",
+     "name": "Quantum Gold ETF",
+     "code": "QGOLDHALF",
+     "inception": "2008-02-27",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "QGOLDHALF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=QGOLDHALF"
+      }
+     ]
+    },
+    {
+     "id": "nse-hdfcgold",
+     "name": "HDFCGOLD",
+     "code": "HDFCGOLD",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "HDFCGOLD on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=HDFCGOLD"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "nse-liquidbees",
+     "name": "Nippon India ETF Liquid BeES",
+     "code": "LIQUIDBEES",
+     "inception": "2003-07-08",
+     "dateSource": "manual",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LIQUIDBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LIQUIDBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-liquid1",
+     "name": "Kotak Nifty 1D Rate Liquid ETF",
+     "code": "LIQUID1",
+     "inception": "2023-01-31",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LIQUID1 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LIQUID1"
+      }
+     ]
+    },
+    {
+     "id": "nse-liquidcase",
+     "name": "LIQUIDCASE",
+     "code": "LIQUIDCASE",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LIQUIDCASE on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LIQUIDCASE"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "nse-licnetfgsc",
+     "name": "LIC MF Nifty 8-13 yr G-Sec ETF",
+     "code": "LICNETFGSC",
+     "inception": "2014-12-26",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LICNETFGSC on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LICNETFGSC"
+      }
+     ]
+    },
+    {
+     "id": "nse-ltgiltbees",
+     "name": "Nippon India ETF Nifty 8-13 yr G-Sec Long Term Gilt",
+     "code": "LTGILTBEES",
+     "inception": "2016-07-07",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LTGILTBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LTGILTBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-ltgiltcase",
+     "name": "LTGILTCASE",
+     "code": "LTGILTCASE",
+     "inception": null,
+     "dateSource": null,
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LTGILTCASE on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LTGILTCASE"
       }
      ]
     }

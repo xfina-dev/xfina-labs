@@ -169,7 +169,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <div class="flex items-start gap-3 min-w-0">
                   <span v-if="vehicle !== 'index'" class="inline-grid place-items-center w-6 h-6 shrink-0 rounded-full bg-muted text-xs font-semibold">{{ k + 1 }}</span>
                   <div class="min-w-0">
-                    <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10">{{ i.code }}</Tag> <Tag v-if="i.plan" variant="warn">{{ i.plan }}</Tag></div>
+                    <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag> <Tag v-if="i.plan" variant="warn">{{ i.plan }}</Tag></div>
                     <div class="text-xs text-muted-foreground mt-0.5">
                       <span class="font-mono text-foreground">{{ dateNote(i) }}</span>
                       <span v-if="dateSourceNote(i)"> ({{ dateSourceNote(i) }})</span> · {{ i.ccy }} · {{ i.returnType }}
@@ -200,7 +200,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <ul v-else class="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
           <li v-for="i in list" :key="i.id" class="flex items-start justify-between gap-2 rounded-md border p-3">
             <div class="min-w-0 text-sm">
-              <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10">{{ i.code }}</Tag></div>
+              <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></div>
               <div class="text-xs text-muted-foreground mt-0.5">{{ i.asset }} · {{ HOW[i.how].site }} · {{ i.ccy }}</div>
             </div>
             <Button variant="ghost" size="sm" class="h-7 px-2 -mr-1 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
@@ -241,7 +241,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               <ul class="divide-y rounded-md border">
                 <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
                   <div class="min-w-0 text-sm">
-                    <span class="font-medium">{{ clip(i.name) }}</span> <Tag v-if="i.code && i.code.length <= 10">{{ i.code }}</Tag>
+                    <span class="font-medium">{{ clip(i.name) }}</span> <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag>
                     <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.returnType }}</div>
                   </div>
                   <div class="flex items-center gap-1.5">

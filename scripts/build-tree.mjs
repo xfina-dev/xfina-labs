@@ -97,6 +97,60 @@ function oldestFirst(rows, vehicle) {
   return [...best.values()].sort((a, b) => a.first.localeCompare(b.first) || a.c.schemeName.localeCompare(b.c.schemeName)).slice(0, KEEP).map((r) => toInstrument(r, vehicle));
 }
 
+// ---------------------------------------------------------------- India ETFs, from NSE
+// Indian ETFs trade on NSE under a ticker, so the list comes from NSE (https://www.nseindia.com/api/etf:
+// symbol and underlying index for every listed ETF). NSE does not serve a listing date to scripts (its
+// per-symbol endpoints refuse them), so dates are typed here for the funds where the symbol and the
+// launch are both certain, and every other ETF is listed without one, after the dated ones.
+//   'manual' = a public launch date typed in, not yet verified.
+//   'amfi'   = the first NAV AMFI holds for the same fund (measured through mfapi.in earlier).
+const NSE_ETF = {
+  NIFTYBEES: ['Nippon India ETF Nifty 50 BeES', '2002-01-08', 'manual'],
+  QNIFTY: ['Quantum Nifty 50 ETF', '2008-07-17', 'amfi'],
+  MOM50: ['Motilal Oswal Nifty 50 ETF', '2010-07-30', 'amfi'],
+  JUNIORBEES: ['Nippon India ETF Nifty Next 50 Junior BeES', '2003-02-21', 'manual'],
+  NEXT50IETF: ['ICICI Prudential Nifty Next 50 ETF', '2018-08-24', 'amfi'],
+  MID150BEES: ['Nippon India ETF Nifty Midcap 150', '2019-02-01', 'amfi'],
+  GOLDBEES: ['Nippon India ETF Gold BeES', '2007-03-08', 'manual'],
+  QGOLDHALF: ['Quantum Gold ETF', '2008-02-27', 'amfi'],
+  LIQUIDBEES: ['Nippon India ETF Liquid BeES', '2003-07-08', 'manual'],
+  LIQUID1: ['Kotak Nifty 1D Rate Liquid ETF', '2023-01-31', 'amfi'],
+  LICNETFGSC: ['LIC MF Nifty 8-13 yr G-Sec ETF', '2014-12-26', 'amfi'],
+  LTGILTBEES: ['Nippon India ETF Nifty 8-13 yr G-Sec Long Term Gilt', '2016-07-07', 'amfi'],
+};
+// Which NSE ETFs belong to which asset, by the underlying NSE prints for each.
+const NSE_ASSETS = [
+  { cls: 'equity', asset: 'Nifty 50', re: /^nifty 50$/i },
+  { cls: 'equity', asset: 'Nifty Next 50', re: /next 50/i, no: /sensex|bse|momentum|quality|alpha|low vol/i, also: ['JUNIORBEES'] },
+  { cls: 'equity', asset: 'Nifty Midcap 150', re: /midcap ?150/i, no: /momentum|quality|bse|alpha|low vol/i },
+  { cls: 'equity', asset: 'Nifty Smallcap 250', re: /smallcap ?250/i, no: /momentum|quality|bse|alpha|low vol/i },
+  { cls: 'gold', asset: 'Gold', re: /^gold$/i },
+  { cls: 'debt', asset: 'Short duration', re: /nifty ?1d rate/i, also: ['LIQUIDBEES'] },
+  { cls: 'debt', asset: 'Long duration', re: /8-13|10 yr/i, no: /5 yr|hybrid|momentum/i },
+];
+async function indiaEtfs() {
+  const j = await getJson('https://www.nseindia.com/api/etf');
+  if (!j?.data?.length) throw new Error('could not read the NSE ETF list (https://www.nseindia.com/api/etf)');
+  const rows = j.data;
+  console.log(`  ${rows.length} ETFs listed on NSE`);
+  const NSE_REPORT = 'https://www.nseindia.com/report-detail/eq_security';
+  for (const a of NSE_ASSETS) {
+    const hit = rows.filter((r) => (a.re.test(r.assets || '') && !(a.no && a.no.test(r.assets || ''))) || (a.also || []).includes(r.symbol));
+    const insts = hit.map((r) => {
+      const t = NSE_ETF[r.symbol];
+      return {
+        id: `nse-${r.symbol.toLowerCase()}`, name: t ? t[0] : r.symbol, code: r.symbol, inception: t ? t[1] : null, dateSource: t ? t[2] : null,
+        turnover: Number(r.trdVal) || 0, ccy: 'INR', returnType: 'Price only', how: 'nseEtf', kind: 'ETF',
+        links: [L('NSE historical price data', NSE_REPORT), L(`${r.symbol} on NSE`, `https://www.nseindia.com/get-quotes/equity?symbol=${r.symbol}`)],
+      };
+    });
+    // Dated ones first, oldest first; the rest by what trades most, so an undated leaf still lists the liquid funds.
+    insts.sort((x, y) => (x.inception && y.inception ? x.inception.localeCompare(y.inception) : x.inception ? -1 : y.inception ? 1 : y.turnover - x.turnover));
+    node(a.cls, 'india', 'etf', null, a.asset).instruments.push(...insts.slice(0, KEEP));
+    console.log(`  NSE ${a.cls}/${a.asset}: ${hit.length} ETFs (${insts.filter((i) => i.inception).length} dated)`);
+  }
+}
+
 // ---------------------------------------------------------------- non-India, curated
 async function isharesInception(url) {
   try {
@@ -175,18 +229,21 @@ console.log('Reading the AMFI scheme list from mfapi.in ...');
 const schemes = await loadSchemes();
 console.log(`  ${schemes.length} schemes`);
 
-async function fromSchemes(def, region, cls) {
+async function fromSchemes(def, region, cls, { etfs: withEtfs = true } = {}) {
   const pool_ = schemes.filter((s) => def.re.test(s.schemeName) && !(def.no && def.no.test(s.schemeName)) && !NOT_GROWTH.test(s.schemeName));
   const etfs = pool_.filter((s) => isEtf(s.schemeName));
   // Equity: index funds only. Indian funds that feed a US index are usually fund-of-funds, so those are allowed there.
   const mfs = pool_.filter((s) => !isEtf(s.schemeName) && (cls !== 'equity' || /index/i.test(s.schemeName) || (def.feeder && FOF.test(s.schemeName))));
   const cap = (a) => a.slice(0, 80);
-  const [me, mm] = [await measure(cap(etfs)), await measure(cap(mfs))];
-  node(cls, region, 'etf', null, def.asset).instruments.push(...oldestFirst(me, 'etf'));
+  const [me, mm] = [withEtfs ? await measure(cap(etfs)) : [], await measure(cap(mfs))];
+  if (withEtfs) node(cls, region, 'etf', null, def.asset).instruments.push(...oldestFirst(me, 'etf'));
   node(cls, region, 'mf', null, def.asset).instruments.push(...oldestFirst(mm, 'mf'));
   console.log(`  ${cls}/${region}/${def.asset}: ${etfs.length} ETF candidates → ${me.length} live, ${mfs.length} fund candidates → ${mm.length} live`);
 }
-for (const d of INDIA) await fromSchemes(d, 'india', d.cls);
+// Indian ETFs come from NSE (below), so from AMFI only the mutual funds are taken here.
+for (const d of INDIA) await fromSchemes(d, 'india', d.cls, { etfs: false });
+console.log('Reading the NSE ETF list ...');
+await indiaEtfs();
 for (const d of FEEDERS) await fromSchemes(d, 'us', 'equity');
 // The feeder search also finds Indian ETFs and index funds tracking US indices: for the US region
 // they belong in one list ("Indian funds"), so fold the ETF node into the MF node.
@@ -216,7 +273,7 @@ for (const i of INDICES) {
 
 // Oldest first; instruments without a known date go last. Keep the top KEEP.
 const byAge = (a, b) => (a.inception && b.inception ? a.inception.localeCompare(b.inception) : a.inception ? -1 : b.inception ? 1 : 0);
-const list = [...nodes.values()].map((n) => ({ ...n, instruments: n.instruments.sort(byAge).slice(0, KEEP) })).filter((n) => n.instruments.length);
+const list = [...nodes.values()].map((n) => ({ ...n, instruments: n.instruments.sort(byAge).slice(0, KEEP).map(({ turnover, ...i }) => i) })).filter((n) => n.instruments.length);
 
 await writeFile(OUT, JSON.stringify({ generatedAt: new Date().toISOString().slice(0, 10), keep: KEEP, nodes: list }, null, 1));
 console.log(`\nWrote ${list.length} leaves, ${list.reduce((s, n) => s + n.instruments.length, 0)} instruments → src/portfolio-engine/tree.json`);

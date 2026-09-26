@@ -54,10 +54,10 @@ export const HOW = {
     format: 'A date and NAV per line, as AMFI publishes it.',
   },
   nseEtf: {
-    site: 'AMFI',
-    title: 'Indian ETF: NAV (preferred) or price',
-    steps: ['For NAV, use AMFI NAV History and pick the ETF as the scheme.', 'For exchange price, open the NSE quote page for the symbol and use its historical data.', 'Download the widest range available.'],
-    format: 'NAV or price by date, as published.',
+    site: 'NSE',
+    title: 'NSE: ETF price history',
+    steps: ['Open the NSE historical price report.', 'Choose Security-wise price and volume data, then enter the ETF\'s symbol and the EQ series.', 'Set the widest date range the report allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
+    format: 'NSE\'s price and volume table, with a row per trading day. It is the exchange price, not NAV.',
   },
   yahoo: {
     site: 'Yahoo Finance',
@@ -98,8 +98,8 @@ export const HOW = {
 };
 
 
-const DATE_SOURCE = { mfapi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date' };
-export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : 'Full published history');
+const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date' };
+export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
 export const dateSourceNote = (i) => (i.inception ? DATE_SOURCE[i.dateSource] || '' : '');
 
 export const nodes = tree.nodes;
