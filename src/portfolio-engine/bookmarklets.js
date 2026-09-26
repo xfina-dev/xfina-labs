@@ -3,6 +3,7 @@
 // covers the supported indexes selected in the list, and works out for itself what is new (see the script).
 // Add a site here and its card in the download list gets an Assisted tab.
 import nseIndices from './bookmarklets/nse-indices.js?raw';
+import nseEtf from './bookmarklets/nse-etf.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
 import { nodes } from './guide.js';
 
@@ -27,7 +28,28 @@ const BUILDERS = {
       label: 'Xfina · NSE Indices',
       href: bookmarkletHref(nseIndices, { INDEXES: chosen }),
       indexes: chosen.map((x) => x[1]),
+      action: 'csv format',
       skipped: items.length - supported.length,
+    };
+  },
+  // NSE's own price and volume report for exchange-listed ETFs, by symbol. NSE's terms restrict automated data
+  // collection, so this one carries a plain caution on the card (see GetData.vue).
+  NSE: (items) => {
+    const etfs = items.filter((i) => i.kind === 'ETF' && i.how === 'nseEtf' && i.code);
+    if (!etfs.length) return null;
+    // Some listing dates are unknown; asking from 2014 costs only a few empty years for those.
+    const symbols = etfs.map((i) => [i.code, i.name, i.inception || '2014-01-01']);
+    return {
+      site: 'NSE',
+      openUrl: 'https://www.nseindia.com/report-detail/eq_security',
+      openLabel: 'Open NSE Security-wise Archives',
+      termsUrl: 'https://www.nseindia.com/nse-terms-of-use',
+      label: 'Xfina · NSE ETFs',
+      href: bookmarkletHref(nseEtf, { SYMBOLS: symbols }),
+      indexes: etfs.map((i) => i.code),
+      action: 'Download (.csv)',
+      caution: 'NSE\'s terms of use restrict automated data collection. This bookmark only does the clicking you would do on that page, one file at a time and at a human pace, but the terms say what they say, so the decision to use it is yours.',
+      skipped: items.length - etfs.length,
     };
   },
 };

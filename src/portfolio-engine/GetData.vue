@@ -299,14 +299,17 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 Click the bookmark. A small panel opens on that page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new, starting the day after the newest date it already has. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the files it will download before you press Start.
               </li>
               <li>Press <strong>Start</strong> and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
-              <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, index after index. The first three files go out back to back so your browser asks to <strong>allow multiple downloads</strong>: choose Allow. It waits about 15 seconds for that (or press Continue now in its panel), then carries on at a gentler pace with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
-              <li>Your browser saves the files as it does for any download: in its usual folder, or wherever it asks you. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the files by date, and a newer file replaces older data for the same dates.</li>
+              <li>It fills in the page's form and presses its <strong>{{ g.bookmarklet.action }}</strong> button for you, one file after another, with a pause of a few seconds each time, as a person would. That's the same download you'd do by hand, without the clicking.</li>
+              <li>In Chrome or Edge it asks for <strong>one folder</strong> (make a new one, as Downloads and Desktop aren't allowed) and saves every file there with no more prompts. In other browsers the files download as usual: the first three go out together so your browser asks to <strong>allow multiple downloads</strong>, so choose Allow; it waits about 15 seconds for that. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the files by date, and a newer file replaces older data for the same dates.</li>
             </ol>
 
             <p class="text-xs text-muted-foreground">
-              The bookmark remembers where it left off in this browser, so clearing that site's data makes the next Update a full history. This just saves you the clicking: the same form and the same download button, so a few years of files take one click instead of many. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}; their
-              <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
-              apply here as they do when downloading by hand.
+              The bookmark remembers where it left off in this browser, so clearing that site's data makes the next Update a full history. This just saves you the clicking: the same form and the same download button, so a few years of files take one click instead of many. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}.
+              <template v-if="g.bookmarklet.caution">{{ g.bookmarklet.caution }} Read their
+                <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>.</template>
+              <template v-else>Their
+                <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
+                apply here as they do when downloading by hand.</template>
               <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
             </p>
           </div>
