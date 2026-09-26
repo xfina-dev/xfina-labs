@@ -84,12 +84,14 @@ const bySite = computed(() => {
     const shared = its.length > 1 ? [...urls.values()].filter((u) => u.n === its.length).map((u) => u.l) : [];
     const sharedUrls = new Set(shared.map((l) => l.url));
     const hows = [...new Set(its.map((i) => i.how))].map((h) => HOW[h]);
-    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its) };
+    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its, { split: split.value }) };
   });
 });
 
 // Clicking a bookmarklet link on this page would run it here, where it does nothing useful. It is for dragging.
 const dragHint = ref(false);
+// How the bookmarklet splits a long history into files: financial year (April to March) or calendar year.
+const split = ref('FY');
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
@@ -229,7 +231,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 Drag {{ g.bookmarklet.bookmarks.length > 1 ? 'these buttons' : 'this button' }} to your bookmarks bar, one per index:
                 <div class="mt-2 flex flex-wrap gap-2">
                   <a
-                    v-for="b in g.bookmarklet.bookmarks" :key="b.label" :href="b.href" draggable="true" :title="`Drag me to your bookmarks bar. ${b.years} one-year files from ${b.since}`"
+                    v-for="b in g.bookmarklet.bookmarks" :key="b.label" :href="b.href" draggable="true" :title="`Drag me to your bookmarks bar. ${b.files} files from ${b.since}`"
                     class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
                     @click.prevent="dragHint = true"
                   >{{ b.label }}</a>
@@ -242,9 +244,16 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
                 </a>
               </li>
+              <li>
+                Choose how the files are split:
+                <span class="ml-2 inline-flex rounded-md border border-border overflow-hidden align-middle">
+                  <button v-for="o in [['FY', 'Financial year'], ['CY', 'Calendar year']]" :key="o[0]" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="split === o[0] ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="split = o[0]">{{ o[1] }}</button>
+                </span>
+                <span class="text-xs text-muted-foreground ml-2">Drag the buttons again after changing this.</span>
+              </li>
               <li>In each tab, click that index's bookmark. Each shows its own progress bar and runs alongside the others.</li>
-              <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one year at a time, pausing between files like a person would. The page won't export more than a year at once, so a long index takes a few minutes.</li>
-              <li>The files land in your Downloads folder, the same as downloading by hand. Allow multiple downloads if the browser asks. Then use <strong>Import Files</strong> in Portfolio Engine: it merges the yearly files by date.</li>
+              <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one {{ split === 'FY' ? 'financial' : 'calendar' }} year at a time, pausing between files like a person would. The page won't export more than a year at once, so a long index takes a few minutes.</li>
+              <li>Your browser saves the files exactly as it does for any download: in its usual folder, or wherever it asks you, depending on your settings. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
             </ol>
             <p class="text-xs text-muted-foreground">
               Runs only on that site and sends nothing to Xfina.

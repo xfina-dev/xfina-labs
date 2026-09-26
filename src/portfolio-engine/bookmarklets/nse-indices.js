@@ -3,23 +3,26 @@
 
   It runs on niftyindices.com only and does what a person does on the Historical Data page: opens
   "Total returns Index Values", picks the index, sets a one-year date range, presses Submit, then
-  presses the page's own "csv format" button. It repeats that for each year from the index's start
-  date to today, pausing a few seconds each time like someone doing it by hand. The files are the
-  ones the page itself produces, named by the page, exactly as a manual download.
+  presses the page's own "csv format" button. It repeats that for each financial year (April to March)
+  or calendar year, as chosen, from the index's start date to today, pausing a few seconds each time like
+  someone doing it by hand. The files are the ones the page itself produces, named by the page, exactly as
+  a manual download. Where the browser saves them is the browser's own setting.
 
-  The page refuses a range longer than one year, so a long index takes one file per year. Nothing is
+  The page refuses a range longer than a year (more than 365 days between the two dates), so a long index
+  takes one file per year. A whole financial or calendar year always fits, leap years included. Nothing is
   sent to Xfina or anywhere else. The importer merges the files by date.
 
   Parameters, filled in when the bookmark is generated (see bookmarklet.js): __INDEX__ is JSON,
-  ["NIFTY 50", "Nifty 50", "1999-06-30"]: the name the page's dropdown uses, a label, and the start date.
+  ["NIFTY 50", "Nifty 50", "1999-06-30", "FY"]: the name the page's dropdown uses, a label, the start date,
+  and how to split the files, "FY" (financial year) or "CY" (calendar year).
   Written to be minified: statements end in semicolons, no line comments inside.
   If the page changes, this is the one file to fix.
 */
 (function () {
   var HOST = 'niftyindices.com';
   var INDEX = JSON.parse('__INDEX__');
+  var FY = INDEX[3] === 'FY';
   var SUBINDEX = 'Broad Market Indices';
-  var SPAN_DAYS = 364;
   var DAY = 86400000;
 
   if (location.hostname.replace(/^www\./, '') !== HOST) {
@@ -38,7 +41,7 @@
   box.style.cssText = 'position:fixed;top:16px;right:16px;z-index:2147483647;width:340px;background:#0a0a0b;color:#fafafa;font:14px/1.5 system-ui,sans-serif;border:1px solid #3f3f46;border-radius:8px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.5)';
   box.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:16px">Xfina · ' + INDEX[1] + ' TRI<span id="xfina-x" style="cursor:pointer;color:#a1a1aa" title="Stop and close">✕</span></div>' +
-    '<div style="color:#a1a1aa;font-size:12px;margin:4px 0 10px">Downloads NSE\'s own CSV, one file per year, pausing between files like a person would. Allow multiple downloads if asked. Nothing is sent to Xfina.</div>' +
+    '<div style="color:#a1a1aa;font-size:12px;margin:4px 0 10px">Downloads NSE\'s own CSV, one file per ' + (FY ? 'financial' : 'calendar') + ' year, pausing between files like a person would. Your browser saves them where it normally does. Allow multiple downloads if asked. Nothing is sent to Xfina.</div>' +
     '<div style="height:8px;background:#27272a;border-radius:9px;overflow:hidden"><div id="xfina-bar" style="height:100%;width:0;background:#4ade80;transition:width .3s"></div></div>' +
     '<div id="xfina-status" style="margin-top:6px;font-size:13px">Starting...</div>' +
     '<div id="xfina-log" style="margin-top:6px;font-size:12px;color:#a1a1aa;white-space:pre-line"></div>';
@@ -76,9 +79,13 @@
   var today = new Date();
   today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   while (cursor <= today) {
-    var end = new Date(Math.min(cursor.getTime() + SPAN_DAYS * DAY, today.getTime()));
-    windows.push([cursor, end]);
-    cursor = new Date(end.getTime() + DAY);
+    var y = cursor.getFullYear();
+    var m = cursor.getMonth();
+    var end = FY ? new Date(m >= 3 ? y + 1 : y, 2, 31) : new Date(y, 11, 31);
+    if (end > today) end = today;
+    var name = FY ? 'FY ' + (m >= 3 ? y : y - 1) + '-' + String((m >= 3 ? y + 1 : y) % 100).padStart(2, '0') : String(y);
+    windows.push([cursor, end, name]);
+    cursor = new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1);
   }
 
   var rowsNow = function () { return document.querySelectorAll('#historytotalindex tr'); };
@@ -99,8 +106,8 @@
       var saved = 0;
       for (var k = 0; k < windows.length && !stopped; k++) {
         var w = windows[k];
-        var label = iso(w[0]) + ' to ' + iso(w[1]);
-        status('Year ' + (k + 1) + ' of ' + windows.length + ': ' + label);
+        var label = w[2] + ' (' + iso(w[0]) + ' to ' + iso(w[1]) + ')';
+        status('File ' + (k + 1) + ' of ' + windows.length + ': ' + label);
         var before = firstRow();
         $('#datepickerFromtotalindex').datepicker('setDate', w[0]);
         $('#datepickerTototalindex').datepicker('setDate', w[1]);
@@ -117,7 +124,7 @@
         progress(k + 1, windows.length);
         if (k < windows.length - 1) await human(3500, 6500);
       }
-      status(stopped ? 'Stopped.' : 'Done: ' + saved + ' files in your Downloads folder. Import them in Portfolio Engine.');
+      status(stopped ? 'Stopped.' : 'Done: ' + saved + ' files saved by your browser. Import them in Portfolio Engine.');
     } catch (e) {
       status('Stopped: ' + e.message);
     }
