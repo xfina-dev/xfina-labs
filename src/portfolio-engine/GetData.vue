@@ -90,6 +90,9 @@ const bySite = computed(() => {
 
 // Clicking a bookmarklet link on this page would run it here, where it does nothing useful. It is for dragging.
 const dragHint = ref(false);
+// Manual or assisted, per website. Assisted exists only where a bookmarklet does.
+const modes = ref({});
+const mode = (site) => modes.value[site] || 'manual';
 // How the bookmarklet splits a long history into files: financial year (April to March) or calendar year.
 const split = ref('FY');
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -223,53 +226,38 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <CardDescription>{{ g.items.length }} to download here. Open the page, follow the steps, then import the files.</CardDescription>
         </CardHeader>
         <CardContent class="space-y-6">
-          <!-- One-click download: a bookmarklet the user drags to the bookmarks bar, for sites that only serve their data to a page on that site -->
-          <div v-if="g.bookmarklet" class="rounded-md border bg-muted/30 p-4 space-y-3">
-            <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
-            <ol class="list-decimal pl-5 space-y-2 text-sm">
-              <li>
-                Choose how the files are split:
-                <span class="ml-2 inline-flex rounded-md border border-border overflow-hidden align-middle">
-                  <button v-for="o in [['FY', 'Financial year'], ['CY', 'Calendar year']]" :key="o[0]" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="split === o[0] ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="split = o[0]">{{ o[1] }}</button>
-                </span>
-                <span class="text-xs text-muted-foreground ml-2">The buttons below are generated from this choice.</span>
-              </li>
-              <li>
-                Drag {{ g.bookmarklet.bookmarks.length > 1 ? 'these buttons' : 'this button' }} to your bookmarks bar, one per index:
-                <div class="mt-2 flex flex-wrap gap-2">
-                  <a
-                    v-for="b in g.bookmarklet.bookmarks" :key="b.label" :href="b.href" draggable="true" :title="`Drag me to your bookmarks bar. ${b.files} files from ${b.since}`"
-                    class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
-                    @click.prevent="dragHint = true"
-                  >{{ b.label }}</a>
+          <!-- What to download: the same for both ways -->
+          <div>
+            <div class="font-medium text-muted-foreground text-xs mb-1">Datasets to download</div>
+            <ul class="divide-y rounded-md border">
+              <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
+                <div class="min-w-0 text-sm">
+                  <span class="font-medium">{{ clip(i.name) }}</span> <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag>
+                  <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.returnType }}</div>
                 </div>
-                <span v-if="dragHint" class="text-xs text-muted-foreground">Drag them, don't click them here.</span>
+                <div class="flex items-center gap-1.5">
+                  <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
+                    <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
+                  </a>
+                  <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+                </div>
               </li>
-              <li>
-                Open the site, once per index, each in its own tab:
-                <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
-                  <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
-                </a>
-              </li>
-              <li>In each tab, click that index's bookmark. Each shows its own progress bar and runs alongside the others.</li>
-              <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one {{ split === 'FY' ? 'financial' : 'calendar' }} year at a time, pausing between files to go easy on the site. The page won't export more than a year at once, so a long index takes a few minutes.</li>
-              <li>Your browser saves the files exactly as it does for any download: in its usual folder, or wherever it asks you, depending on your settings. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
-            </ol>
-            <p class="rounded-md border border-dashed border-[hsl(var(--warn)/0.6)] bg-[hsl(var(--warn)/0.07)] p-3 text-xs">
-              <strong>Before you use it.</strong> Xfina is not affiliated with {{ g.bookmarklet.site }}. This saves the same files you could download by hand on their page, for your own personal, non-commercial study, and Xfina never sees or stores the data. Their
-              <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
-              restrict automated data collection, so use it in line with them, or download by hand instead. Please don't share or republish the data.
-            </p>
-            <p class="text-xs text-muted-foreground">
-              Runs only on that site and sends nothing to Xfina.
-              <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
-              Changed your list? Drag the buttons again to update your bookmarks.
-            </p>
+            </ul>
           </div>
 
-          <GifPreview :slug="slug(g.site)" :title="g.site" />
+          <!-- Two ways to get them. Assisted appears only for sites that have a bookmarklet. -->
+          <div v-if="g.bookmarklet" class="flex gap-1 border-b" role="tablist">
+            <button
+              v-for="m in [['manual', 'Manual'], ['assisted', 'Assisted']]" :key="m[0]" type="button" role="tab" :aria-selected="mode(g.site) === m[0]"
+              class="h-10 px-3 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
+              :class="mode(g.site) === m[0] ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+              @click="modes = { ...modes, [g.site]: m[0] }"
+            >{{ m[1] }}</button>
+          </div>
 
-          <div class="grid gap-6 lg:grid-cols-2 items-start">
+          <!-- Manual: open the page and download by hand -->
+          <div v-if="!g.bookmarklet || mode(g.site) === 'manual'" class="space-y-6">
+            <GifPreview :slug="slug(g.site)" :title="g.site" />
             <div class="space-y-4">
               <div v-if="g.shared.length" class="flex flex-wrap gap-2">
                 <a v-for="l in g.shared" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
@@ -284,24 +272,59 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <p class="text-xs text-muted-foreground mt-1">You will get: {{ h.format }} Import it as it is.</p>
               </div>
             </div>
+          </div>
 
-            <div>
-              <div class="font-medium text-muted-foreground text-xs mb-1">Download</div>
-              <ul class="divide-y rounded-md border">
-                <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
-                  <div class="min-w-0 text-sm">
-                    <span class="font-medium">{{ clip(i.name) }}</span> <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag>
-                    <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.returnType }}</div>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
-                      <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
-                    </a>
-                    <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
-                  </div>
-                </li>
-              </ul>
+          <!-- Assisted: a bookmarklet, dragged to the bookmarks bar, that does the clicking on the site -->
+          <div v-else class="space-y-4">
+            <div class="rounded-md border p-4 space-y-3">
+              <div class="font-semibold">Bookmarklet settings</div>
+              <div class="flex flex-wrap items-center gap-3 text-sm">
+                <span class="text-muted-foreground">Split files by</span>
+                <span class="inline-flex rounded-md border border-border overflow-hidden">
+                  <button v-for="o in [['FY', 'Financial year'], ['CY', 'Calendar year']]" :key="o[0]" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="split === o[0] ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="split = o[0]">{{ o[1] }}</button>
+                </span>
+              </div>
+              <p class="text-xs text-muted-foreground">
+                The site exports at most a year at a time, so a long history comes as one file per {{ split === 'FY' ? 'financial year (April to March)' : 'calendar year' }}. The buttons below are generated from this, so drag them again if you change it.
+              </p>
             </div>
+
+            <div class="rounded-md border bg-muted/30 p-4 space-y-3">
+              <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
+              <ol class="list-decimal pl-5 space-y-2 text-sm">
+                <li>
+                  Drag {{ g.bookmarklet.bookmarks.length > 1 ? 'these buttons' : 'this button' }} to your bookmarks bar, one per index:
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    <a
+                      v-for="b in g.bookmarklet.bookmarks" :key="b.label" :href="b.href" draggable="true" :title="`Drag me to your bookmarks bar. ${b.files} files from ${b.since}`"
+                      class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
+                      @click.prevent="dragHint = true"
+                    >{{ b.label }}</a>
+                  </div>
+                  <span v-if="dragHint" class="text-xs text-muted-foreground">Drag them, don't click them here.</span>
+                </li>
+                <li>
+                  Open the site, once per index, each in its own tab:
+                  <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
+                    <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
+                  </a>
+                </li>
+                <li>In each tab, click that index's bookmark. Each shows its own progress bar and runs alongside the others.</li>
+                <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one {{ split === 'FY' ? 'financial' : 'calendar' }} year at a time, pausing between files to go easy on the site. A long index takes a few minutes.</li>
+                <li>Your browser saves the files exactly as it does for any download: in its usual folder, or wherever it asks you, depending on your settings. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
+              </ol>
+              <p class="text-xs text-muted-foreground">
+                Runs only on that site and sends nothing to Xfina.
+                <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
+                Changed your list? Drag the buttons again to update your bookmarks.
+              </p>
+            </div>
+
+            <p class="rounded-md border border-dashed border-[hsl(var(--warn)/0.6)] bg-[hsl(var(--warn)/0.07)] p-3 text-xs">
+              <strong>Before you use it.</strong> Xfina is not affiliated with {{ g.bookmarklet.site }}. This saves the same files you could download by hand on their page, for your own personal, non-commercial study, and Xfina never sees or stores the data. Their
+              <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
+              restrict automated data collection, so use it in line with them, or download by hand instead. Please don't share or republish the data.
+            </p>
           </div>
         </CardContent>
       </Card>
