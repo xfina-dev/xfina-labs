@@ -43,9 +43,9 @@ const sections = [
   {
     id: 'global', title: 'Global', note: 'USD assets',
     assets: [
+      { name: 'MSCI ACWI', since: '2001-01-02', series: [] },
       { name: 'MSCI World', since: '1999-01-04', series: [ix('MSCI World NR', 'msci-world.csv', '1999-01-04', { ccy: 'USD' })] },
       { name: 'MSCI Emerging Markets', since: '1999-01-04', series: [] },
-      { name: 'MSCI ACWI', since: '2001-01-02', series: [] },
     ],
   },
   {
