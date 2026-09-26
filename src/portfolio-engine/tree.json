@@ -2051,55 +2051,6 @@
    "class": "gold",
    "region": "global",
    "vehicle": "etf",
-   "listing": "us",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "etf-gld",
-     "name": "SPDR Gold Shares",
-     "code": "GLD",
-     "inception": "2004-11-18",
-     "dateSource": "manual",
-     "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "GLD price history",
-       "url": "https://finance.yahoo.com/quote/GLD/history/"
-      }
-     ],
-     "asset": "Gold"
-    },
-    {
-     "id": "etf-iau",
-     "name": "iShares Gold Trust",
-     "code": "IAU",
-     "inception": "2005-01-21",
-     "dateSource": "issuer",
-     "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "IAU fund page",
-       "url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund"
-      },
-      {
-       "label": "IAU price history",
-       "url": "https://finance.yahoo.com/quote/IAU/history/"
-      }
-     ],
-     "asset": "Gold"
-    }
-   ]
-  },
-  {
-   "class": "gold",
-   "region": "global",
-   "vehicle": "etf",
    "listing": "irish",
    "asset": "Gold",
    "instruments": [
