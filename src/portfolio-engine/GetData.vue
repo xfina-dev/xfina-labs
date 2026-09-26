@@ -321,7 +321,9 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
 
             <!-- The indexes and the files each will produce for the chosen period -->
-            <div v-if="g.bookmarklet.rows.length" class="overflow-x-auto rounded-md border bg-background">
+            <div v-if="g.bookmarklet.rows.length" class="space-y-1.5">
+              <div class="text-sm text-muted-foreground">Files to be downloaded</div>
+              <div class="overflow-x-auto rounded-md border bg-background">
               <table class="w-full text-sm">
                 <thead class="text-muted-foreground">
                   <tr class="border-b">
@@ -351,6 +353,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   </tr>
                 </tfoot>
               </table>
+              </div>
             </div>
 
             <ol class="list-decimal pl-5 space-y-2 text-sm border-t pt-4">
