@@ -8,8 +8,9 @@
   scheme name is put in front, so files for different schemes do not overwrite each other; other browsers download
   under AMFI's name. Nothing is sent to Xfina.
 
-  The page takes at most 5 years per download, so a first run of a long history is several files, split at five-year
-  steps from the scheme's first date; after that Update is one small file per scheme. AMFI's scheme names differ a
+  The page takes at most 5 years per download, so a first run of a long history is several files, each ending on a
+  31 March (financial years, April to March), the first one starting at the scheme's first date and covering up to five
+  financial years; after that Update is one small file per scheme. AMFI's scheme names differ a
   little from the catalogue's, so each scheme is found by its base name, plan (direct or regular) and option (growth
   or IDCW); one that cannot be found is skipped and says so.
 
@@ -81,7 +82,7 @@
   var wins = function (f, t) {
     var o = [];
     while (f <= t) {
-      var e = day(new Date(f.getFullYear() + 5, f.getMonth(), f.getDate()), -1);
+      var e = new Date((f.getMonth() >= 3 ? f.getFullYear() + 1 : f.getFullYear()) + 4, 2, 31);
       if (e > t) e = t;
       o.push([f, e]);
       f = day(e, 1);
