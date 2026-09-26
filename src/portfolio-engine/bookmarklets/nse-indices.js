@@ -59,6 +59,12 @@
     await pause(600);
     el.style.outline = o;
   };
+  var put = function (sel, d) {
+    var el = $(sel);
+    el.datepicker('setDate', d);
+    var f = el.datepicker('option', 'onSelect');
+    if (f) f.call(el[0]);
+  };
   var pause = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   var today = day(new Date(), 0);
 
@@ -223,9 +229,9 @@
           var w = p.w[k];
           var before = first();
           await look('#datepickerFromtotalindex');
-          $('#datepickerFromtotalindex').datepicker('setDate', w[0]);
+          put('#datepickerFromtotalindex', w[0]);
           await look('#datepickerTototalindex');
-          $('#datepickerTototalindex').datepicker('setDate', w[1]);
+          put('#datepickerTototalindex', w[1]);
           await nap(6 + Math.floor(Math.random() * 4));
           alerts = [];
           await look('#submit_totalindexhistorical');
