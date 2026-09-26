@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
-import { bookmarkletFor, fromOptions } from './bookmarklets.js';
+import { bookmarkletFor, PERIODS, periodDates } from './bookmarklets.js';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
@@ -108,7 +108,7 @@ const pickPeriod = (id) => {
   }
 };
 const today = isoDay(new Date());
-const fromChoices = computed(() => fromOptions());
+const shownDates = computed(() => periodDates(from.value));
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
@@ -295,15 +295,22 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="space-y-1.5">
               <div class="text-sm text-muted-foreground">Period</div>
               <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden bg-background">
-                <button v-for="o in fromChoices" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id)">{{ o.label }}</button>
+                <button v-for="o in PERIODS" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id)">{{ o.label }}</button>
               </span>
-              <div v-if="from === 'CUSTOM'" class="flex flex-wrap items-center gap-3 pt-1 text-sm">
-                <label class="flex items-center gap-2 text-muted-foreground">Start <input v-model="customStart" type="date" :max="today" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" /></label>
-                <label class="flex items-center gap-2 text-muted-foreground">End <input v-model="customEnd" type="date" :max="today" :min="customStart || undefined" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" /></label>
+              <!-- Always shown, so each choice says which dates it covers. Editable only for Custom. -->
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-sm">
+                <label class="flex items-center gap-2 text-muted-foreground">Start
+                  <input v-if="from === 'CUSTOM'" v-model="customStart" type="date" :max="today" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" />
+                  <input v-else type="text" :value="shownDates.start || 'Each index\'s start'" disabled class="h-8 w-40 rounded-md border border-input bg-muted/40 px-2 text-sm text-foreground" />
+                </label>
+                <label class="flex items-center gap-2 text-muted-foreground">End
+                  <input v-if="from === 'CUSTOM'" v-model="customEnd" type="date" :max="today" :min="customStart || undefined" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" />
+                  <input v-else type="text" :value="shownDates.end" disabled class="h-8 w-40 rounded-md border border-input bg-muted/40 px-2 text-sm text-foreground" />
+                </label>
               </div>
               <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>
               <p class="text-xs text-muted-foreground">
-                {{ fromChoices.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). The current and previous financial year are worked out when you click the bookmark, so running it again later covers whatever is current then, and importing a newer file replaces the same dates from older ones.
+                Covers {{ PERIODS.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). Current and Previous FY are worked out again each time you click the bookmark, so running it later covers whatever is current then, and importing a newer file replaces the same dates from older ones.
               </p>
             </div>
 

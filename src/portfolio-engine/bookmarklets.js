@@ -8,26 +8,29 @@ import { bookmarkletHref } from './bookmarklet.js';
 // The indexes the NSE Indices page lists under Total Returns (Broad Market). Debt indices are not among them.
 const NSE_SUPPORTED = ['Nifty 50', 'Nifty Next 50', 'Nifty Midcap 150', 'Nifty Smallcap 250'];
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 // First day of the financial year (April to March) that contains `d`.
 export function yearStart(d) {
   return new Date(d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1, 3, 1);
 }
 
-// The "start from" choices the settings box offers, with the dates they mean today. The bookmark itself
-// works the date out when it is clicked, so "current" is always the financial year of the day it runs.
-export function fromOptions(now = new Date()) {
+// The period choices the settings box offers. The bookmark itself works the dates out when it is clicked, so
+// "current" is always the financial year of the day it runs.
+export const PERIODS = [
+  { id: 'CURRENT', label: 'Current FY', hint: 'the current financial year so far' },
+  { id: 'PREVIOUS', label: 'Previous FY', hint: 'the previous financial year and the current one so far' },
+  { id: 'FULL', label: 'Full history', hint: "every index from its own start" },
+  { id: 'CUSTOM', label: 'Custom', hint: 'the dates you pick' },
+];
+
+// The dates a period means today, for showing in the settings box. `start` is null for the full history,
+// which begins at a different date for each index.
+export function periodDates(from, now = new Date()) {
   const cur = yearStart(now);
-  const prev = new Date(cur.getFullYear() - 1, cur.getMonth(), 1);
-  const fmt = (d) => `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-  const fy = (d) => `FY ${d.getFullYear()}-${String((d.getFullYear() + 1) % 100).padStart(2, '0')}`;
-  return [
-    { id: 'CURRENT', label: 'Current FY', hint: `${fy(cur)}, from ${fmt(cur)}` },
-    { id: 'PREVIOUS', label: 'Previous FY', hint: `from ${fmt(prev)}: ${fy(prev)} and the current FY` },
-    { id: 'FULL', label: 'Full history', hint: "from each index's own start" },
-    { id: 'CUSTOM', label: 'Custom', hint: 'from your start date to your end date' },
-  ];
+  if (from === 'CURRENT') return { start: iso(cur), end: iso(now) };
+  if (from === 'PREVIOUS') return { start: iso(new Date(cur.getFullYear() - 1, cur.getMonth(), 1)), end: iso(now) };
+  return { start: null, end: iso(now) };
 }
 
 // The dates a run covers for one index, or null if the period is empty: from where it starts (never before the
