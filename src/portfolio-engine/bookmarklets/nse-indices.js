@@ -4,7 +4,8 @@
   Runs on niftyindices.com only. It opens a small panel, one row per index, and on Start does what a person does on
   the Historical Data page: opens "Total returns Index Values", picks an index, sets a date range, presses Submit,
   then presses the page's own "csv format" button. The files are the ones the page produces, named by the page,
-  exactly as a manual download; the browser decides where they are saved. Nothing is sent to Xfina.
+  exactly as a manual download. Where the browser allows it (Chrome, Edge) Start asks for a folder once and the files
+  are written there with no further prompts; otherwise the browser downloads them as usual. Nothing is sent to Xfina.
 
   Modes: Update (default) fetches only what is new: it remembers, per index, the newest date that came back and
   starts the day after (an index it has never done gets its full history). Full history redoes everything from each
@@ -13,7 +14,8 @@
 
   A range of up to a year is one file. The page refuses more (over 365 days between the dates), so a longer range is
   split into one file per financial year (April to March), the ends partial. The first three files go out back to
-  back so the browser asks to "allow multiple downloads" at once; the run then waits for that before slowing down.
+  back so a browser without folder access asks to "allow multiple downloads" at once; the run then waits for that
+  before slowing down.
 
   The memory is browser storage, kept separately for niftyindices.com and www.niftyindices.com, so the bookmark always
   works on the www address. If storage is blocked it says so, and Update then fetches the full history each time.
@@ -158,6 +160,11 @@
     var saved = 0;
     var done = 0;
     var say = function (t) { q('xs').textContent = t; };
+    var dir = null;
+    if (window.showDirectoryPicker) {
+      say('Choose a folder for the files (asked once)...');
+      try { dir = await window.showDirectoryPicker({ mode: 'readwrite' }); } catch (e0) { dir = null; }
+    }
     var gentle = function (a, b) { return pause(saved >= FAST ? a + Math.random() * (b - a) : 250); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
@@ -188,23 +195,30 @@
           if (got) {
             await gentle(500, 1200);
             var e = iso(newest() || w[1]);
-            document.getElementById('exportTotalindex').click();
+            var ex = document.getElementById('exportTotalindex');
+            if (dir) {
+              $(ex).triggerHandler('click');
+              var fh = await dir.getFileHandle(ex.download, { create: true });
+              var ws = await fh.createWritable();
+              await ws.write(decodeURIComponent(ex.href.slice(ex.href.indexOf(',') + 1)));
+              await ws.close();
+            } else ex.click();
             saved++;
             if (!mem[p.n] || e > mem[p.n]) { mem[p.n] = e; save(); }
             if (!(i === todo.length - 1 && k === p.w.length - 1)) {
-              if (saved === FAST) {
+              if (saved === FAST && !dir) {
                 q('xn').style.display = 'block';
                 skip = 0;
                 for (var s = WAIT; s > 0 && !skip && !stop; s--) { q('xk').textContent = s; await pause(1000); }
                 q('xn').style.display = 'none';
-              } else if (saved > FAST) await pause(3500 + Math.random() * 3000);
+              } else if (saved >= FAST) await pause(3500 + Math.random() * 3000);
             }
           }
           done++;
           q('xb').style.width = Math.round((100 * done) / r.n) + '%';
         }
       }
-      say(stop ? 'Stopped.' : 'Done: ' + saved + ' files saved by your browser. Import them in Portfolio Engine.');
+      say(stop ? 'Stopped.' : 'Done: ' + saved + ' files saved' + (dir ? ' to the folder you chose' : ' by your browser') + '. Import them in Portfolio Engine.');
     } catch (e2) {
       say('Stopped: ' + e2.message);
     }
