@@ -8,9 +8,9 @@ import ResultsSection from './ResultsSection.vue';
 
 // One page, four steps in order. Each step reads what the one above it produced.
 const SECTIONS = [
-  { id: 'data', label: 'Data', comp: DataSection },
-  { id: 'portfolio', label: 'Portfolio', comp: PortfolioSection },
-  { id: 'rebalancing', label: 'Rebalancing', comp: RebalancingSection },
+  { id: 'data', label: 'Import Data', comp: DataSection },
+  { id: 'portfolio', label: 'Setup Portfolio', comp: PortfolioSection },
+  { id: 'rebalancing', label: 'Choose Rebalancing', comp: RebalancingSection },
   { id: 'results', label: 'Results', comp: ResultsSection },
 ];
 </script>

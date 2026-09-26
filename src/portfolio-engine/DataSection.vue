@@ -83,10 +83,16 @@ function loaded(asset, s) {
 const startOf = (s) => (s.segments ? s.segments[0].from : s.from);
 
 // Flatten sections → assets → series into the rows the table draws.
+const region = ref('india');
+const regions = sections.filter((s) => s.id !== 'provided');
+const current = computed(() => regions.find((s) => s.id === region.value));
+const ready = (sec) => sec.assets.filter((a) => a.series.some((s) => loaded(a, s) === 100)).length;
+
 const rows = computed(() => {
   const out = [];
-  for (const sec of sections) {
-    out.push({ kind: 'section', key: `s:${sec.id}`, sec });
+  for (const sec of [current.value, sections.find((s) => s.id === 'provided')]) {
+    // Regions are chosen with the tabs, so only the Provided block needs its own heading.
+    if (sec.id === 'provided') out.push({ kind: 'section', key: `s:${sec.id}`, sec });
     for (const a of sec.assets) {
       out.push({ kind: 'asset', key: `a:${sec.id}:${a.name}`, a });
       if (!a.series.length) out.push({ kind: 'empty', key: `e:${sec.id}:${a.name}`, a });
@@ -131,6 +137,16 @@ const pick = () => fileInput.value.click();
       </div>
     </CardHeader>
     <CardContent class="space-y-4">
+      <div class="flex gap-1 border-b overflow-x-auto overflow-y-hidden" role="tablist">
+        <button
+          v-for="t in regions" :key="t.id" type="button" role="tab" :aria-selected="region === t.id"
+          class="h-10 px-3 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
+          :class="region === t.id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+          @click="region = t.id; expanded = null"
+        >{{ t.title }} <span class="ml-1 text-xs font-normal text-muted-foreground">{{ ready(t) }}/{{ t.assets.length }}</span></button>
+      </div>
+      <p class="text-sm text-muted-foreground">{{ current.note }}</p>
+
       <Table>
         <TableHeader>
           <TableRow>
