@@ -277,56 +277,49 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           </div>
 
           <!-- Assisted: a bookmarklet, dragged to the bookmarks bar, that does the clicking on the site -->
-          <div v-else class="space-y-4">
-            <div class="rounded-md border p-4 space-y-4">
-              <div class="font-semibold">Bookmarklet settings</div>
-              <div class="space-y-1.5">
-                <div class="text-sm text-muted-foreground">Start from</div>
-                <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden">
-                  <button v-for="o in fromChoices" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="from = o.id">{{ o.label }}</button>
-                </span>
-                <div v-if="from === 'DATE'" class="pt-1"><input v-model="fromDate" type="date" class="h-8 w-44 rounded-md border border-input bg-background px-2 text-sm" /></div>
-                <p class="text-xs text-muted-foreground">
-                  {{ fromChoices.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). It's worked out when you click the bookmark, so the same bookmark run later covers whatever is current then. Importing a newer file replaces the same dates from older ones, so a repeat run just refreshes recent data.
-                </p>
-              </div>
-              <p class="text-xs text-muted-foreground">The bookmark below is generated from these choices, so drag it again if you change them.</p>
+          <div v-else class="rounded-md border bg-muted/30 p-4 space-y-4">
+            <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
+
+            <div class="space-y-1.5">
+              <div class="text-sm text-muted-foreground">Start from</div>
+              <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden bg-background">
+                <button v-for="o in fromChoices" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="from = o.id">{{ o.label }}</button>
+              </span>
+              <div v-if="from === 'DATE'" class="pt-1"><input v-model="fromDate" type="date" class="h-8 w-44 rounded-md border border-input bg-background px-2 text-sm" /></div>
+              <p class="text-xs text-muted-foreground">
+                {{ fromChoices.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). The start is worked out when you click the bookmark, so running it again later covers whatever is current then, and importing a newer file replaces the same dates from older ones.
+              </p>
             </div>
 
-            <div class="rounded-md border bg-muted/30 p-4 space-y-3">
-              <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
-              <ol class="list-decimal pl-5 space-y-2 text-sm">
-                <li>
-                  Drag this button to your bookmarks bar:
+            <ol class="list-decimal pl-5 space-y-2 text-sm border-t pt-4">
+              <li>
+                Drag this button to your bookmarks bar. It is generated from your choice above, so drag it again if you change that.
+                <div class="mt-2">
                   <a
                     :href="g.bookmarklet.href" draggable="true" :title="`Drag me to your bookmarks bar. ${g.bookmarklet.files} files across ${g.bookmarklet.indexes.length} ${g.bookmarklet.indexes.length > 1 ? 'indexes' : 'index'}`"
-                    class="ml-2 inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline align-middle"
+                    class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
                     @click.prevent="dragHint = true"
                   >{{ g.bookmarklet.label }}</a>
                   <span v-if="dragHint" class="ml-2 text-xs text-muted-foreground">Drag it, don't click it here.</span>
                   <div class="text-xs text-muted-foreground mt-1">It does {{ g.bookmarklet.indexes.join(', ') }}: about {{ g.bookmarklet.files }} {{ g.bookmarklet.files === 1 ? 'file' : 'files' }}, one after another.</div>
-                </li>
-                <li>
-                  Open the site:
-                  <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
-                    <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
-                  </a>
-                </li>
-                <li>Click the bookmark and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
-                <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one financial year at a time, index after index, pausing between files to go easy on the site. One progress bar covers the whole run.</li>
-                <li>Your browser saves the files exactly as it does for any download: in its usual folder, or wherever it asks you, depending on your settings. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
-              </ol>
-              <p class="text-xs text-muted-foreground">
-                Runs only on that site and sends nothing to Xfina.
-                <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
-                Changed your list? Drag the button again to update your bookmark.
-              </p>
-            </div>
+                </div>
+              </li>
+              <li>
+                Open the site:
+                <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
+                  <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
+                </a>
+              </li>
+              <li>Click the bookmark and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
+              <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, one financial year at a time and one index after another, with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
+              <li>Your browser saves the files as it does for any download: in its usual folder, or wherever it asks you. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
+            </ol>
 
-            <p class="rounded-md border border-dashed border-[hsl(var(--warn)/0.6)] bg-[hsl(var(--warn)/0.07)] p-3 text-xs">
-              <strong>Before you use it.</strong> Xfina is not affiliated with {{ g.bookmarklet.site }}. This saves the same files you could download by hand on their page, for your own personal, non-commercial study, and Xfina never sees or stores the data. Their
+            <p class="text-xs text-muted-foreground border-t pt-3">
+              This just saves you the clicking: the same form and the same download button, so a few years of files take one click instead of many. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}; their
               <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
-              restrict automated data collection, so use it in line with them, or download by hand instead. Please don't share or republish the data.
+              apply here as they do when downloading by hand.
+              <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
             </p>
           </div>
         </CardContent>

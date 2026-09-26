@@ -41,7 +41,7 @@ Cloudflare, as an assets-only Worker (same pattern as xsteer; all new xfina proj
 
 Some sites (NSE Indices, NSE) only serve their data to a page on that site, so a page here cannot fetch it. For those the data guide offers a bookmarklet: a script the user drags to the bookmarks bar, clicks while on the site, and which saves the files to their disk. They then import the files in Portfolio Engine. It runs only on that site and sends nothing to Xfina.
 
-**Terms of use.** A bookmarklet automates what a person can do by hand on a site, and site terms can restrict that. Before adding one for a site, read its terms and record the result here. A bookmarklet must stay user-initiated (one dataset per click, in the user's own browser and session), work within the site's own limits, never evade blocks or CAPTCHAs, and never send data to Xfina or host it. The guide card carries a plain disclosure: not affiliated, personal non-commercial use, the site's terms apply, download by hand instead if in doubt.
+**Terms of use.** A bookmarklet automates what a person can do by hand on a site, and site terms can restrict that. Before adding one for a site, read its terms and record the result here. A bookmarklet must stay user-initiated (one dataset per click, in the user's own browser and session), work within the site's own limits, never evade blocks or CAPTCHAs, and never send data to Xfina or host it. The guide card carries a short, plain note: it only saves the clicking, it is for the user's own study, Xfina never sees the data, Xfina is not affiliated with the site, and the site's terms apply as they do to a manual download (with a link).
 
 | Site | Terms reviewed | Result |
 |---|---|---|
