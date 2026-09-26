@@ -31,11 +31,11 @@ export const VEHICLES = [
   { id: 'etf', title: 'ETF', blurb: 'What you could have held on an exchange' },
   { id: 'mf', title: 'MF', blurb: 'Mutual fund NAV' },
 ];
-// Irish first: it is the default for US and Global ETFs. India domiciled ETFs are the Indian ones that track a foreign index.
+// The first one that exists for a choice is its default: Canada (only Global gold has it), then Irish, US and India.
 export const LISTINGS = [
+  { id: 'canada', title: 'Canada domiciled', blurb: 'Canadian trusts and funds, priced in USD or CAD' },
   { id: 'irish', title: 'Ireland domiciled', blurb: 'UCITS ETFs, usually listed in London' },
   { id: 'us', title: 'US domiciled', blurb: 'US-listed ETFs, in USD' },
-  { id: 'canada', title: 'Canada domiciled', blurb: 'Canadian trusts and funds, priced in USD or CAD' },
   { id: 'india', title: 'India domiciled', blurb: 'Indian ETFs on foreign indices, in INR' },
 ];
 
