@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
-import { CLASSES, REGIONS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote } from './guide.js';
+import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
@@ -16,6 +16,7 @@ const region = ref(null);
 const vehicle = ref(null);
 const listing = ref(null);
 
+const offers = (id) => vehicles.value.some((v) => v.id === id);
 const vehicles = computed(() => (cls.value && region.value ? vehiclesFor(cls.value, region.value) : []));
 const listings = computed(() => (cls.value && region.value && vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : []));
 // The fourth lane exists only when there is a listing to choose: US and Global ETFs.
@@ -99,7 +100,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-6">
-        <div class="grid gap-6 md:grid-cols-2" :class="showListing ? 'lg:grid-cols-4' : 'lg:grid-cols-3'">
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">1</span>Asset class</h3>
             <div class="grid gap-2">
@@ -121,20 +122,22 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <section class="space-y-2" :class="!region && 'opacity-50 pointer-events-none'">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">3</span>Model it as</h3>
             <div class="grid gap-2">
-              <button v-for="v in vehicles" :key="v.id" type="button" :class="tile(vehicle === v.id)" @click="pick('vehicle', v.id)">
+              <!-- All three always show; ones with nothing behind them for this class and region are dimmed. -->
+              <button v-for="v in VEHICLES" :key="v.id" type="button" :disabled="!!region && !offers(v.id)" :class="[tile(vehicle === v.id), !!region && !offers(v.id) && 'opacity-40 cursor-not-allowed']" @click="pick('vehicle', v.id)">
                 <div class="font-medium">{{ v.title }}</div><div class="text-xs text-muted-foreground">{{ v.blurb }}</div>
               </button>
-              <p v-if="region && !vehicles.length" class="text-xs text-muted-foreground">Nothing is listed for this yet.</p>
             </div>
           </section>
 
-          <!-- Only for US and Global ETFs. Irish ETFs are the default. -->
-          <section v-if="showListing" class="space-y-2">
+          <!-- Lane 4 is always there so the picker never changes shape. It is active only for US and
+               Global ETFs, where Irish ETFs are the default; otherwise it stays empty. -->
+          <section class="space-y-2" :class="!showListing && 'opacity-50 pointer-events-none'">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>Which ETFs</h3>
             <div class="grid gap-2">
-              <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
+              <button v-for="l in LISTINGS" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
                 <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground">{{ l.blurb }}</div>
               </button>
+              <p v-if="!showListing" class="text-xs text-muted-foreground">US and Global ETFs only.</p>
             </div>
           </section>
         </div>
