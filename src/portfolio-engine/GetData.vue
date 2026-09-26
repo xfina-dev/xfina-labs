@@ -158,7 +158,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <!-- Every asset for the path, grouped, each with its oldest three -->
         <section v-if="vehicle" class="space-y-6 border-t pt-6">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 class="text-sm font-semibold">Datasets</h3>
+            <h3 class="text-sm font-semibold">Curated Datasets</h3>
             <span v-if="vehicle !== 'index'" class="text-xs text-muted-foreground">The three with the longest history for each, oldest first</span>
           </div>
           <p v-if="!groups.length" class="text-sm text-muted-foreground">Nothing is listed for this yet.</p>

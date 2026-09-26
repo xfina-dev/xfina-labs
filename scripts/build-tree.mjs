@@ -244,15 +244,8 @@ async function fromSchemes(def, region, cls, { etfs: withEtfs = true } = {}) {
 for (const d of INDIA) await fromSchemes(d, 'india', d.cls, { etfs: false });
 console.log('Reading the NSE ETF list ...');
 await indiaEtfs();
-for (const d of FEEDERS) await fromSchemes(d, 'us', 'equity');
-// The feeder search also finds Indian ETFs and index funds tracking US indices: for the US region
-// they belong in one list ("Indian funds"), so fold the ETF node into the MF node.
-for (const [k, n] of [...nodes]) if (n.region === 'us' && n.class === 'equity' && n.vehicle === 'etf' && !n.listing) {
-  const target = node('equity', 'us', 'mf', null, n.asset);
-  target.instruments.push(...n.instruments); nodes.delete(k);
-  const seen = new Set(); target.instruments = target.instruments.filter((i) => (seen.has(i.id) ? false : seen.add(i.id))).sort((a, b) => a.inception.localeCompare(b.inception)).slice(0, KEEP);
-}
-
+// Feeder ETFs are listed under Indian ETFs (below), so only the funds are taken here.
+for (const d of FEEDERS) await fromSchemes(d, 'us', 'equity', { etfs: false });
 console.log('Reading ETF inception dates ...');
 const etfInst = await pool(ETFS, 6, async (e) => {
   let inception = e.manual || null, dateSource = e.manual ? 'manual' : null;
@@ -266,6 +259,28 @@ for (const { e, inst } of etfInst) {
   const n = node(e.cls, e.region, 'etf', e.listing, e.asset);
   n.instruments.push({ ...inst, asset: e.asset });
 }
+// Indian ETFs that track US and global indices: listed on NSE in INR. The date is the first NAV AMFI holds
+// for the same fund, found by name, so nothing here is typed.
+const FOREIGN = [
+  { sym: 'MON100', name: 'Motilal Oswal Nasdaq 100 ETF', region: 'us', asset: 'Nasdaq 100', re: /motilal.*nasdaq\s*100 etf/i },
+  { sym: 'MASPTOP50', name: 'Mirae Asset S&P 500 Top 50 ETF', region: 'us', asset: 'S&P 500 Top 50', re: /mirae.*s&p 500 top 50 etf\s*$/i },
+  { sym: 'MAFANG', name: 'Mirae Asset NYSE FANG+ ETF', region: 'us', asset: 'NYSE FANG+', re: /mirae.*fang.*etf\s*$/i },
+  { sym: 'MONQ50', name: 'Motilal Oswal Nasdaq Q 50 ETF', region: 'us', asset: 'Nasdaq Q-50', re: /motilal.*nasdaq q.?50 etf/i },
+  { sym: 'HNGSNGBEES', name: 'Nippon India ETF Hang Seng BeES', region: 'global', asset: 'Hang Seng', re: /hang seng (bees|etf)/i, no: /tech/i },
+  { sym: 'MAHKTECH', name: 'Mirae Asset Hang Seng TECH ETF', region: 'global', asset: 'Hang Seng', re: /hang seng tech etf/i },
+];
+console.log('Reading Indian ETFs on foreign indices ...');
+for (const f of FOREIGN) {
+  const cand = schemes.filter((x) => f.re.test(x.schemeName) && !(f.no && f.no.test(x.schemeName)) && !FOF.test(x.schemeName));
+  const live = (await measure(cand)).sort((a, b) => a.first.localeCompare(b.first))[0];
+  if (!live) console.warn(`  ! no live AMFI record for ${f.sym}`);
+  node('equity', f.region, 'etf', 'india', f.asset).instruments.push({
+    id: `nse-${f.sym.toLowerCase()}`, name: f.name, code: f.sym, inception: live?.first || null, dateSource: live ? 'amfi' : null,
+    ccy: 'INR', returnType: 'Price only', how: 'nseEtf', kind: 'ETF',
+    links: [L('NSE historical price data', 'https://www.nseindia.com/report-detail/eq_security'), L(`${f.sym} on NSE`, `https://www.nseindia.com/get-quotes/equity?symbol=${f.sym}`)],
+  });
+}
+
 for (const i of INDICES) {
   const n = node(i.cls, i.region, 'index', null, i.asset);
   n.instruments.push({ id: `idx-${++seq}`, name: i.name, inception: i.since || null, dateSource: i.since ? 'publisher' : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });

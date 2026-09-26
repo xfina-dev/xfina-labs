@@ -26,10 +26,11 @@ export const VEHICLES = [
   { id: 'etf', title: 'ETF', blurb: 'What you could have held on an exchange' },
   { id: 'mf', title: 'MF', blurb: 'Mutual fund NAV' },
 ];
-// Irish first: it is the default for US and Global ETFs.
+// Irish first: it is the default for US and Global ETFs. Indian ETFs are the NSE-listed ones that track a foreign index.
 export const LISTINGS = [
   { id: 'irish', title: 'Irish ETFs', blurb: 'Irish-domiciled UCITS ETFs' },
   { id: 'us', title: 'US ETFs', blurb: 'Listed in the US' },
+  { id: 'india', title: 'Indian ETFs', blurb: 'Listed on NSE, in INR' },
 ];
 
 // How a source is downloaded and what you get. `site` is the website: the download list groups by it,

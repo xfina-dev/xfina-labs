@@ -1097,29 +1097,6 @@
    "asset": "Nasdaq 100",
    "instruments": [
     {
-     "id": "mf114984",
-     "name": "Motilal Oswal Nasdaq 100 ETF",
-     "code": "114984",
-     "inception": "2011-03-30",
-     "lastNav": "2026-09-25",
-     "observations": 3815,
-     "dateSource": "mfapi",
-     "ccy": "INR",
-     "returnType": "Adjusted price",
-     "how": "mfapi",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/114984"
-      },
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
      "id": "mf145551",
      "name": "Motilal Oswal Nasdaq 100 Fund of Fund",
      "code": "145551",
@@ -1159,6 +1136,29 @@
       {
        "label": "NAV data (JSON)",
        "url": "https://api.mfapi.in/mf/149218"
+      },
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149910",
+     "name": "Navi NASDAQ100 US Specific Equity Passive FOF",
+     "code": "149910",
+     "inception": "2022-03-25",
+     "lastNav": "2026-09-25",
+     "observations": 1071,
+     "dateSource": "mfapi",
+     "ccy": "INR",
+     "returnType": "Adjusted price",
+     "how": "mfapi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "NAV data (JSON)",
+       "url": "https://api.mfapi.in/mf/149910"
       },
       {
        "label": "AMFI NAV history",
@@ -1822,6 +1822,177 @@
       }
      ],
      "asset": "Aggregate"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "india",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "nse-mon100",
+     "name": "Motilal Oswal Nasdaq 100 ETF",
+     "code": "MON100",
+     "inception": "2011-03-30",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MON100 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MON100"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "india",
+   "asset": "S&P 500 Top 50",
+   "instruments": [
+    {
+     "id": "nse-masptop50",
+     "name": "Mirae Asset S&P 500 Top 50 ETF",
+     "code": "MASPTOP50",
+     "inception": "2021-09-21",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MASPTOP50 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MASPTOP50"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "india",
+   "asset": "NYSE FANG+",
+   "instruments": [
+    {
+     "id": "nse-mafang",
+     "name": "Mirae Asset NYSE FANG+ ETF",
+     "code": "MAFANG",
+     "inception": "2021-05-07",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MAFANG on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MAFANG"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "india",
+   "asset": "Nasdaq Q-50",
+   "instruments": [
+    {
+     "id": "nse-monq50",
+     "name": "Motilal Oswal Nasdaq Q 50 ETF",
+     "code": "MONQ50",
+     "inception": "2021-12-29",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MONQ50 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MONQ50"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "india",
+   "asset": "Hang Seng",
+   "instruments": [
+    {
+     "id": "nse-hngsngbees",
+     "name": "Nippon India ETF Hang Seng BeES",
+     "code": "HNGSNGBEES",
+     "inception": "2016-11-07",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "HNGSNGBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=HNGSNGBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-mahktech",
+     "name": "Mirae Asset Hang Seng TECH ETF",
+     "code": "MAHKTECH",
+     "inception": "2021-12-07",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Price only",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MAHKTECH on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MAHKTECH"
+      }
+     ]
     }
    ]
   },
