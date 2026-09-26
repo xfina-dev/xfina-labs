@@ -34,6 +34,18 @@ button.primary{background:hsl(var(--primary));color:hsl(var(--primary-foreground
 button.primary:hover{opacity:.9}
 button.sm{height:28px;padding:0 .6rem;font-size:12px}
 button:disabled{opacity:.45;cursor:not-allowed}
+.brand{flex:1;min-width:0}
+@media(min-width:768px){header.top{flex-wrap:nowrap;align-items:flex-start}}
+.actions{flex:none;display:flex;align-items:center;gap:.75rem}
+.icon{width:36px;padding:0;justify-content:center}
+.ic{width:1.2rem;height:1.2rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dark .moon,html:not(.dark) .sun{display:none}
+dialog{max-width:48rem;width:calc(100% - 2rem);border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--background));color:hsl(var(--foreground));padding:1.5rem}
+dialog::backdrop{background:rgb(0 0 0/.6)}
+dialog h2{margin:0 0 .25rem;font-size:1.1rem}
+.choice{display:block;border:1px solid hsl(var(--border));border-radius:calc(var(--radius) - 2px);padding:.6rem .8rem;margin-top:.75rem;cursor:pointer}
+.choice.on{border-color:hsl(var(--primary));background:hsl(var(--primary)/.05)}
+.choice b{font-size:1rem}
 .banner{margin:1rem 0;padding:.6rem .9rem;border:1px dashed hsl(var(--warn)/.6);border-radius:var(--radius);background:hsl(var(--warn)/.07);font-size:12.5px}
 nav.tabs{display:flex;gap:.25rem;border-bottom:1px solid hsl(var(--border));margin:1.25rem 0 1.5rem;overflow-x:auto}
 nav.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;height:40px;background:none;color:hsl(var(--muted-foreground));white-space:nowrap}
@@ -98,9 +110,18 @@ svg text{fill:hsl(var(--muted-foreground));font-size:10px}
         <p class="muted">Bring your own data. Everything runs in your browser; nothing is uploaded.</p>
       </div>
     </div>
-    <div style="display:flex;gap:.5rem">
-      <a class="btn" href="https://github.com/xfina-dev/xfina-labs">GitHub</a>
-      <button id="theme" title="Toggle theme">◐</button>
+    <div class="actions">
+      <a class="btn" href="https://sakthipriyan.com/building-wealth" target="_blank" rel="noopener noreferrer">sakthipriyan.com</a>
+      <a class="btn icon" href="https://github.com/xfina-dev/xfina-labs" target="_blank" rel="noopener noreferrer" title="GitHub Repository" aria-label="GitHub Repository">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+      </a>
+      <button class="icon" id="privacy" title="Privacy &amp; Analytics" aria-label="Privacy &amp; Analytics">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg>
+      </button>
+      <button class="icon" id="theme" title="Toggle Theme" aria-label="Toggle Theme">
+        <svg viewBox="0 0 24 24" class="ic sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        <svg viewBox="0 0 24 24" class="ic moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
     </div>
   </header>
 
@@ -352,6 +373,30 @@ svg text{fill:hsl(var(--muted-foreground));font-size:10px}
   </section>
 </div>
 
+
+<dialog id="privacy-dlg">
+  <div style="display:flex;justify-content:space-between;align-items:start"><h2>Privacy &amp; Analytics</h2><button class="sm" id="dlg-close" aria-label="Close">✕</button></div>
+  <p class="muted" style="margin:0">Your files, weights, amounts and results never leave the browser. The only thing that can be sent is a count of what happened.</p>
+  <div class="choice on" data-level="Anonymous Usage">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem"><span><b>Anonymous Usage Statistics</b> <span class="tag">Recommended</span></span>
+      <button class="sm mono" id="payload-toggle">Payload ▾</button></div>
+    <p class="muted" style="margin:.4rem 0 0">Event names and a few technical counts, sent through Google Analytics with no cookies and a random per-visit ID. No portfolio, salary, transaction or result data is included.</p>
+    <div id="payload" class="hide" style="margin-top:.6rem"><div class="tblwrap"><table>
+      <thead><tr><th>Field</th><th>Description</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">tid</td><td>Google Analytics measurement ID</td><td class="mono">G-WZEYQGS8PE</td></tr>
+        <tr><td class="mono">cid</td><td>Random ID for this visit; never stored</td><td class="mono">1834920.1790…</td></tr>
+        <tr><td class="mono">en</td><td>Event name</td><td class="mono">backtest_completed</td></tr>
+        <tr><td class="mono">ep.app_version</td><td>Labs version</td><td class="mono">0.1.0</td></tr>
+        <tr><td class="mono">epn.assets</td><td>Number of assets, not which ones</td><td class="mono">6</td></tr>
+        <tr><td class="mono">epn.run_time_ms</td><td>How long the run took</td><td class="mono">412</td></tr>
+      </tbody></table></div>
+      <p class="foot" style="margin:.5rem 0 0">Events: <span class="mono">dataset_validation_failed</span>, <span class="mono">backtest_started</span>, <span class="mono">backtest_completed</span>.</p></div>
+  </div>
+  <div class="choice" data-level="Off"><b>Zero Usage Statistics</b>
+    <p class="muted" style="margin:.4rem 0 0">Opt out completely. No requests are sent from your browser.</p></div>
+  <p class="foot" style="margin:.8rem 0 0">Design mock: this choice is saved locally but nothing is ever sent.</p>
+</dialog>
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TABS=[["data","Data"],["portfolio","Portfolio"],["strategy","Strategy"],["tax","Tax"],["results","Results"]];
@@ -362,6 +407,12 @@ function show(id){TABS.forEach(([t])=>$("#s-"+t).classList.toggle("hide",t!==id)
   $$("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.id===id));
   try{history.replaceState(null,"","#"+id)}catch(e){}}
 $("#theme").onclick=()=>document.documentElement.classList.toggle("dark");
+const dlg=$("#privacy-dlg");$("#privacy").onclick=()=>dlg.showModal();$("#dlg-close").onclick=()=>dlg.close();
+dlg.onclick=e=>{if(e.target===dlg)dlg.close()};
+$("#payload-toggle").onclick=e=>{e.stopPropagation();$("#payload").classList.toggle("hide")};
+let lvl="Anonymous Usage";try{lvl=localStorage.getItem("labs_analytics_level")||lvl}catch(e){}
+const paint=()=>$$(".choice").forEach(c=>c.classList.toggle("on",c.dataset.level===lvl));paint();
+$$(".choice").forEach(c=>c.onclick=()=>{lvl=c.dataset.level;try{localStorage.setItem("labs_analytics_level",lvl)}catch(e){}paint()});
 
 // Increment plan
 [["1 · Data: upload + validate","ok"],["2 · Buy & hold, 2+ assets","" ],["3 · Weights + annual rebalance + ledger",""],["4 · Contributions + XIRR",""],["5 · Threshold + compare",""],["6 · FX / INR base",""],["V2 · Perpetual, tax, inflation","soon"]]
