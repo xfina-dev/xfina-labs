@@ -43,6 +43,25 @@ const has = (id) => picked.value.includes(id);
 const toggle = (id) => (picked.value = has(id) ? picked.value.filter((x) => x !== id) : [...picked.value, id]);
 const list = computed(() => picked.value.map(findDataset).filter(Boolean));
 
+// The download list is grouped by website, so each site is visited once. A page link that every
+// dataset in the group shares (for example the NSE Indices historical data page) shows once at the
+// top; links specific to one dataset (a ticker's own page) stay on its row.
+const bySite = computed(() => {
+  const m = new Map();
+  for (const i of list.value) {
+    const site = HOW[i.how].site;
+    m.set(site, [...(m.get(site) || []), i]);
+  }
+  return [...m.entries()].map(([site, items]) => {
+    const urls = new Map();
+    for (const i of items) for (const l of i.links) urls.set(l.url, { l, n: (urls.get(l.url)?.n || 0) + 1 });
+    const shared = items.length > 1 ? [...urls.values()].filter((u) => u.n === items.length).map((u) => u.l) : [];
+    const sharedUrls = new Set(shared.map((l) => l.url));
+    const hows = [...new Set(items.map((i) => i.how))].map((h) => HOW[h]);
+    return { site, items, shared, sharedUrls, hows };
+  });
+});
+
 onMounted(() => {
   fromHash();
   window.addEventListener('hashchange', fromHash);
@@ -149,33 +168,49 @@ const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 
         <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
           <div class="space-y-1.5">
             <CardTitle>Your download list</CardTitle>
-            <CardDescription>{{ list.length ? `${list.length} to download. Open each link, then import the files.` : 'Add datasets and the exact download pages appear here.' }}</CardDescription>
+            <CardDescription>{{ list.length ? `${list.length} dataset${list.length > 1 ? 's' : ''} across ${bySite.length} website${bySite.length > 1 ? 's' : ''}. Visit each site once, then import the files.` : 'Add datasets and they are grouped here by website.' }}</CardDescription>
           </div>
           <Button v-if="list.length" variant="ghost" size="sm" @click="picked = []">Clear all</Button>
         </CardHeader>
         <CardContent>
           <div v-if="!list.length" class="rounded-md border border-dashed bg-muted/30 p-10 text-center text-sm text-muted-foreground">Nothing added yet.</div>
           <ul v-else class="space-y-4">
-            <li v-for="i in list" :key="i.id" class="rounded-md border p-4 space-y-3">
+            <li v-for="g in bySite" :key="g.site" class="rounded-md border p-4 space-y-4">
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <div class="font-semibold">{{ i.name }} <Tag v-if="i.code">{{ i.code }}</Tag></div>
-                  <div class="text-xs text-muted-foreground mt-0.5">{{ i.group }} · {{ i.ccy }} · {{ i.ret }}</div>
-                </div>
-                <Button variant="ghost" size="sm" class="h-7 px-2 -mr-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+                <div class="font-semibold">{{ g.site }} <span class="text-xs font-normal text-muted-foreground">{{ g.items.length }} to download</span></div>
               </div>
-              <div class="flex flex-wrap gap-2">
-                <a v-for="l in i.links" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
+
+              <div v-if="g.shared.length" class="flex flex-wrap gap-2">
+                <a v-for="l in g.shared" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
                   <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
                 </a>
               </div>
-              <div class="text-sm">
-                <div class="font-medium text-muted-foreground text-xs mb-1">{{ HOW[i.how].title }}</div>
+
+              <div v-for="h in g.hows" :key="h.title" class="text-sm">
+                <div class="font-medium text-muted-foreground text-xs mb-1">{{ g.hows.length > 1 ? h.title : 'Steps' }}</div>
                 <ol class="list-decimal pl-5 space-y-1">
-                  <li v-for="(s, k) in HOW[i.how].steps" :key="k">{{ s }}</li>
+                  <li v-for="(s, k) in h.steps" :key="k">{{ s }}</li>
                 </ol>
+                <p class="text-xs text-muted-foreground mt-1">You will get: {{ h.format }} Import it as it is.</p>
               </div>
-              <p class="text-xs text-muted-foreground">You will get: {{ HOW[i.how].format }} Import it as it is.</p>
+
+              <div>
+                <div class="font-medium text-muted-foreground text-xs mb-1">Download</div>
+                <ul class="divide-y rounded-md border">
+                  <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
+                    <div class="min-w-0 text-sm">
+                      <span class="font-medium">{{ i.name }}</span> <Tag v-if="i.code">{{ i.code }}</Tag>
+                      <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.ret }}</div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
+                        <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
+                      </a>
+                      <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+                    </div>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
         </CardContent>
