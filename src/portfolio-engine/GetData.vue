@@ -18,9 +18,9 @@ const asset = ref(null);
 
 const vehicles = computed(() => (cls.value && region.value ? vehiclesFor(cls.value, region.value) : []));
 const isIndex = computed(() => vehicle.value === 'index');
-// India has no US/Irish split, and indexes have no ETF listing, so the "Which ETFs" step is hidden for both.
+// India has no US/Irish split and indexes have no ETF listing, so the listing choice only shows for US and Global ETFs.
 const showListing = computed(() => !isIndex.value && region.value !== 'india');
-const cols = computed(() => (isIndex.value ? 'lg:grid-cols-3' : showListing.value ? 'lg:grid-cols-5' : 'lg:grid-cols-4'));
+
 const indexes = computed(() => (isIndex.value ? indexesFor(cls.value, region.value) : []));
 const listings = computed(() => (cls.value && region.value && vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : []));
 const needsListing = computed(() => listings.value.length > 0);
@@ -115,7 +115,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-6">
-        <div class="grid gap-6 md:grid-cols-2" :class="cols">
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">1</span>Asset class</h3>
             <div class="grid gap-2">
@@ -144,23 +144,23 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </section>
 
-          <section v-if="showListing" class="space-y-2" :class="!needsListing && 'opacity-50 pointer-events-none'">
-            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>Which ETFs</h3>
-            <div class="grid gap-2">
-              <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
-                <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground">{{ l.blurb }}</div>
-              </button>
-              <p v-if="!needsListing" class="text-xs text-muted-foreground">For US and Global ETFs only.</p>
-            </div>
-          </section>
-
-          <section v-if="!isIndex" class="space-y-2" :class="!assets.length && 'opacity-50 pointer-events-none'">
-            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">{{ showListing ? 5 : 4 }}</span>Asset</h3>
-            <div class="grid gap-2">
-              <button v-for="a in assets" :key="a" type="button" :class="tile(asset === a)" @click="pick('asset', a)">
-                <div class="font-medium">{{ a }}</div>
-              </button>
-            </div>
+          <!-- Lane 4 is always there, so the picker keeps four lanes. It holds the ETF listing (US and Global
+               only) and the asset. For an index it stays empty: indexes are simply listed below. -->
+          <section class="space-y-2" :class="!isIndex && !assets.length && !needsListing && 'opacity-50 pointer-events-none'">
+            <template v-if="!isIndex">
+              <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>{{ showListing ? 'ETFs and asset' : 'Asset' }}</h3>
+              <div v-if="showListing" class="grid grid-cols-2 gap-2" :class="!needsListing && 'opacity-50 pointer-events-none'">
+                <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
+                  <div class="font-medium text-sm">{{ l.title }}</div>
+                </button>
+                <p v-if="!needsListing" class="col-span-2 text-xs text-muted-foreground">Pick ETF above.</p>
+              </div>
+              <div class="grid gap-2">
+                <button v-for="a in assets" :key="a" type="button" :class="tile(asset === a)" @click="pick('asset', a)">
+                  <div class="font-medium">{{ a }}</div>
+                </button>
+              </div>
+            </template>
           </section>
         </div>
 
