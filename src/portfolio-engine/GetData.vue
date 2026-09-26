@@ -384,7 +384,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 </a>
               </li>
               <li>Click the bookmark and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
-              <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, one financial year at a time and one index after another, with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
+              <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, one financial year at a time and one index after another. The first three files go out back to back so your browser asks to <strong>allow multiple downloads</strong>: choose Allow. It waits about 15 seconds for that (or press Continue now in its panel), then carries on at a gentler pace with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
               <li>Your browser saves the files as it does for any download: in its usual folder, or wherever it asks you. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date, and a newer file replaces older data for the same dates.</li>
             </ol>
 
