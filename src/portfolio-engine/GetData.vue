@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
+import DateField from './DateField.vue';
+import { fmtDate } from './format.js';
 import { bookmarkletFor, PERIODS, periodDates } from './bookmarklets.js';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote } from './guide.js';
 
@@ -116,12 +118,6 @@ const editDate = (which, value, g) => {
   from.value = 'CUSTOM';
 };
 const today = isoDay(new Date());
-// Dates in the files table read like "Apr 1, 2026", whatever the browser's locale.
-const fmtDate = (iso) => {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-};
-const shownDates = computed(() => periodDates(from.value));
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
@@ -313,10 +309,10 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <button v-for="o in PERIODS" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id, g)">{{ o.label }}</button>
                 </span>
                 <label class="flex items-center gap-2 text-muted-foreground">Start
-                  <input :value="dates(g).start" type="date" :max="today" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('start', $event.target.value, g)" />
+                  <DateField :model-value="dates(g).start" :max="today" @update:model-value="editDate('start', $event, g)" />
                 </label>
                 <label class="flex items-center gap-2 text-muted-foreground">End
-                  <input :value="dates(g).end" type="date" :max="today" :min="dates(g).start || undefined" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('end', $event.target.value, g)" />
+                  <DateField :model-value="dates(g).end" :max="today" :min="dates(g).start || undefined" @update:model-value="editDate('end', $event, g)" />
                 </label>
               </div>
               <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>
