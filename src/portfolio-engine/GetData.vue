@@ -84,7 +84,7 @@ const bySite = computed(() => {
     const shared = its.length > 1 ? [...urls.values()].filter((u) => u.n === its.length).map((u) => u.l) : [];
     const sharedUrls = new Set(shared.map((l) => l.url));
     const hows = [...new Set(its.map((i) => i.how))].map((h) => HOW[h]);
-    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its, { from: from.value, date: fromDate.value }) };
+    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its, { from: from.value, start: customStart.value, end: customEnd.value }) };
   });
 });
 
@@ -93,9 +93,21 @@ const dragHint = ref(false);
 // Manual or assisted, per website. Assisted exists only where a bookmarklet does.
 const modes = ref({});
 const mode = (site) => modes.value[site] || 'manual';
-// Where a run starts: the current year (the default, so a repeat run refreshes it), the previous one, the full history, or a date.
+// The period a run covers: the current financial year (the default, so a repeat run refreshes it), the previous one, the full history, or a custom range.
 const from = ref('CURRENT');
-const fromDate = ref('');
+const customStart = ref('');
+const customEnd = ref('');
+const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+// Picking Custom starts from a sensible range (this financial year so far) that the browser's own date pickers can then change.
+const pickPeriod = (id) => {
+  from.value = id;
+  if (id === 'CUSTOM' && !customStart.value) {
+    const now = new Date();
+    customStart.value = isoDay(new Date(now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1, 3, 1));
+    customEnd.value = isoDay(now);
+  }
+};
+const today = isoDay(new Date());
 const fromChoices = computed(() => fromOptions());
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
@@ -281,20 +293,25 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
 
             <div class="space-y-1.5">
-              <div class="text-sm text-muted-foreground">Start from</div>
+              <div class="text-sm text-muted-foreground">Period</div>
               <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden bg-background">
-                <button v-for="o in fromChoices" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="from = o.id">{{ o.label }}</button>
+                <button v-for="o in fromChoices" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id)">{{ o.label }}</button>
               </span>
-              <div v-if="from === 'DATE'" class="pt-1"><input v-model="fromDate" type="date" class="h-8 w-44 rounded-md border border-input bg-background px-2 text-sm" /></div>
+              <div v-if="from === 'CUSTOM'" class="flex flex-wrap items-center gap-3 pt-1 text-sm">
+                <label class="flex items-center gap-2 text-muted-foreground">Start <input v-model="customStart" type="date" :max="today" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" /></label>
+                <label class="flex items-center gap-2 text-muted-foreground">End <input v-model="customEnd" type="date" :max="today" :min="customStart || undefined" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" /></label>
+              </div>
+              <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>
               <p class="text-xs text-muted-foreground">
-                {{ fromChoices.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). The start is worked out when you click the bookmark, so running it again later covers whatever is current then, and importing a newer file replaces the same dates from older ones.
+                {{ fromChoices.find((o) => o.id === from)?.hint }}. The site exports at most a year at a time, so files come one per financial year (April to March). The current and previous financial year are worked out when you click the bookmark, so running it again later covers whatever is current then, and importing a newer file replaces the same dates from older ones.
               </p>
             </div>
 
             <ol class="list-decimal pl-5 space-y-2 text-sm border-t pt-4">
               <li>
                 Drag this button to your bookmarks bar. It is generated from your choice above, so drag it again if you change that.
-                <div class="mt-2">
+                <div v-if="g.bookmarklet.invalid" class="mt-2 text-xs text-muted-foreground">Set a valid period above and the button will appear here.</div>
+                <div v-else class="mt-2">
                   <a
                     :href="g.bookmarklet.href" draggable="true" :title="`Drag me to your bookmarks bar. ${g.bookmarklet.files} files across ${g.bookmarklet.indexes.length} ${g.bookmarklet.indexes.length > 1 ? 'indexes' : 'index'}`"
                     class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"

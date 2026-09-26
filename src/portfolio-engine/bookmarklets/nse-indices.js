@@ -19,8 +19,10 @@
                  and the date the index starts.
     __FROM__     where to start, worked out when the bookmark is CLICKED, so one bookmark can be reused:
                  "CURRENT" (the current financial year), "PREVIOUS" (the one before, then the current one),
-                 "FULL" (each index's own start), or a date like "2020-04-01". Never earlier than an
-                 index's start.
+                 "FULL" (each index's own start), or a date like "2020-04-01" for a custom range. Never
+                 earlier than an index's start.
+    __TO__       where to end: "" for today, or a date like "2025-11-20" for a custom range. Never later
+                 than today.
   Written to be minified: statements end in semicolons, no line comments inside.
   If the page changes, this is the one file to fix.
 */
@@ -28,6 +30,7 @@
   var HOST = 'niftyindices.com';
   var INDEXES = JSON.parse('__INDEXES__');
   var FROM = JSON.parse('__FROM__');
+  var TO = JSON.parse('__TO__');
   var SUBINDEX = 'Broad Market Indices';
 
   if (location.hostname.replace(/^www\./, '') !== HOST) {
@@ -83,6 +86,8 @@
   var yearStart = function (d) {
     return new Date(d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1, 3, 1);
   };
+  var until = TO ? parse(TO) : today;
+  if (until > today) until = today;
   var wanted = null;
   if (FROM === 'CURRENT') wanted = yearStart(today);
   else if (FROM === 'PREVIOUS') { var cs = yearStart(today); wanted = new Date(cs.getFullYear() - 1, cs.getMonth(), 1); }
@@ -92,11 +97,11 @@
     var cursor = parse(indexStart);
     if (wanted && wanted > cursor) cursor = wanted;
     var out = [];
-    while (cursor <= today) {
+    while (cursor <= until) {
       var y = cursor.getFullYear();
       var m = cursor.getMonth();
       var end = new Date(m >= 3 ? y + 1 : y, 2, 31);
-      if (end > today) end = today;
+      if (end > until) end = until;
       var name = 'FY ' + (m >= 3 ? y : y - 1) + '-' + String((m >= 3 ? y + 1 : y) % 100).padStart(2, '0');
       out.push([cursor, end, name]);
       cursor = day(end, 1);
@@ -114,7 +119,7 @@
 
   (async function () {
     try {
-      if (!total) { status('Nothing to download: the chosen start is after today.'); finish(); return; }
+      if (!total) { status('Nothing to download: the chosen period is empty.'); finish(); return; }
       status('Opening the page\'s Total Returns section...');
       document.querySelector('li.form5').click();
       await pause(1200);
