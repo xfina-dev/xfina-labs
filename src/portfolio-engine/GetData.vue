@@ -320,14 +320,14 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 </label>
               </div>
               <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>
-              <p class="text-xs text-muted-foreground">
-                One file per financial year (April to March), because the site exports at most a year at a time. Current and Previous FY are worked out again each time you click the bookmark.
-              </p>
             </div>
 
             <!-- The indexes and the files each will produce for the chosen period -->
             <div v-if="g.bookmarklet.rows.length" class="space-y-1.5">
-              <div class="text-sm text-muted-foreground">Files to be downloaded</div>
+              <div class="text-sm text-muted-foreground">To Download</div>
+              <p class="text-xs text-muted-foreground">
+                One file per financial year (April to March), because the site exports at most a year at a time. Current and Previous FY are worked out again each time you click the bookmark.
+              </p>
               <div class="overflow-x-auto rounded-md border bg-background">
               <table class="w-full text-sm">
                 <thead class="text-muted-foreground">
