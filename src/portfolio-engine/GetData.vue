@@ -313,10 +313,10 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <button v-for="o in PERIODS" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id, g)">{{ o.label }}</button>
                 </span>
                 <label class="flex items-center gap-2 text-muted-foreground">Start
-                  <input :value="dates(g).start" type="date" :max="today" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('start', $event.target.value, g)" />
+                  <input :value="dates(g).start" type="date" :max="today" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('start', $event.target.value, g)" />
                 </label>
                 <label class="flex items-center gap-2 text-muted-foreground">End
-                  <input :value="dates(g).end" type="date" :max="today" :min="dates(g).start || undefined" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('end', $event.target.value, g)" />
+                  <input :value="dates(g).end" type="date" :max="today" :min="dates(g).start || undefined" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('end', $event.target.value, g)" />
                 </label>
               </div>
               <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>

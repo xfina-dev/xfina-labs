@@ -6,7 +6,9 @@
   "Total returns Index Values", picks an index, sets a date range of one financial year (April to March),
   presses Submit, then presses the page's own "csv format" button. It repeats that for each year from the
   chosen start to today, then moves on to the next index, pausing a few seconds between files to stay gentle
-  on the site. The files are the ones the page itself produces, named by the page, exactly as a manual
+  on the site, except at the start: the first three files go out back to back so the browser asks about
+  "multiple downloads" straight away, then the run waits for the user to choose Allow before carrying on at
+  the gentler pace. The files are the ones the page itself produces, named by the page, exactly as a manual
   download. Where the browser saves them is the browser's own setting.
 
   The page refuses a range longer than a year (more than 365 days between the two dates), so a long index
@@ -32,6 +34,8 @@
   var FROM = JSON.parse('__FROM__');
   var TO = JSON.parse('__TO__');
   var SUBINDEX = 'Broad Market Indices';
+  var FAST = 3;
+  var ALLOW_SECS = 15;
 
   if (location.hostname.replace(/^www\./, '') !== HOST) {
     alert('Xfina: open niftyindices.com (Reports, Historical Data) and click this bookmark again.');
@@ -52,6 +56,7 @@
     '<div style="color:#a1a1aa;font-size:12px;margin:4px 0 10px">Downloads NSE\'s own CSV, one file per financial year, one index after another, pausing between files to go easy on the site. Keep this tab open and in front while it runs: browsers pause background tabs. Your browser saves the files where it normally does. Allow multiple downloads if asked. Nothing is sent to Xfina.</div>' +
     '<div style="height:8px;background:#27272a;border-radius:9px;overflow:hidden"><div id="xfina-bar" style="height:100%;width:0;background:#4ade80;transition:width .3s"></div></div>' +
     '<div id="xfina-status" style="margin-top:6px;font-size:13px">Starting...</div>' +
+    '<div id="xfina-note" style="display:none;margin-top:8px;padding:8px;border:1px solid #f59e0b;border-radius:6px;font-size:12px">Your browser may now ask to allow multiple downloads. Choose <b>Allow</b>. Carrying on in <b id="xfina-count"></b>s at a gentler pace. <span id="xfina-go" style="text-decoration:underline;cursor:pointer">Continue now</span></div>' +
     '<div id="xfina-log" style="margin-top:6px;font-size:12px;color:#a1a1aa;white-space:pre-line"></div>';
   document.body.appendChild(box);
 
@@ -69,6 +74,20 @@
   };
   var pause = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   var human = function (a, b) { return pause(a + Math.random() * (b - a)); };
+  var saved = 0;
+  var gentle = function (a, b) { return saved >= FAST ? human(a, b) : pause(250); };
+  var skip = false;
+  document.getElementById('xfina-go').onclick = function () { skip = true; };
+  var allowPrompt = async function () {
+    var note = document.getElementById('xfina-note');
+    note.style.display = 'block';
+    skip = false;
+    for (var n = ALLOW_SECS; n > 0 && !skip && !stopped; n--) {
+      document.getElementById('xfina-count').textContent = n;
+      await pause(1000);
+    }
+    note.style.display = 'none';
+  };
   var waitFor = async function (test, ms) {
     var t0 = Date.now();
     while (Date.now() - t0 < ms && !stopped) {
@@ -128,13 +147,12 @@
       $('#ddlHistoricalreturntypeeSubindex').val(SUBINDEX).trigger('change');
       if (!(await waitFor(function () { return $('#ddlHistoricalreturntypeeindex option').length > 1; }, 10000))) throw new Error('the page did not list indexes');
 
-      var saved = 0;
       for (var i = 0; i < plan.length && !stopped; i++) {
         var p = plan[i];
         var has = $('#ddlHistoricalreturntypeeindex option').filter(function () { return this.value === p.name; }).length;
         if (!has) { log(p.label + ' is not in the page\'s list, skipped'); done += p.windows.length; progress(); continue; }
         $('#ddlHistoricalreturntypeeindex').val(p.name).trigger('change');
-        await human(800, 1500);
+        await gentle(800, 1500);
         for (var k = 0; k < p.windows.length && !stopped; k++) {
           var w = p.windows[k];
           var label = w[2] + ' (' + iso(w[0]) + ' to ' + iso(w[1]) + ')';
@@ -142,7 +160,7 @@
           var before = firstRow();
           $('#datepickerFromtotalindex').datepicker('setDate', w[0]);
           $('#datepickerTototalindex').datepicker('setDate', w[1]);
-          await human(600, 1400);
+          await gentle(600, 1400);
           alerts = [];
           document.getElementById('submit_totalindexhistorical').click();
           var loaded = await waitFor(function () { return alerts.length || (firstRow() && firstRow() !== before); }, 20000);
@@ -150,11 +168,14 @@
           if (!loaded) {
             log(p.label + ' ' + w[2] + ': no data, skipped');
           } else {
-            await human(500, 1200);
+            await gentle(500, 1200);
             document.getElementById('exportTotalindex').click();
             saved++;
             log('saved ' + p.label + ' ' + w[2]);
-            if (!(i === plan.length - 1 && k === p.windows.length - 1)) await human(3500, 6500);
+            if (!(i === plan.length - 1 && k === p.windows.length - 1)) {
+              if (saved === FAST) await allowPrompt();
+              else if (saved > FAST) await human(3500, 6500);
+            }
           }
           done++;
           progress();
