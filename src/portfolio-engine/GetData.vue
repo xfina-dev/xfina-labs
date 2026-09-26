@@ -11,39 +11,46 @@ import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, gr
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
 // URL hash, e.g. #equity/us/etf/irish, so a link lands on the same step.
-const cls = ref(null);
-const region = ref(null);
-const vehicle = ref(null);
+//
+// Lanes 1 to 3 always hold a choice: Equity, India, Index unless the URL says otherwise. Changing an
+// earlier lane keeps the later choice when it still exists and otherwise falls back to the first that does.
+const cls = ref('equity');
+const region = ref('india');
+const vehicle = ref('index');
 const listing = ref(null);
 
+const vehicles = computed(() => vehiclesFor(cls.value, region.value));
 const offers = (id) => vehicles.value.some((v) => v.id === id);
-const vehicles = computed(() => (cls.value && region.value ? vehiclesFor(cls.value, region.value) : []));
-const listings = computed(() => (cls.value && region.value && vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : []));
-// The fourth lane exists only when there is a listing to choose: US and Global ETFs.
+const listings = computed(() => (vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : []));
+// The fourth lane has content only when there is a listing to choose: US and Global ETFs.
 const showListing = computed(() => listings.value.length > 0);
 const groups = computed(() => {
-  if (!vehicle.value || (showListing.value && !listing.value)) return [];
   const g = groupsFor(cls.value, region.value, vehicle.value, listing.value);
   // An index is named after its asset ("Nifty 50" then "Nifty 50 TRI"), so a heading only repeats it: one flat list.
   return vehicle.value === 'index' ? (g.length ? [{ asset: null, instruments: g.flatMap((x) => x.instruments) }] : []) : g;
 });
 
-// Choosing a step clears the ones after it, because their options depend on it. Irish ETFs are the
-// default for US and Global.
+// Bring the lanes back to a valid state after any change. Irish ETFs are the default listing.
+function settle(wantListing = null) {
+  if (!offers(vehicle.value)) vehicle.value = vehicles.value.find((v) => v.id === 'index')?.id || vehicles.value[0]?.id || vehicle.value;
+  const ls = listingsFor(cls.value, region.value);
+  listing.value = vehicle.value === 'etf' && ls.length ? (ls.some((x) => x.id === wantListing) ? wantListing : ls[0].id) : null;
+}
 const pick = (which, v) => {
-  if (which === 'cls') { cls.value = v; region.value = vehicle.value = listing.value = null; }
-  if (which === 'region') { region.value = v; vehicle.value = listing.value = null; }
-  if (which === 'vehicle') { vehicle.value = v; listing.value = v === 'etf' ? listingsFor(cls.value, region.value)[0]?.id || null : null; }
-  if (which === 'listing') listing.value = v;
+  const keepListing = listing.value;
+  if (which === 'cls') cls.value = v;
+  if (which === 'region') region.value = v;
+  if (which === 'vehicle') { vehicle.value = v; settle(); return; }
+  if (which === 'listing') { listing.value = v; return; }
+  settle(keepListing);
 };
 const toHash = () => [cls.value, region.value, vehicle.value, listing.value].filter(Boolean).join('/');
 const fromHash = () => {
   const [c, r, v, l] = location.hash.slice(1).split('/');
-  cls.value = CLASSES.some((x) => x.id === c) ? c : null;
-  region.value = cls.value && REGIONS.some((x) => x.id === r) ? r : null;
-  vehicle.value = region.value && vehiclesFor(cls.value, region.value).some((x) => x.id === v) ? v : null;
-  const ls = vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : [];
-  listing.value = ls.length ? (ls.some((x) => x.id === l) ? l : ls[0].id) : null;
+  if (CLASSES.some((x) => x.id === c)) cls.value = c;
+  if (REGIONS.some((x) => x.id === r)) region.value = r;
+  if (VEHICLES.some((x) => x.id === v)) vehicle.value = v;
+  settle(l);
 };
 watch([cls, region, vehicle, listing], () => { try { history.replaceState(null, '', `#${toHash()}`); } catch { /* ignore */ } });
 
@@ -115,7 +122,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </section>
 
-          <section class="space-y-2" :class="!cls && 'opacity-50 pointer-events-none'">
+          <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">2</span>Region</h3>
             <div class="grid gap-2">
               <button v-for="r in REGIONS" :key="r.id" type="button" :class="tile(region === r.id)" @click="pick('region', r.id)">
@@ -124,11 +131,11 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </section>
 
-          <section class="space-y-2" :class="!region && 'opacity-50 pointer-events-none'">
+          <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">3</span>Model it as</h3>
             <div class="grid gap-2">
               <!-- All three always show; ones with nothing behind them for this class and region are dimmed. -->
-              <button v-for="v in VEHICLES" :key="v.id" type="button" :disabled="!!region && !offers(v.id)" :class="[tile(vehicle === v.id), !!region && !offers(v.id) && 'opacity-40 cursor-not-allowed']" @click="pick('vehicle', v.id)">
+              <button v-for="v in VEHICLES" :key="v.id" type="button" :disabled="!offers(v.id)" :class="[tile(vehicle === v.id), !offers(v.id) && 'opacity-40 cursor-not-allowed']" @click="pick('vehicle', v.id)">
                 <div class="font-medium">{{ v.title }}</div><div class="text-xs text-muted-foreground">{{ v.blurb }}</div>
               </button>
             </div>
