@@ -25,6 +25,8 @@ const BUILDERS = {
     return {
       openUrl: 'https://www.niftyindices.com/reports/historical-data',
       openLabel: 'Open NSE Indices',
+      site: 'NSE Indices',
+      termsUrl: 'https://www.niftyindices.com/terms-of-use',
       // One bookmark per index: open the page in one tab per index and run each bookmark in its own tab.
       bookmarks: picked.map((i) => ({
         label: `Xfina · ${i.asset}`,

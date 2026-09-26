@@ -4,8 +4,8 @@
   It runs on niftyindices.com only and does what a person does on the Historical Data page: opens
   "Total returns Index Values", picks the index, sets a one-year date range, presses Submit, then
   presses the page's own "csv format" button. It repeats that for each financial year (April to March)
-  or calendar year, as chosen, from the index's start date to today, pausing a few seconds each time like
-  someone doing it by hand. The files are the ones the page itself produces, named by the page, exactly as
+  or calendar year, as chosen, from the index's start date to today, pausing a few seconds between files
+  to stay gentle on the site. The files are the ones the page itself produces, named by the page, exactly as
   a manual download. Where the browser saves them is the browser's own setting.
 
   The page refuses a range longer than a year (more than 365 days between the two dates), so a long index
@@ -41,7 +41,7 @@
   box.style.cssText = 'position:fixed;top:16px;right:16px;z-index:2147483647;width:340px;background:#0a0a0b;color:#fafafa;font:14px/1.5 system-ui,sans-serif;border:1px solid #3f3f46;border-radius:8px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.5)';
   box.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:16px">Xfina · ' + INDEX[1] + ' TRI<span id="xfina-x" style="cursor:pointer;color:#a1a1aa" title="Stop and close">✕</span></div>' +
-    '<div style="color:#a1a1aa;font-size:12px;margin:4px 0 10px">Downloads NSE\'s own CSV, one file per ' + (FY ? 'financial' : 'calendar') + ' year, pausing between files like a person would. Your browser saves them where it normally does. Allow multiple downloads if asked. Nothing is sent to Xfina.</div>' +
+    '<div style="color:#a1a1aa;font-size:12px;margin:4px 0 10px">Downloads NSE\'s own CSV, one file per ' + (FY ? 'financial' : 'calendar') + ' year, pausing between files to go easy on the site. Your browser saves them where it normally does. Allow multiple downloads if asked. Nothing is sent to Xfina.</div>' +
     '<div style="height:8px;background:#27272a;border-radius:9px;overflow:hidden"><div id="xfina-bar" style="height:100%;width:0;background:#4ade80;transition:width .3s"></div></div>' +
     '<div id="xfina-status" style="margin-top:6px;font-size:13px">Starting...</div>' +
     '<div id="xfina-log" style="margin-top:6px;font-size:12px;color:#a1a1aa;white-space:pre-line"></div>';

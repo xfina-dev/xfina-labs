@@ -252,9 +252,14 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 </a>
               </li>
               <li>In each tab, click that index's bookmark. Each shows its own progress bar and runs alongside the others.</li>
-              <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one {{ split === 'FY' ? 'financial' : 'calendar' }} year at a time, pausing between files like a person would. The page won't export more than a year at once, so a long index takes a few minutes.</li>
+              <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one {{ split === 'FY' ? 'financial' : 'calendar' }} year at a time, pausing between files to go easy on the site. The page won't export more than a year at once, so a long index takes a few minutes.</li>
               <li>Your browser saves the files exactly as it does for any download: in its usual folder, or wherever it asks you, depending on your settings. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date.</li>
             </ol>
+            <p class="rounded-md border border-dashed border-[hsl(var(--warn)/0.6)] bg-[hsl(var(--warn)/0.07)] p-3 text-xs">
+              <strong>Before you use it.</strong> Xfina is not affiliated with {{ g.bookmarklet.site }}. This saves the same files you could download by hand on their page, for your own personal, non-commercial study, and Xfina never sees or stores the data. Their
+              <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
+              restrict automated data collection, so use it in line with them, or download by hand instead. Please don't share or republish the data.
+            </p>
             <p class="text-xs text-muted-foreground">
               Runs only on that site and sends nothing to Xfina.
               <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
