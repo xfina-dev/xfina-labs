@@ -37,6 +37,12 @@ Cloudflare, as an assets-only Worker (same pattern as xsteer; all new xfina proj
 - iShares ETFs: the inception date on the fund's own page.
 - A few others (SPY, VOO, QQQ, VUAA, GLD, BIL, BNDW, EEM): a launch date typed into the script and flagged `manual`. Check these.
 
+### Bookmarklets
+
+Some sites (NSE Indices, NSE) only serve their data to a page on that site, so a page here cannot fetch it. For those the data guide offers a bookmarklet: a script the user drags to the bookmarks bar, clicks while on the site, and which saves the files to their disk. They then import the files in Portfolio Engine. It runs only on that site and sends nothing to Xfina.
+
+One readable script per site in `src/portfolio-engine/bookmarklets/`, registered in `bookmarklets.js` by the website name the download list groups by. `bookmarklet.js` turns a script into the `javascript:` link. They call the sites' own, undocumented data endpoints, so when a site changes, its one script is what to fix. Currently: `nse-indices.js` (Nifty 50, Next 50, Midcap 150, Smallcap 250 Total Returns Index).
+
 Scope: equity is index funds and index ETFs only; gold, liquid and gilt are included as well.
 
 Adding a tool: create `<tool>/index.html` and `main.js` (mount a component inside `AppShell`), register it in `vite.config.js`, and add it to `TOOLS` in `AppHeader.vue`.

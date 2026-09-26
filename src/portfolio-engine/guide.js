@@ -104,7 +104,7 @@ export const HOW = {
 };
 
 
-const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date' };
+const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices' };
 export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
 export const dateSourceNote = (i) => (i.inception ? DATE_SOURCE[i.dateSource] || '' : '');
 

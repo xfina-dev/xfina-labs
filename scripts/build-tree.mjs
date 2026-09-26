@@ -205,7 +205,9 @@ const ETFS = [
 // Indices: one instrument per asset, the benchmark itself. Start dates are only given where the
 // publisher states one; the rest are left out rather than guessed.
 const INDICES = [
-  ...['Nifty 50', 'Nifty Next 50', 'Nifty Midcap 150', 'Nifty Smallcap 250'].map((a) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since: a === 'Nifty 50' ? '1999-06-30' : null })),
+  // Start dates are the oldest rows NSE Indices returns for each Total Returns Index (measured by calling the same
+  // endpoint the historical data page uses, on 2026-09-26).
+  ...[['Nifty 50', '1999-06-30'], ['Nifty Next 50', '2002-11-08'], ['Nifty Midcap 150', '2005-04-01'], ['Nifty Smallcap 250', '2005-04-01']].map(([a, since]) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since })),
   { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 Total Return', how: 'spdji', ccy: 'USD', links: [L('S&P 500 on S&P Dow Jones Indices', 'https://www.spglobal.com/spdji/en/indices/equity/sp-500/')] },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 Total Return (XNDX)', how: 'nasdaqIdx', ccy: 'USD', links: [L('XNDX history', 'https://indexes.nasdaqomx.com/Index/History/XNDX')] },
   ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Net Total Return`, how: 'msci', ccy: 'USD', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
@@ -287,7 +289,7 @@ for (const f of FOREIGN) {
 
 for (const i of INDICES) {
   const n = node(i.cls, i.region, 'index', null, i.asset);
-  n.instruments.push({ id: `idx-${++seq}`, name: i.name, inception: i.since || null, dateSource: i.since ? 'publisher' : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
+  n.instruments.push({ id: `idx-${++seq}`, name: i.name, inception: i.since || null, dateSource: i.since ? 'nse' : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
 }
 
 // Oldest first; instruments without a known date go last. Keep the top KEEP.
