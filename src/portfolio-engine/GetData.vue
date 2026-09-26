@@ -98,14 +98,22 @@ const from = ref('CURRENT');
 const customStart = ref('');
 const customEnd = ref('');
 const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-// Picking Custom starts from a sensible range (this financial year so far) that the browser's own date pickers can then change.
-const pickPeriod = (id) => {
+// The dates shown in the Start and End fields: the period's own dates, or the user's for Custom. Every field is
+// editable; touching one switches the period to Custom, seeded with the dates that were showing.
+const dates = (g) => {
+  if (from.value === 'CUSTOM') return { start: customStart.value, end: customEnd.value };
+  const d = periodDates(from.value);
+  return { start: d.start || g.bookmarklet.earliest || '', end: d.end };
+};
+const pickPeriod = (id, g) => {
+  if (id === 'CUSTOM') { const d = dates(g); customStart.value = d.start; customEnd.value = d.end; }
   from.value = id;
-  if (id === 'CUSTOM' && !customStart.value) {
-    const now = new Date();
-    customStart.value = isoDay(new Date(now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1, 3, 1));
-    customEnd.value = isoDay(now);
-  }
+};
+const editDate = (which, value, g) => {
+  const d = dates(g);
+  customStart.value = which === 'start' ? value : d.start;
+  customEnd.value = which === 'end' ? value : d.end;
+  from.value = 'CUSTOM';
 };
 const today = isoDay(new Date());
 const shownDates = computed(() => periodDates(from.value));
@@ -294,18 +302,16 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
 
             <div class="space-y-1.5">
               <div class="text-sm text-muted-foreground">Period</div>
-              <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden bg-background">
-                <button v-for="o in PERIODS" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id)">{{ o.label }}</button>
-              </span>
-              <!-- Always shown, so each choice says which dates it covers. Editable only for Custom. -->
-              <div class="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-sm">
+              <!-- One row: the period choices with their dates. Editing a date makes it Custom. -->
+              <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+                <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden bg-background">
+                  <button v-for="o in PERIODS" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id, g)">{{ o.label }}</button>
+                </span>
                 <label class="flex items-center gap-2 text-muted-foreground">Start
-                  <input v-if="from === 'CUSTOM'" v-model="customStart" type="date" :max="today" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" />
-                  <input v-else type="text" :value="shownDates.start || 'Each index\'s start'" disabled class="h-8 w-40 rounded-md border border-input bg-muted/40 px-2 text-sm text-foreground" />
+                  <input :value="dates(g).start" type="date" :max="today" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('start', $event.target.value, g)" />
                 </label>
                 <label class="flex items-center gap-2 text-muted-foreground">End
-                  <input v-if="from === 'CUSTOM'" v-model="customEnd" type="date" :max="today" :min="customStart || undefined" class="h-8 w-40 rounded-md border border-input bg-background px-2 text-sm text-foreground" />
-                  <input v-else type="text" :value="shownDates.end" disabled class="h-8 w-40 rounded-md border border-input bg-muted/40 px-2 text-sm text-foreground" />
+                  <input :value="dates(g).end" type="date" :max="today" :min="dates(g).start || undefined" class="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground" @input="editDate('end', $event.target.value, g)" />
                 </label>
               </div>
               <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>

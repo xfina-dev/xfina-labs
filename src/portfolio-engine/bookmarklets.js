@@ -20,12 +20,12 @@ export function yearStart(d) {
 export const PERIODS = [
   { id: 'CURRENT', label: 'Current FY', hint: 'the current financial year so far' },
   { id: 'PREVIOUS', label: 'Previous FY', hint: 'the previous financial year and the current one so far' },
-  { id: 'FULL', label: 'Full history', hint: "every index from its own start" },
+  { id: 'FULL', label: 'Full history', hint: 'every index from its own start (the earliest start is shown)' },
   { id: 'CUSTOM', label: 'Custom', hint: 'the dates you pick' },
 ];
 
 // The dates a period means today, for showing in the settings box. `start` is null for the full history,
-// which begins at a different date for each index.
+// which begins at a different date for each index (the card shows the earliest of them).
 export function periodDates(from, now = new Date()) {
   const cur = yearStart(now);
   if (from === 'CURRENT') return { start: iso(cur), end: iso(now) };
@@ -68,6 +68,8 @@ const BUILDERS = {
       invalid,
       href: invalid ? null : bookmarkletHref(nseIndices, { INDEXES: picked.map((i) => [i.asset.toUpperCase(), i.asset, i.inception]), FROM: from === 'CUSTOM' ? start : from, TO: from === 'CUSTOM' ? end : '' }),
       indexes: picked.map((i) => i.asset),
+      // The earliest start among the picked indexes: what Full history shows as its start date.
+      earliest: picked.map((i) => i.inception).sort()[0],
       files: invalid ? 0 : picked.reduce((n, i) => n + files(i.inception, period), 0),
       skipped: items.length - picked.length,
     };
