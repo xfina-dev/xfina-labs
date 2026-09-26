@@ -120,6 +120,9 @@ export const assetsFor = (cls, region, vehicle, listing) => [...new Set(nodes.fi
 // Oldest first, three at most (the tree is built that way).
 export const instrumentsFor = (cls, region, vehicle, listing, asset) => nodes.find((n) => same(n, cls, region, vehicle, listing) && n.asset === asset)?.instruments || [];
 
+// Indexes are simply listed: there is no listing or asset to choose, every index for the region is shown.
+export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls && n.region === region && n.vehicle === 'index').flatMap((n) => n.instruments.map((i) => ({ ...i, asset: n.asset })));
+
 export function findDataset(id) {
   for (const n of nodes) {
     const hit = n.instruments.find((i) => i.id === id);
