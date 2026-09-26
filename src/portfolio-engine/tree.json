@@ -24,10 +24,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/101349"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -48,10 +44,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/101314"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -71,10 +63,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/100484"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -105,10 +93,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/118581"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -129,10 +113,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/119063"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -152,10 +132,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/119648"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -186,10 +162,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/112957"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -210,10 +182,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/143340"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -233,10 +201,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/146380"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -267,10 +231,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/120684"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -291,10 +251,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/143341"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -314,10 +270,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/146381"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -348,10 +300,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/147621"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -372,10 +320,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148723"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -395,10 +339,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148805"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -429,10 +369,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/147622"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -453,10 +389,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148726"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -476,10 +408,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148807"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -510,10 +438,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/147624"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -534,10 +458,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148518"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -557,10 +477,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/149281"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -591,10 +507,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/147623"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -615,10 +527,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148519"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -638,10 +546,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/149283"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -672,10 +576,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/114616"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -696,10 +596,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/114758"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -719,10 +615,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/115676"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -753,10 +645,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/115132"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -777,10 +665,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/119132"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -800,10 +684,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/120546"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -833,10 +713,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/101408"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -857,10 +733,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/102012"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -880,10 +752,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/100047"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -914,10 +782,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/103734"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -938,10 +802,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/119091"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -961,10 +821,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/119568"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -995,10 +851,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/100369"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1019,10 +871,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/100265"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1042,10 +890,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/100058"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -1076,10 +920,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/118498"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1100,10 +940,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/119116"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1123,10 +959,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/119605"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -1654,10 +1486,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148382"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1687,10 +1515,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/148381"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1719,10 +1543,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/145551"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1743,10 +1563,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/149218"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1765,10 +1581,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/149910"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
@@ -1799,10 +1611,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/149219"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1823,10 +1631,6 @@
      "kind": "MF",
      "links": [
       {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/149961"
-      },
-      {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"
       }
@@ -1846,10 +1650,6 @@
      "how": "mfapi",
      "kind": "MF",
      "links": [
-      {
-       "label": "NAV data (JSON)",
-       "url": "https://api.mfapi.in/mf/150751"
-      },
       {
        "label": "AMFI NAV history",
        "url": "https://www.amfiindia.com/net-asset-value/nav-history"

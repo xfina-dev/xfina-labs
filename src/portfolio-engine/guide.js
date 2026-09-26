@@ -49,9 +49,9 @@ export const HOW = {
   },
   mfapi: {
     site: 'AMFI',
-    title: 'AMFI NAV history, as JSON',
-    steps: ['Open the NAV data link. It shows the scheme\'s full NAV history.', 'Save the page (right-click, Save As) as a file.', 'Prefer a spreadsheet? Use AMFI NAV History instead: pick the fund house, the scheme and the date range.'],
-    format: 'A JSON list of dates and NAVs, as mfapi.in republishes AMFI\'s data.',
+    title: 'AMFI: NAV history',
+    steps: ['Open NAV History and choose Historical NAV for a period.', 'Pick the fund house, then the scheme (the plan and option named here).', 'Set From and To. The page allows at most 5 years at a time, so a long history is several downloads.', 'Press Go, then download the Excel file and import every part as it is.'],
+    format: 'AMFI\'s own Excel: the net asset value, repurchase and sale price and the NAV date, one row per day.',
   },
   amfi: {
     site: 'AMFI',

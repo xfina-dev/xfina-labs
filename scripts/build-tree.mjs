@@ -87,7 +87,7 @@ function toInstrument(r, vehicle) {
     id: `mf${r.c.schemeCode}`, name, code: String(r.c.schemeCode), plan: planOf(name) || undefined,
     inception: r.first, lastNav: r.last, observations: r.n, dateSource: 'mfapi',
     ccy: 'INR', returnType: 'Adjusted price', how: 'mfapi', kind: vehicle === 'etf' ? 'ETF' : 'MF',
-    links: [L('NAV data (JSON)', `https://api.mfapi.in/mf/${r.c.schemeCode}`), L('AMFI NAV history', AMFI)],
+    links: [L('AMFI NAV history', AMFI)],
   };
 }
 function oldestFirst(rows, vehicle) {

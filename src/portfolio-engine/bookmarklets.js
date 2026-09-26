@@ -4,6 +4,7 @@
 // Add a site here and its card in the download list gets an Assisted tab.
 import nseIndices from './bookmarklets/nse-indices.js?raw';
 import nseEtf from './bookmarklets/nse-etf.js?raw';
+import amfiNav from './bookmarklets/amfi-nav.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
 import { nodes } from './guide.js';
 
@@ -63,6 +64,22 @@ const BUILDERS = {
       action: 'Download (.csv)',
       caution: 'NSE\'s terms of use restrict automated data collection. This bookmark only does the clicking you would do on that page, one file at a time and at a human pace, but the terms say what they say, so the decision to use it is yours.',
       skipped: items.length - etfs.length,
+    };
+  },
+  // AMFI's own NAV History page, for the mutual fund and fund-of-fund schemes (their first NAV date is known).
+  AMFI: (items) => {
+    const funds = items.filter((i) => i.kind === 'MF' && i.inception);
+    if (!funds.length) return null;
+    return {
+      site: 'AMFI',
+      openUrl: 'https://www.amfiindia.com/net-asset-value/nav-history',
+      openLabel: 'Open AMFI NAV History',
+      termsUrl: 'https://www.amfiindia.com/terms-of-use',
+      label: 'Xfina · AMFI NAV',
+      href: bookmarkletHref(amfiNav, { SCHEMES: funds.map((i) => [i.name, i.name, i.inception]) }),
+      indexes: funds.map((i) => i.name),
+      action: 'Excel download',
+      skipped: items.length - funds.length,
     };
   },
 };
