@@ -116,6 +116,11 @@ const editDate = (which, value, g) => {
   from.value = 'CUSTOM';
 };
 const today = isoDay(new Date());
+// Dates in the files table read like "Apr 1, 2026", whatever the browser's locale.
+const fmtDate = (iso) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 const shownDates = computed(() => periodDates(from.value));
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
@@ -328,7 +333,8 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <thead class="text-muted-foreground">
                   <tr class="border-b">
                     <th class="text-left font-medium px-3 py-2">Index</th>
-                    <th class="text-left font-medium px-3 py-2">Start and end dates</th>
+                    <th class="text-left font-medium px-3 py-2">Start Date</th>
+                    <th class="text-left font-medium px-3 py-2">End Date</th>
                     <th class="text-right font-medium px-3 py-2">Full years</th>
                     <th class="text-right font-medium px-3 py-2">Partial years</th>
                     <th class="text-right font-medium px-3 py-2">Total Files</th>
@@ -337,7 +343,9 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <tbody class="divide-y">
                   <tr v-for="r in g.bookmarklet.rows" :key="r.index">
                     <td class="px-3 py-2 font-medium">{{ r.index }}</td>
-                    <td class="px-3 py-2 font-mono text-xs whitespace-nowrap">{{ r.files ? `${r.start} → ${r.end}` : 'Not in this period' }}</td>
+                    <td v-if="r.files" class="px-3 py-2 whitespace-nowrap">{{ fmtDate(r.start) }}</td>
+                    <td v-if="r.files" class="px-3 py-2 whitespace-nowrap">{{ fmtDate(r.end) }}</td>
+                    <td v-else colspan="2" class="px-3 py-2 text-muted-foreground">Not in this period</td>
                     <td class="px-3 py-2 text-right tabular-nums">{{ r.fullYears }}</td>
                     <td class="px-3 py-2 text-right tabular-nums">{{ r.partialYears }}</td>
                     <td class="px-3 py-2 text-right tabular-nums font-medium">{{ r.files }}</td>
@@ -346,7 +354,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <tfoot v-if="g.bookmarklet.rows.length > 1">
                   <tr class="border-t font-medium">
                     <td class="px-3 py-2">Total</td>
-                    <td class="px-3 py-2" />
+                    <td class="px-3 py-2" colspan="2" />
                     <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.fullYears, 0) }}</td>
                     <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.partialYears, 0) }}</td>
                     <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.files }}</td>
