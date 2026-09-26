@@ -190,7 +190,7 @@
             var e = iso(newest() || w[1]);
             document.getElementById('exportTotalindex').click();
             saved++;
-            if (!mem[p.n] || e > mem[p.n])) { mem[p.n] = e; save(); }
+            if (!mem[p.n] || e > mem[p.n]) { mem[p.n] = e; save(); }
             if (!(i === todo.length - 1 && k === p.w.length - 1)) {
               if (saved === FAST) {
                 q('xn').style.display = 'block';
