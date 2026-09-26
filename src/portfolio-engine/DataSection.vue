@@ -78,18 +78,18 @@ const returnType = ref('Total return');
           {{ fully }} of {{ rows.length }} datasets are fully loaded from <span class="font-mono">{{ startDate }}</span>.
         </CardDescription>
       </div>
-      <Button @click="fileInput.click()"><Upload class="h-4 w-4 mr-2" />Import CSV</Button>
-      <input ref="fileInput" type="file" accept=".csv" multiple class="sr-only" />
-    </CardHeader>
-    <CardContent class="space-y-4">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div class="space-y-1.5">
-          <Label class="text-muted-foreground">Start date</Label>
-          <Input v-model="startDate" type="date" class="h-9 w-44" />
-        </div>
+      <div class="flex flex-wrap items-center justify-end gap-3">
         <HelpDataDialog>
           <Button variant="outline"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
         </HelpDataDialog>
+        <Button @click="fileInput.click()"><Upload class="h-4 w-4 mr-2" />Import Files</Button>
+      </div>
+      <input ref="fileInput" type="file" accept=".csv" multiple class="sr-only" />
+    </CardHeader>
+    <CardContent class="space-y-4">
+      <div class="space-y-1.5">
+        <Label class="text-muted-foreground">Start date</Label>
+        <Input v-model="startDate" type="date" class="h-9 w-44" />
       </div>
 
       <Table>
