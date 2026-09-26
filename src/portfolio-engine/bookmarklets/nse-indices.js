@@ -169,15 +169,16 @@
     var saved = 0;
     var done = 0;
     var say = function (t) { q('xs').textContent = t; };
-    var nap = async function (m) { for (var n = m; n > 0 && !stop; n--) { turn('xz', n / m, n); await pause(1000); } q('xz').style.display = 'none'; };
+    var nap = async function (m) { for (var n = m; n > 0 && !stop; n -= 0.25) { turn('xz', n / m, Math.ceil(n)); await pause(250); } turn('xz', 0, ''); };
     say('');
-    q('xo').style.display = 'none';
+    turn('xo', 0, 0);
+    turn('xz', 0, '');
     var dir = null;
     if (window.showDirectoryPicker) {
       say('Choose a folder for the files (asked once)...');
       try { dir = await window.showDirectoryPicker({ mode: 'readwrite' }); } catch (e0) { dir = null; }
     }
-    var gentle = function (a, b) { return pause(saved >= FAST || dir ? a + Math.random() * (b - a) : 250); };
+    var gentle = function (a, b) { return saved >= FAST || dir ? nap((a + Math.random() * (b - a)) / 1000) : pause(250); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
       document.querySelector('li.form5').click();
@@ -222,9 +223,9 @@
               else if (saved === FAST) {
                 q('xn').style.display = 'block';
                 skip = 0;
-                for (var s = WAIT; s > 0 && !skip && !stop; s--) { q('xk').textContent = s; await pause(1000); }
-                q('xn').style.display = 'none';
-              } else if (saved >= FAST) await pause(3500 + Math.random() * 3000);
+                for (var s = WAIT; s > 0 && !skip && !stop; s--) { q('xk').textContent = s; turn('xz', s / WAIT, s); await pause(1000); }
+                q('xn').style.display = 'none'; turn('xz', 0, '');
+              } else if (saved >= FAST) await nap(3.5 + Math.random() * 3);
             }
           }
           done++;
