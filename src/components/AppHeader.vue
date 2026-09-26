@@ -55,8 +55,8 @@ onMounted(() => document.documentElement.classList.toggle('dark', isDark.value))
         </div>
         <p class="text-muted-foreground mt-2 leading-relaxed">
           <slot>
-            Experimental finance tools that run entirely in your browser.<br />
-            Bring your own data; nothing is uploaded to any server.
+            Experimental finance tools for long-term investors.<br />
+            Everything runs in your browser; nothing is uploaded to any server.
           </slot>
         </p>
       </div>

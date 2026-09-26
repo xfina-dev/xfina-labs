@@ -1,3 +1,0 @@
-/* Chart series colours for Labs. Kept apart from style.css, which is a straight copy of Xfina's. */
-:root { --chart-1: 226 70% 55%; --chart-2: 174 65% 40%; --chart-3: 38 90% 50%; --chart-4: 280 55% 58%; --chart-5: 340 70% 55%; --ok: 142 60% 32%; --warn: 38 92% 42%; }
-.dark { --chart-1: 226 85% 68%; --chart-2: 174 65% 50%; --chart-3: 38 90% 60%; --chart-4: 280 65% 70%; --chart-5: 340 75% 66%; --ok: 142 55% 50%; --warn: 38 92% 55%; }

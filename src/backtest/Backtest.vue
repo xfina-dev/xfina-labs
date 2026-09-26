@@ -23,8 +23,8 @@ const plan = [
 <template>
   <AppShell tool="/backtest/">
     <template #tagline>
-      Multi-asset portfolio backtester. Bring your own price data, set weights and a rebalance rule.<br />
-      Fast, private, zero-setup, and without uploading your files to any server.
+      Multi-asset portfolio backtester with bring-your-own data.<br />
+      Everything runs in your browser; nothing is uploaded to any server.
     </template>
 
     <div class="rounded-md border border-dashed border-[hsl(var(--warn)/0.6)] bg-[hsl(var(--warn)/0.07)] p-3 text-sm space-y-2">
