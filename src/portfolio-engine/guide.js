@@ -33,10 +33,10 @@ export const VEHICLES = [
 ];
 // The first one that exists for a choice is its default: Canada (only Global gold has it), then Irish, US and India.
 export const LISTINGS = [
-  { id: 'canada', title: 'Canada domiciled', blurb: 'Canadian trusts and funds, priced in USD or CAD' },
-  { id: 'irish', title: 'Ireland domiciled', blurb: 'UCITS ETFs, usually listed in London' },
-  { id: 'us', title: 'US domiciled', blurb: 'US-listed ETFs, in USD' },
-  { id: 'india', title: 'India domiciled', blurb: 'Indian ETFs on foreign indices, in INR' },
+  { id: 'canada', title: 'Canada', blurb: 'Canadian trusts and funds, priced in USD or CAD' },
+  { id: 'irish', title: 'Ireland', blurb: 'UCITS ETFs, usually listed in London' },
+  { id: 'us', title: 'US', blurb: 'US-listed ETFs, in USD' },
+  { id: 'india', title: 'India', blurb: 'Indian ETFs on foreign indices, in INR' },
 ];
 
 // How a source is downloaded and what you get. `site` is the website: the download list groups by it,
