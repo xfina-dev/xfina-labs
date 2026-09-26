@@ -168,7 +168,7 @@ const pick = () => fileInput.value.click();
               <TableCell colspan="4" class="py-2">
                 <span class="font-semibold">{{ r.a.name }}</span>
                 <span class="ml-2 text-xs text-muted-foreground">full history from <span class="font-mono">{{ r.a.since }}</span></span>
-                <span v-if="current.id === 'provided'" class="ml-3 text-xs font-medium" :class="assetLoaded(r.a) === 100 ? 'text-[hsl(var(--ok))]' : 'text-[hsl(var(--warn))]'">
+                <span class="ml-3 text-xs font-medium" :class="assetLoaded(r.a) === 100 ? 'text-[hsl(var(--ok))]' : 'text-muted-foreground'">
                   Combined {{ assetLoaded(r.a) }}%<template v-if="assetLoaded(r.a) === 100"> · Fully loaded</template>
                 </span>
               </TableCell>
@@ -196,13 +196,12 @@ const pick = () => fileInput.value.click();
                   </div>
                   <div class="mt-1 text-xs" :class="r.pct === 100 ? 'text-[hsl(var(--ok))] font-medium' : 'text-muted-foreground'">
                     <template v-if="r.pct === 100">100% · Fully loaded</template>
-                    <template v-else-if="r.s.origin === 'provided'">{{ r.s.from }} → {{ r.s.to }}</template>
-                    <template v-else>{{ r.pct }}% · starts {{ r.s.from }}</template>
+                    <template v-else>{{ r.pct }}% · <span class="font-mono">{{ r.s.from }} → {{ r.s.to }}</span></template>
                   </div>
                 </TableCell>
                 <TableCell class="whitespace-nowrap">
                   <Tag :variant="r.s.origin === 'provided' ? 'default' : r.s.status[0]">{{ r.s.origin === 'provided' ? 'provided' : r.s.status[1] }}</Tag>
-                  <span v-if="r.s.file" class="ml-2 text-xs text-muted-foreground font-mono">{{ r.s.file }}</span>
+                  <span class="ml-2 text-xs text-muted-foreground font-mono">{{ r.s.file || 'data.xfina.dev' }}</span>
                 </TableCell>
                 <TableCell class="text-muted-foreground"><ChevronRight class="h-4 w-4 transition-transform" :class="expanded === r.key && 'rotate-90'" /></TableCell>
               </TableRow>
