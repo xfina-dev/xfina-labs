@@ -328,28 +328,28 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <thead class="text-muted-foreground">
                   <tr class="border-b">
                     <th class="text-left font-medium px-3 py-2">Index</th>
-                    <th class="text-right font-medium px-3 py-2">Files</th>
                     <th class="text-left font-medium px-3 py-2">Start and end dates</th>
                     <th class="text-right font-medium px-3 py-2">Full years</th>
                     <th class="text-right font-medium px-3 py-2">Partial years</th>
+                    <th class="text-right font-medium px-3 py-2">Total Files</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y">
                   <tr v-for="r in g.bookmarklet.rows" :key="r.index">
                     <td class="px-3 py-2 font-medium">{{ r.index }}</td>
-                    <td class="px-3 py-2 text-right tabular-nums">{{ r.files }}</td>
                     <td class="px-3 py-2 font-mono text-xs whitespace-nowrap">{{ r.files ? `${r.start} → ${r.end}` : 'Not in this period' }}</td>
                     <td class="px-3 py-2 text-right tabular-nums">{{ r.fullYears }}</td>
                     <td class="px-3 py-2 text-right tabular-nums">{{ r.partialYears }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums font-medium">{{ r.files }}</td>
                   </tr>
                 </tbody>
                 <tfoot v-if="g.bookmarklet.rows.length > 1">
                   <tr class="border-t font-medium">
                     <td class="px-3 py-2">Total</td>
-                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.files }}</td>
                     <td class="px-3 py-2" />
                     <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.fullYears, 0) }}</td>
                     <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.partialYears, 0) }}</td>
+                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.files }}</td>
                   </tr>
                 </tfoot>
               </table>
