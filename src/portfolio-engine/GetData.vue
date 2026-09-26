@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
-import DateField from './DateField.vue';
-import { fmtDate } from './format.js';
-import { bookmarkletFor, PERIODS, periodDates } from './bookmarklets.js';
+import { bookmarkletFor } from './bookmarklets.js';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
@@ -86,7 +84,7 @@ const bySite = computed(() => {
     const shared = its.length > 1 ? [...urls.values()].filter((u) => u.n === its.length).map((u) => u.l) : [];
     const sharedUrls = new Set(shared.map((l) => l.url));
     const hows = [...new Set(its.map((i) => i.how))].map((h) => HOW[h]);
-    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its, { from: from.value, start: customStart.value, end: customEnd.value }) };
+    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its) };
   });
 });
 
@@ -95,29 +93,6 @@ const dragHint = ref(false);
 // Manual or assisted, per website. Assisted exists only where a bookmarklet does.
 const modes = ref({});
 const mode = (site) => modes.value[site] || 'manual';
-// The period a run covers: the current financial year (the default, so a repeat run refreshes it), the previous one, the full history, or a custom range.
-const from = ref('CURRENT');
-const customStart = ref('');
-const customEnd = ref('');
-const isoDay = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-// The dates shown in the Start and End fields: the period's own dates, or the user's for Custom. Every field is
-// editable; touching one switches the period to Custom, seeded with the dates that were showing.
-const dates = (g) => {
-  if (from.value === 'CUSTOM') return { start: customStart.value, end: customEnd.value };
-  const d = periodDates(from.value);
-  return { start: d.start || g.bookmarklet.earliest || '', end: d.end };
-};
-const pickPeriod = (id, g) => {
-  if (id === 'CUSTOM') { const d = dates(g); customStart.value = d.start; customEnd.value = d.end; }
-  from.value = id;
-};
-const editDate = (which, value, g) => {
-  const d = dates(g);
-  customStart.value = which === 'start' ? value : d.start;
-  customEnd.value = which === 'end' ? value : d.end;
-  from.value = 'CUSTOM';
-};
-const today = isoDay(new Date());
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
@@ -297,80 +272,21 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </div>
 
-          <!-- Assisted: a bookmarklet, dragged to the bookmarks bar, that does the clicking on the site -->
+          <!-- Assisted: a bookmarklet, made once, that does the clicking on the site -->
           <div v-else class="rounded-md border bg-muted/30 p-4 space-y-4">
             <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
 
-            <div class="space-y-1.5">
-              <div class="text-sm text-muted-foreground">Period</div>
-              <!-- One row: the period choices with their dates. Editing a date makes it Custom. -->
-              <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-                <span class="inline-flex flex-wrap rounded-md border border-border overflow-hidden bg-background">
-                  <button v-for="o in PERIODS" :key="o.id" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="from === o.id ? 'bg-primary text-primary-foreground' : 'hover:bg-accent'" @click="pickPeriod(o.id, g)">{{ o.label }}</button>
-                </span>
-                <label class="flex items-center gap-2 text-muted-foreground">Start
-                  <DateField :model-value="dates(g).start" :max="today" @update:model-value="editDate('start', $event, g)" />
-                </label>
-                <label class="flex items-center gap-2 text-muted-foreground">End
-                  <DateField :model-value="dates(g).end" :max="today" :min="dates(g).start || undefined" @update:model-value="editDate('end', $event, g)" />
-                </label>
-              </div>
-              <p v-if="g.bookmarklet.invalid" class="text-xs text-destructive">{{ g.bookmarklet.invalid }}</p>
-            </div>
-
-            <!-- The indexes and the files each will produce for the chosen period -->
-            <div v-if="g.bookmarklet.rows.length" class="space-y-1.5">
-              <div class="text-sm text-muted-foreground">To Download</div>
-              <p class="text-xs text-muted-foreground">
-                One file per financial year (April to March), because the site exports at most a year at a time. Current and Previous FY are worked out again each time you click the bookmark.
-              </p>
-              <div class="overflow-x-auto rounded-md border bg-background">
-              <table class="w-full text-sm">
-                <thead class="text-muted-foreground">
-                  <tr class="border-b">
-                    <th class="text-left font-medium px-3 py-2">Index</th>
-                    <th class="text-left font-medium px-3 py-2">Start Date</th>
-                    <th class="text-left font-medium px-3 py-2">End Date</th>
-                    <th class="text-right font-medium px-3 py-2">Full years</th>
-                    <th class="text-right font-medium px-3 py-2">Partial years</th>
-                    <th class="text-right font-medium px-3 py-2">Total Files</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y">
-                  <tr v-for="r in g.bookmarklet.rows" :key="r.index">
-                    <td class="px-3 py-2 font-medium">{{ r.index }}</td>
-                    <td v-if="r.files" class="px-3 py-2 whitespace-nowrap">{{ fmtDate(r.start) }}</td>
-                    <td v-if="r.files" class="px-3 py-2 whitespace-nowrap">{{ fmtDate(r.end) }}</td>
-                    <td v-else colspan="2" class="px-3 py-2 text-muted-foreground">Not in this period</td>
-                    <td class="px-3 py-2 text-right tabular-nums">{{ r.fullYears }}</td>
-                    <td class="px-3 py-2 text-right tabular-nums">{{ r.partialYears }}</td>
-                    <td class="px-3 py-2 text-right tabular-nums font-medium">{{ r.files }}</td>
-                  </tr>
-                </tbody>
-                <tfoot v-if="g.bookmarklet.rows.length > 1">
-                  <tr class="border-t font-medium">
-                    <td class="px-3 py-2">Total</td>
-                    <td class="px-3 py-2" colspan="2" />
-                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.fullYears, 0) }}</td>
-                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.rows.reduce((n, r) => n + r.partialYears, 0) }}</td>
-                    <td class="px-3 py-2 text-right tabular-nums">{{ g.bookmarklet.files }}</td>
-                  </tr>
-                </tfoot>
-              </table>
-              </div>
-            </div>
-
-            <ol class="list-decimal pl-5 space-y-2 text-sm border-t pt-4">
+            <ol class="list-decimal pl-5 space-y-2 text-sm">
               <li>
-                Drag this button to your bookmarks bar. It is generated from your choice above, so drag it again if you change that.
-                <div v-if="g.bookmarklet.invalid" class="mt-2 text-xs text-muted-foreground">Set a valid period above and the button will appear here.</div>
-                <div v-else class="mt-2">
+                Drag this button to your bookmarks bar. You only do this once.
+                <div class="mt-2">
                   <a
-                    :href="g.bookmarklet.href" draggable="true" :title="`Drag me to your bookmarks bar. ${g.bookmarklet.files} files across ${g.bookmarklet.indexes.length} ${g.bookmarklet.indexes.length > 1 ? 'indexes' : 'index'}`"
+                    :href="g.bookmarklet.href" draggable="true" title="Drag me to your bookmarks bar"
                     class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
                     @click.prevent="dragHint = true"
                   >{{ g.bookmarklet.label }}</a>
                   <span v-if="dragHint" class="ml-2 text-xs text-muted-foreground">Drag it, don't click it here.</span>
+                  <div class="text-xs text-muted-foreground mt-1">It covers {{ g.bookmarklet.indexes.join(', ') }}.</div>
                 </div>
               </li>
               <li>
@@ -379,13 +295,16 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
                 </a>
               </li>
-              <li>Click the bookmark and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
-              <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, one financial year at a time and one index after another. The first three files go out back to back so your browser asks to <strong>allow multiple downloads</strong>: choose Allow. It waits about 15 seconds for that (or press Continue now in its panel), then carries on at a gentler pace with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
-              <li>Your browser saves the files as it does for any download: in its usual folder, or wherever it asks you. Allow multiple downloads if it asks. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the yearly files by date, and a newer file replaces older data for the same dates.</li>
+              <li>
+                Click the bookmark. A small panel opens on that page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new since your last run. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the files it will download before you press Start.
+              </li>
+              <li>Press <strong>Start</strong> and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
+              <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, index after index. The first three files go out back to back so your browser asks to <strong>allow multiple downloads</strong>: choose Allow. It waits about 15 seconds for that (or press Continue now in its panel), then carries on at a gentler pace with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
+              <li>Your browser saves the files as it does for any download: in its usual folder, or wherever it asks you. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the files by date, and a newer file replaces older data for the same dates.</li>
             </ol>
 
-            <p class="text-xs text-muted-foreground border-t pt-3">
-              This just saves you the clicking: the same form and the same download button, so a few years of files take one click instead of many. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}; their
+            <p class="text-xs text-muted-foreground">
+              The bookmark remembers where it left off in this browser, so clearing that site's data makes the next Update a full history. This just saves you the clicking: the same form and the same download button, so a few years of files take one click instead of many. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}; their
               <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
               apply here as they do when downloading by hand.
               <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
