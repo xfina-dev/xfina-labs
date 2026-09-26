@@ -16,11 +16,13 @@ body{margin:0;background:hsl(var(--background));color:hsl(var(--foreground));fon
 a{color:inherit}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .muted{color:hsl(var(--muted-foreground))}
-.wrap{max-width:72rem;margin:0 auto;padding:1.5rem 1rem 4rem}
+.wrap{max-width:72rem;margin:0 auto;padding:2rem 2rem 4rem}
+@media(max-width:640px){.wrap{padding:1.25rem 1rem 3rem}}
 header.top{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.brand{display:flex;gap:.9rem;align-items:center}
-.brand img{width:44px;height:44px}
-.brand h1{margin:0;font-size:1.5rem;letter-spacing:-.02em}
+.brand{display:flex;gap:1.25rem;align-items:flex-start}
+.brand img{width:64px;height:64px;flex:none}
+.brand h1{margin:0;font-size:1.875rem;line-height:2.25rem;font-weight:700;letter-spacing:-.025em}
+.brand p{margin:.5rem 0 0;line-height:1.625}
 .tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:6px;border:1px solid hsl(var(--primary)/.25);background:hsl(var(--primary)/.08)}
 .tag.warn{border-color:hsl(var(--warn)/.5);background:hsl(var(--warn)/.12);color:hsl(var(--warn))}
 .tag.ok{border-color:hsl(var(--ok)/.5);background:hsl(var(--ok)/.12);color:hsl(var(--ok))}
@@ -93,7 +95,7 @@ svg text{fill:hsl(var(--muted-foreground));font-size:10px}
       <a href="/"><img src="/favicon.svg" alt="Xfina" /></a>
       <div>
         <h1>Xfina Labs <span class="muted" style="font-weight:400">/ Backtest</span></h1>
-        <div class="muted">Bring your own data. Everything runs in your browser; nothing is uploaded.</div>
+        <p class="muted">Bring your own data. Everything runs in your browser; nothing is uploaded.</p>
       </div>
     </div>
     <div style="display:flex;gap:.5rem">
