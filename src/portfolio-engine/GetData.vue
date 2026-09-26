@@ -196,7 +196,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
-                  <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="inline-flex h-9 items-center whitespace-nowrap rounded-md border border-primary/20 bg-primary/10 px-3 text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
+                  <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="inline-flex h-9 w-20 items-center justify-center whitespace-nowrap rounded-md border border-primary/20 bg-primary/10 px-3 text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
                   <Button :variant="has(i.id) ? 'default' : 'outline'" size="sm" @click="toggle(i.id)">
                     <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
                   </Button>
