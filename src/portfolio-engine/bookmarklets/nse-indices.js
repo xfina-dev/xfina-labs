@@ -96,7 +96,7 @@
     '#xfina-bm button{height:28px;padding:0 10px;border:1px solid #3f3f46;border-radius:6px;background:0;color:#fafafa;cursor:pointer}#xfina-bm .on,#xfina-bm #xg{background:#fafafa;color:#0a0a0b;border:0;font-weight:600}' +
     '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark}#xfina-bm .w{border:1px solid #f59e0b;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:12px}</style>' +
     '<div style="display:flex;justify-content:space-between;font-weight:600;font-size:15px">Xfina - NSE Indices - Download<span id="xx" style="cursor:pointer" class="g" title="Stop and close">✕</span></div>' +
-    '<div class="g" style="margin:2px 0 8px">Saves NSE\'s own CSV files. Keep this tab in front. Nothing goes to Xfina.</div>' +
+    '<div class="g" style="margin:2px 0 8px">Keep this tab in front. Nothing goes to Xfina.</div>' +
     X.map(function (x, i) { return '<label><span>' + x[1] + '</span><span class="g" id="xr' + i + '"></span></label>'; }).join('') +
     '<div id="xc" class="g" style="display:none;margin:6px 0">From <input type="date" id="xf"> to <input type="date" id="xt"></div>' +
     '<div id="xs" style="margin-top:8px;font-size:12px"></div>' +
