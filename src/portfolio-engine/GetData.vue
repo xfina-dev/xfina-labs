@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
-import { BOOKMARKLETS } from './bookmarklets.js';
+import { bookmarkletFor } from './bookmarklets.js';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
@@ -84,7 +84,7 @@ const bySite = computed(() => {
     const shared = its.length > 1 ? [...urls.values()].filter((u) => u.n === its.length).map((u) => u.l) : [];
     const sharedUrls = new Set(shared.map((l) => l.url));
     const hows = [...new Set(its.map((i) => i.how))].map((h) => HOW[h]);
-    return { site, items: its, shared, sharedUrls, hows };
+    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its) };
   });
 });
 
@@ -222,28 +222,32 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         </CardHeader>
         <CardContent class="space-y-6">
           <!-- One-click download: a bookmarklet the user drags to the bookmarks bar, for sites that only serve their data to a page on that site -->
-          <div v-if="BOOKMARKLETS[g.site]" class="rounded-md border bg-muted/30 p-4 space-y-3">
+          <div v-if="g.bookmarklet" class="rounded-md border bg-muted/30 p-4 space-y-3">
             <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
             <ol class="list-decimal pl-5 space-y-2 text-sm">
               <li>
                 Drag this button to your bookmarks bar:
                 <a
-                  :href="BOOKMARKLETS[g.site].href" draggable="true" title="Drag me to your bookmarks bar"
+                  :href="g.bookmarklet.href" draggable="true" title="Drag me to your bookmarks bar"
                   class="ml-2 inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline align-middle"
                   @click.prevent="dragHint = true"
-                >{{ BOOKMARKLETS[g.site].label }}</a>
+                >{{ g.bookmarklet.label }}</a>
                 <span v-if="dragHint" class="ml-2 text-xs text-muted-foreground">Drag it, don't click it here.</span>
               </li>
               <li>
                 Open the site:
-                <a :href="BOOKMARKLETS[g.site].openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
-                  <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ BOOKMARKLETS[g.site].openLabel }}</Button>
+                <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
+                  <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
                 </a>
               </li>
-              <li>Click the bookmark, tick what you need and press Download. The files save to your Downloads folder. Allow multiple downloads if the browser asks.</li>
+              <li>Click the bookmark. It downloads exactly the datasets you added here. The files save to your Downloads folder. Allow multiple downloads if the browser asks.</li>
               <li>Come back to Portfolio Engine and use <strong>Import Files</strong>.</li>
             </ol>
-            <p class="text-xs text-muted-foreground">Covers {{ BOOKMARKLETS[g.site].covers }}. It runs only on that site and sends nothing to Xfina.</p>
+            <p class="text-xs text-muted-foreground">
+              Downloads: {{ g.bookmarklet.covers }}. It runs only on that site and sends nothing to Xfina.
+              <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
+              Changed your list? Drag the button again to update the bookmark.
+            </p>
           </div>
 
           <GifPreview :slug="slug(g.site)" :title="g.site" />
