@@ -132,11 +132,11 @@ const pick = () => fileInput.value.click();
         </CardDescription>
       </div>
       <div class="flex flex-wrap items-center justify-end gap-3">
-        <a :href="`/portfolio-engine/get-data/#${region}`" class="no-underline">
+        <a :href="region === 'provided' ? '/portfolio-engine/get-data/' : `/portfolio-engine/get-data/#equity/${region}`" class="no-underline">
           <Button variant="outline"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
         </a>
         <Button @click="pick"><Upload class="h-4 w-4 mr-2" />Import Files</Button>
-        <input ref="fileInput" type="file" accept=".csv" multiple class="sr-only" />
+        <input ref="fileInput" type="file" accept=".csv,.xls,.xlsx,.txt,.json" multiple class="sr-only" />
       </div>
     </CardHeader>
     <CardContent class="space-y-4">
@@ -240,7 +240,7 @@ const pick = () => fileInput.value.click();
       </Table>
 
       <p class="text-xs text-muted-foreground">
-        Loaded shows how much of an asset's full history a series covers. Files are read and validated in your browser; nothing leaves it.
+        Loaded shows how much of an asset's full history a series covers. Files are read in the format the source publishes and validated in your browser; nothing leaves it.
         Nothing is extrapolated: a run only uses dates every chosen series covers.
       </p>
     </CardContent>
