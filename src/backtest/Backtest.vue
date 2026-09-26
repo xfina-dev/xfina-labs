@@ -16,7 +16,7 @@ const SECTIONS = [
 ];
 const plan = [
   ['1 · Data: upload + validate', 'ok'], ['2 · Buy & hold, 2+ assets', 'default'], ['3 · Weights + annual rebalance + ledger', 'default'],
-  ['4 · Contributions + XIRR', 'default'], ['5 · Threshold + compare', 'default'], ['6 · FX / INR base', 'default'], ['V2 · Perpetual, inflation', 'soon'],
+  ['4 · Contributions + XIRR', 'default'], ['5 · Threshold + compare', 'default'], ['6 · FX: USD → INR', 'default'], ['V2 · Perpetual, inflation', 'soon'],
 ];
 </script>
 
