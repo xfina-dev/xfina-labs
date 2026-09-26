@@ -45,7 +45,7 @@ export const HOW = {
     site: 'NSE Indices',
     title: 'NSE Indices: Total Returns Index',
     steps: ['Open the Historical Data page.', 'Pick the index, then the Total Returns Index series (not the price series).', 'Set the widest date range the site allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
-    format: 'A table with a date and an index value, as NSE publishes it.',
+    format: 'NSE\'s own table or JSON: a row per day with the date and the index value.',
   },
   mfapi: {
     site: 'AMFI',

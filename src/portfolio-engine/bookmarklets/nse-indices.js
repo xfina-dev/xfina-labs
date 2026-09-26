@@ -2,8 +2,12 @@
   Xfina bookmarklet: NSE Indices, Total Returns Index history.
 
   It runs on niftyindices.com only, calls that site's own data endpoint (the one its historical data
-  page uses) with the visitor's own session, and saves one CSV per index to the visitor's disk.
+  page uses) with the visitor's own session, and saves one file per index to the visitor's disk.
   Nothing is sent to Xfina or anywhere else. The visitor then imports the files in Portfolio Engine.
+
+  The file is NSE's response saved exactly as received. It is parsed here only to check it is not empty
+  and to name the file; the text that is saved is never rebuilt or reformatted. Xfina reads the source's
+  own format, so there is no Xfina format to maintain.
 
   The indexes to fetch are baked in when the bookmark is generated: bookmarklet.js replaces __INDEXES__
   with the ones the user added to their download list, as JSON [["NIFTY 50","Nifty 50"], ...]. Clicking
@@ -52,16 +56,11 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json; charset=utf-8' },
       body: JSON.stringify({ cinfo: cinfo })
-    }).then(function (r) { return r.text(); }).then(function (t) { return JSON.parse(t); });
-  }
-  function toCsv(data) {
-    var lines = ['Index Name,Date,TotalReturnsIndex,NTR_Value'];
-    data.forEach(function (r) { lines.push([r['Index Name'], r.Date, r.TotalReturnsIndex, r.NTR_Value].join(',')); });
-    return lines.join('\n') + '\n';
+    }).then(function (r) { return r.text(); });
   }
   function save(filename, text) {
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv' }));
+    a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -75,11 +74,12 @@
       var name = INDEXES[k][0], label = INDEXES[k][1];
       log('Fetching ' + label + ' ...');
       try {
-        var data = await fetchIndex(name);
+        var text = await fetchIndex(name);
+        var data = JSON.parse(text);
         if (!data.length) { log('  no data returned'); continue; }
         var first = iso(data[data.length - 1].Date), last = iso(data[0].Date);
-        var file = 'nse-indices_' + label.toLowerCase().replace(/ /g, '-') + '_tri_' + first + '_' + last + '.csv';
-        save(file, toCsv(data));
+        var file = 'nse-indices_' + label.toLowerCase().replace(/ /g, '-') + '_tri_' + first + '_' + last + '.json';
+        save(file, text);
         log('  saved ' + file + ' (' + data.length + ' days)');
       } catch (e) {
         log('  failed: ' + e.message);
