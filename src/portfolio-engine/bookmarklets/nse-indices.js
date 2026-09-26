@@ -78,15 +78,13 @@
       var l = mem[x[0]] ? parse(mem[x[0]]) : null;
       var f = s;
       var t = today;
-      var ok = 1;
       if (mode === 'C') {
         if (cf) f = parse(cf);
         if (ct) t = parse(ct);
         if (f < s) f = s;
         if (t > today) t = today;
-        ok = f <= s || (l && f <= day(l, 1));
       } else if (mode === 'U' && l) f = day(l, 1);
-      return { n: x[0], l: x[1], f: f, t: t, w: wins(f, t), ok: ok, first: mode === 'U' && !l };
+      return { n: x[0], l: x[1], f: f, t: t, w: wins(f, t), first: mode === 'U' && !l };
     });
   };
 
@@ -192,7 +190,7 @@
             var e = iso(newest() || w[1]);
             document.getElementById('exportTotalindex').click();
             saved++;
-            if (p.ok && (!mem[p.n] || e > mem[p.n])) { mem[p.n] = e; save(); }
+            if (!mem[p.n] || e > mem[p.n])) { mem[p.n] = e; save(); }
             if (!(i === todo.length - 1 && k === p.w.length - 1)) {
               if (saved === FAST) {
                 q('xn').style.display = 'block';
