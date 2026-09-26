@@ -1,7 +1,6 @@
 <script setup>
 import AppShell from '@/components/AppShell.vue';
 import { Button } from '@/components/ui/button';
-import Tag from './Tag.vue';
 import DataSection from './DataSection.vue';
 import PortfolioSection from './PortfolioSection.vue';
 import RebalancingSection from './RebalancingSection.vue';
@@ -14,10 +13,6 @@ const SECTIONS = [
   { id: 'rebalancing', label: 'Rebalancing', comp: RebalancingSection },
   { id: 'results', label: 'Results', comp: ResultsSection },
 ];
-const plan = [
-  ['1 · Data: upload + validate', 'ok'], ['2 · Buy & hold, 2+ assets', 'default'], ['3 · Weights + annual rebalance + ledger', 'default'],
-  ['4 · Contributions + XIRR', 'default'], ['5 · Threshold + compare', 'default'], ['6 · FX: USD → INR', 'default'], ['V2 · Perpetual, inflation', 'soon'],
-];
 </script>
 
 <template>
@@ -26,11 +21,6 @@ const plan = [
       Multi-asset portfolio engine with bring-your-own data.<br />
       Everything runs in your browser; nothing is uploaded to any server.
     </template>
-
-    <div class="rounded-md border border-dashed border-[hsl(var(--warn)/0.6)] bg-[hsl(var(--warn)/0.07)] p-3 text-sm space-y-2">
-      <div><strong>Design mock.</strong> Every number is illustrative, not a real backtest. Items tagged <Tag variant="soon">later</Tag> are designed for but not in the first increments.</div>
-      <div class="flex flex-wrap gap-1.5"><Tag v-for="[t, v] in plan" :key="t" :variant="v" class="normal-case tracking-normal">{{ t }}</Tag></div>
-    </div>
 
     <template v-for="(s, i) in SECTIONS" :key="s.id">
       <div v-if="s.id === 'results'" class="flex justify-end">
