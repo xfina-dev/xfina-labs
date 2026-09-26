@@ -29,4 +29,14 @@ Cloudflare, as an assets-only Worker (same pattern as xsteer; all new xfina proj
 - Repo secrets required: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 - Manual deploy: `npm run build && npx wrangler deploy`
 
+### The data guide's tree
+
+`src/portfolio-engine/tree.json` (asset class → region → vehicle → asset → the three oldest instruments) is generated. Regenerate it with `npm run build:tree`. It needs network and takes a couple of minutes. Where each date comes from:
+
+- Indian funds and ETFs: the first NAV date on AMFI, via mfapi.in. This is the oldest history AMFI holds, which can be later than the fund's real launch.
+- iShares ETFs: the inception date on the fund's own page.
+- A few others (SPY, VOO, QQQ, VUAA, GLD, BIL, BNDW, EEM): a launch date typed into the script and flagged `manual`. Check these.
+
+Scope: equity is index funds and index ETFs only; gold, liquid and gilt are included as well.
+
 Adding a tool: create `<tool>/index.html` and `main.js` (mount a component inside `AppShell`), register it in `vite.config.js`, and add it to `TOOLS` in `AppHeader.vue`.
