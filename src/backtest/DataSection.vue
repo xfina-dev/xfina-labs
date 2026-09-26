@@ -80,7 +80,7 @@ const checks = [
           <div>
             <h4 class="font-semibold mb-2">Common date range</h4>
             <CoverageChart />
-            <p class="text-xs text-muted-foreground mt-1">Backtests run on the overlap, <span class="font-mono">2010-01-04 → 2026-09-21</span>. No history is extrapolated.</p>
+            <p class="text-xs text-muted-foreground mt-1">Runs use the overlap, <span class="font-mono">2010-01-04 → 2026-09-21</span>. No history is extrapolated.</p>
           </div>
         </CardContent>
       </Card>

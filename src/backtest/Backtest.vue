@@ -23,7 +23,7 @@ const plan = [
 <template>
   <AppShell tool="/backtest/">
     <template #tagline>
-      Multi-asset portfolio backtester with bring-your-own data.<br />
+      Multi-asset portfolio engine with bring-your-own data.<br />
       Everything runs in your browser; nothing is uploaded to any server.
     </template>
 

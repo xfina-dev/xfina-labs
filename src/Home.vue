@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Tag from '@/backtest/Tag.vue';
 
 const tools = [
-  { path: '/backtest/', name: 'Backtest', desc: 'Multi-asset portfolio backtester. Bring your own price data; test weights, rebalancing and cash flows.', status: 'design mock' },
+  { path: '/backtest/', name: 'Portfolio Engine', desc: 'Multi-asset portfolio engine. Bring your own price data; test weights, rebalancing and cash flows.', status: 'design mock' },
 ];
 </script>
 
