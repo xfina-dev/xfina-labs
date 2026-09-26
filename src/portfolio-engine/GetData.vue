@@ -72,6 +72,7 @@ const selectedRows = computed(() => CLASSES.map((cls) => {
   const order = (r) => REGIONS.findIndex((x) => x.id === r.region);
   return { cls, rows: [...rows.values()].sort((a, b) => order(a) - order(b)) };
 }).filter((g) => g.rows.length));
+const REGION_CODE = { india: 'IN', us: 'US', global: 'GL' };
 const regionTitle = (id) => REGIONS.find((r) => r.id === id)?.title || id;
 
 onMounted(() => {
@@ -227,7 +228,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <tbody v-for="g in selectedRows" :key="g.cls.id">
               <tr><th colspan="4" class="border-t bg-muted/40 px-2 py-1 text-left text-xs font-semibold uppercase tracking-wide">{{ g.cls.title }}</th></tr>
               <tr v-for="r in g.rows" :key="r.key" class="align-top border-t">
-                <td class="py-2 pr-3 font-medium">{{ r.asset }} <span class="text-xs font-normal text-muted-foreground">{{ regionTitle(r.region) }}</span></td>
+                <td class="py-2 pr-3 font-medium">{{ r.asset }} <Tag :title="regionTitle(r.region)">{{ REGION_CODE[r.region] || r.region }}</Tag></td>
                 <td v-for="v in VEHICLES" :key="v.id" class="py-2 pr-3">
                   <div v-for="i in r.cells[v.id]" :key="i.id" class="flex items-start justify-between gap-1">
                     <span class="min-w-0">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag> <span class="text-xs text-muted-foreground">{{ HOW[i.how].site }}</span></span>
