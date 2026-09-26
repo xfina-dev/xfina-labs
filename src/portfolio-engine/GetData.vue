@@ -228,6 +228,13 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
             <ol class="list-decimal pl-5 space-y-2 text-sm">
               <li>
+                Choose how the files are split:
+                <span class="ml-2 inline-flex rounded-md border border-border overflow-hidden align-middle">
+                  <button v-for="o in [['FY', 'Financial year'], ['CY', 'Calendar year']]" :key="o[0]" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="split === o[0] ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="split = o[0]">{{ o[1] }}</button>
+                </span>
+                <span class="text-xs text-muted-foreground ml-2">The buttons below are generated from this choice.</span>
+              </li>
+              <li>
                 Drag {{ g.bookmarklet.bookmarks.length > 1 ? 'these buttons' : 'this button' }} to your bookmarks bar, one per index:
                 <div class="mt-2 flex flex-wrap gap-2">
                   <a
@@ -243,13 +250,6 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
                   <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
                 </a>
-              </li>
-              <li>
-                Choose how the files are split:
-                <span class="ml-2 inline-flex rounded-md border border-border overflow-hidden align-middle">
-                  <button v-for="o in [['FY', 'Financial year'], ['CY', 'Calendar year']]" :key="o[0]" type="button" class="px-3 h-8 text-sm font-medium transition-colors" :class="split === o[0] ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-accent'" @click="split = o[0]">{{ o[1] }}</button>
-                </span>
-                <span class="text-xs text-muted-foreground ml-2">Drag the buttons again after changing this.</span>
               </li>
               <li>In each tab, click that index's bookmark. Each shows its own progress bar and runs alongside the others.</li>
               <li>It works the page's form for you and presses the page's own <strong>csv format</strong> button, one {{ split === 'FY' ? 'financial' : 'calendar' }} year at a time, pausing between files like a person would. The page won't export more than a year at once, so a long index takes a few minutes.</li>
