@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Tag from './Tag.vue';
 import Field from './Field.vue';
-import HelpDataDialog from './HelpDataDialog.vue';
 
 const END = '2026-09-21';
 const day = (d) => new Date(d).getTime() / 86400000;
@@ -133,9 +132,9 @@ const pick = () => fileInput.value.click();
         </CardDescription>
       </div>
       <div class="flex flex-wrap items-center justify-end gap-3">
-        <HelpDataDialog>
+        <a :href="`/portfolio-engine/get-data/#${region}`" class="no-underline">
           <Button variant="outline"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
-        </HelpDataDialog>
+        </a>
         <Button @click="pick"><Upload class="h-4 w-4 mr-2" />Import Files</Button>
         <input ref="fileInput" type="file" accept=".csv" multiple class="sr-only" />
       </div>
