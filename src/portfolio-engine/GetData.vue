@@ -6,56 +6,40 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
-import { CLASSES, REGIONS, HOW, vehiclesFor, listingsFor, assetsFor, instrumentsFor, indexesFor, findDataset, dateNote, dateSourceNote } from './guide.js';
+import { CLASSES, REGIONS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote } from './guide.js';
 
-// The wizard: asset class → region → model as → (Irish or US ETFs) → asset → the oldest three.
-// The path lives in the URL hash, e.g. #equity/india/etf/Nifty%2050, so a link lands on the same step.
+// The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
+// Every asset for that path is then listed as a group with its oldest three. The path lives in the
+// URL hash, e.g. #equity/us/etf/irish, so a link lands on the same step.
 const cls = ref(null);
 const region = ref(null);
 const vehicle = ref(null);
 const listing = ref(null);
-const asset = ref(null);
 
 const vehicles = computed(() => (cls.value && region.value ? vehiclesFor(cls.value, region.value) : []));
-const isIndex = computed(() => vehicle.value === 'index');
-// India has no US/Irish split and indexes have no ETF listing, so the listing choice only shows for US and Global ETFs.
-const showListing = computed(() => !isIndex.value && region.value !== 'india');
-
-const indexes = computed(() => (isIndex.value ? indexesFor(cls.value, region.value) : []));
 const listings = computed(() => (cls.value && region.value && vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : []));
-const needsListing = computed(() => listings.value.length > 0);
-const assets = computed(() => (vehicle.value && (!needsListing.value || listing.value) ? assetsFor(cls.value, region.value, vehicle.value, listing.value) : []));
-const items = computed(() => (asset.value && assets.value.includes(asset.value) ? instrumentsFor(cls.value, region.value, vehicle.value, listing.value, asset.value) : []));
+// The fourth lane exists only when there is a listing to choose: US and Global ETFs.
+const showListing = computed(() => listings.value.length > 0);
+const groups = computed(() => (vehicle.value && (!showListing.value || listing.value) ? groupsFor(cls.value, region.value, vehicle.value, listing.value) : []));
 
 // Choosing a step clears the ones after it, because their options depend on it. Irish ETFs are the
-// default for US and Global, and the first asset is chosen so the oldest three show straight away.
-const firstAsset = () => (asset.value = assetsFor(cls.value, region.value, vehicle.value, listing.value)[0] || null);
+// default for US and Global.
 const pick = (which, v) => {
-  if (which === 'cls') { cls.value = v; region.value = vehicle.value = listing.value = asset.value = null; }
-  if (which === 'region') { region.value = v; vehicle.value = listing.value = asset.value = null; }
-  if (which === 'vehicle') {
-    vehicle.value = v; asset.value = null;
-    listing.value = v === 'etf' ? listingsFor(cls.value, region.value)[0]?.id || null : null;
-    // Indexes are just listed, so there is no asset to choose.
-    if (v !== 'index') firstAsset();
-  }
-  if (which === 'listing') { listing.value = v; firstAsset(); }
-  if (which === 'asset') asset.value = v;
+  if (which === 'cls') { cls.value = v; region.value = vehicle.value = listing.value = null; }
+  if (which === 'region') { region.value = v; vehicle.value = listing.value = null; }
+  if (which === 'vehicle') { vehicle.value = v; listing.value = v === 'etf' ? listingsFor(cls.value, region.value)[0]?.id || null : null; }
+  if (which === 'listing') listing.value = v;
 };
-const toHash = () => [cls.value, region.value, vehicle.value, listing.value, asset.value && encodeURIComponent(asset.value)].filter(Boolean).join('/');
+const toHash = () => [cls.value, region.value, vehicle.value, listing.value].filter(Boolean).join('/');
 const fromHash = () => {
-  const [c, r, v, ...rest] = location.hash.slice(1).split('/');
+  const [c, r, v, l] = location.hash.slice(1).split('/');
   cls.value = CLASSES.some((x) => x.id === c) ? c : null;
   region.value = cls.value && REGIONS.some((x) => x.id === r) ? r : null;
   vehicle.value = region.value && vehiclesFor(cls.value, region.value).some((x) => x.id === v) ? v : null;
-  listing.value = null; asset.value = null;
-  if (!vehicle.value || vehicle.value === 'index') return;
-  const ls = v === 'etf' ? listingsFor(cls.value, region.value) : [];
-  if (ls.length) listing.value = ls.some((x) => x.id === rest[0]) ? rest.shift() : ls[0].id;
-  const a = rest[0] ? decodeURIComponent(rest[0]) : null;
-  asset.value = a && assetsFor(cls.value, region.value, vehicle.value, listing.value).includes(a) ? a : assetsFor(cls.value, region.value, vehicle.value, listing.value)[0] || null;
+  const ls = vehicle.value === 'etf' ? listingsFor(cls.value, region.value) : [];
+  listing.value = ls.length ? (ls.some((x) => x.id === l) ? l : ls[0].id) : null;
 };
-watch([cls, region, vehicle, listing, asset], () => { try { history.replaceState(null, '', `#${toHash()}`); } catch { /* ignore */ } });
+watch([cls, region, vehicle, listing], () => { try { history.replaceState(null, '', `#${toHash()}`); } catch { /* ignore */ } });
 
 // What the user added, by instrument id. Kept in this browser only.
 const STORE = 'xfina_labs_guide_selection_v3';
@@ -115,7 +99,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-6">
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div class="grid gap-6 md:grid-cols-2" :class="showListing ? 'lg:grid-cols-4' : 'lg:grid-cols-3'">
           <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">1</span>Asset class</h3>
             <div class="grid gap-2">
@@ -144,69 +128,45 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </section>
 
-          <!-- Lane 4 is always there, so the picker keeps four lanes. It holds the ETF listing (US and Global
-               only) and the asset. For an index it stays empty: indexes are simply listed below. -->
-          <section class="space-y-2" :class="!isIndex && !assets.length && !needsListing && 'opacity-50 pointer-events-none'">
-            <template v-if="!isIndex">
-              <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>{{ showListing ? 'ETFs and asset' : 'Asset' }}</h3>
-              <div v-if="showListing" class="grid grid-cols-2 gap-2" :class="!needsListing && 'opacity-50 pointer-events-none'">
-                <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
-                  <div class="font-medium text-sm">{{ l.title }}</div>
-                </button>
-                <p v-if="!needsListing" class="col-span-2 text-xs text-muted-foreground">Pick ETF above.</p>
-              </div>
-              <div class="grid gap-2">
-                <button v-for="a in assets" :key="a" type="button" :class="tile(asset === a)" @click="pick('asset', a)">
-                  <div class="font-medium">{{ a }}</div>
-                </button>
-              </div>
-            </template>
+          <!-- Only for US and Global ETFs. Irish ETFs are the default. -->
+          <section v-if="showListing" class="space-y-2">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>Which ETFs</h3>
+            <div class="grid gap-2">
+              <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
+                <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground">{{ l.blurb }}</div>
+              </button>
+            </div>
           </section>
         </div>
 
-        <!-- Indexes: no ETF listing or asset lane, every index for the region is listed -->
-        <section v-if="isIndex" class="space-y-4 border-t pt-6">
-          <h3 class="text-sm font-semibold">Indexes</h3>
-          <p v-if="!indexes.length" class="text-sm text-muted-foreground">Nothing is listed for this yet.</p>
-          <ul v-else class="divide-y rounded-md border">
-            <li v-for="i in indexes" :key="i.id" class="flex flex-wrap items-center justify-between gap-3 p-3">
-              <div class="min-w-0">
-                <div class="font-medium">{{ i.name }}</div>
-                <div class="text-xs text-muted-foreground mt-0.5">
-                  <span class="font-mono text-foreground">{{ dateNote(i) }}</span><span v-if="dateSourceNote(i)"> ({{ dateSourceNote(i) }})</span> · {{ i.ccy }} · {{ i.returnType }}
-                </div>
-              </div>
-              <Button :variant="has(i.id) ? 'default' : 'outline'" size="sm" @click="toggle(i.id)">
-                <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
-              </Button>
-            </li>
-          </ul>
-        </section>
-
-        <section v-else-if="asset" class="space-y-4 border-t pt-6">
+        <!-- Every asset for the path, grouped, each with its oldest three -->
+        <section v-if="vehicle" class="space-y-6 border-t pt-6">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 class="text-sm font-semibold">{{ items.length > 1 ? `The ${items.length} with the longest history` : 'Available' }} · {{ asset }}</h3>
-            <span class="text-xs text-muted-foreground">Oldest first</span>
+            <h3 class="text-sm font-semibold">Datasets</h3>
+            <span v-if="vehicle !== 'index'" class="text-xs text-muted-foreground">The three with the longest history for each, oldest first</span>
           </div>
-          <ol class="divide-y rounded-md border">
-            <li v-for="(i, k) in items" :key="i.id" class="flex flex-wrap items-center justify-between gap-3 p-3">
-              <div class="flex items-start gap-3 min-w-0">
-                <span class="inline-grid place-items-center w-6 h-6 shrink-0 rounded-full bg-muted text-xs font-semibold">{{ k + 1 }}</span>
-                <div class="min-w-0">
-                  <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10">{{ i.code }}</Tag> <Tag v-if="i.plan" variant="warn">{{ i.plan }}</Tag></div>
-                  <div class="text-xs text-muted-foreground mt-0.5">
-                    <span class="font-mono text-foreground">{{ dateNote(i) }}</span>
-                    <span v-if="dateSourceNote(i)"> ({{ dateSourceNote(i) }})</span> · {{ i.ccy }} · {{ i.returnType }}
+          <p v-if="!groups.length" class="text-sm text-muted-foreground">Nothing is listed for this yet.</p>
+          <div v-for="g in groups" :key="g.asset" class="space-y-2">
+            <div class="text-sm font-medium">{{ g.asset }}</div>
+            <ol class="divide-y rounded-md border">
+              <li v-for="(i, k) in g.instruments" :key="i.id" class="flex flex-wrap items-center justify-between gap-3 p-3">
+                <div class="flex items-start gap-3 min-w-0">
+                  <span v-if="vehicle !== 'index'" class="inline-grid place-items-center w-6 h-6 shrink-0 rounded-full bg-muted text-xs font-semibold">{{ k + 1 }}</span>
+                  <div class="min-w-0">
+                    <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10">{{ i.code }}</Tag> <Tag v-if="i.plan" variant="warn">{{ i.plan }}</Tag></div>
+                    <div class="text-xs text-muted-foreground mt-0.5">
+                      <span class="font-mono text-foreground">{{ dateNote(i) }}</span>
+                      <span v-if="dateSourceNote(i)"> ({{ dateSourceNote(i) }})</span> · {{ i.ccy }} · {{ i.returnType }}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <Button :variant="has(i.id) ? 'default' : 'outline'" size="sm" @click="toggle(i.id)">
-                <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
-              </Button>
-            </li>
-          </ol>
+                <Button :variant="has(i.id) ? 'default' : 'outline'" size="sm" @click="toggle(i.id)">
+                  <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
+                </Button>
+              </li>
+            </ol>
+          </div>
         </section>
-        <p v-else-if="vehicle && !isIndex" class="text-sm text-muted-foreground">Choose an asset to see its oldest datasets.</p>
       </CardContent>
     </Card>
 
