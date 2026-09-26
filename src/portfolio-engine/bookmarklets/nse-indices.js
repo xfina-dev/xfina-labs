@@ -1,7 +1,7 @@
 /*
   Xfina bookmarklet: NSE Indices, Total Returns Index history. Made once, used again and again.
 
-  Runs on niftyindices.com only. It opens a small panel, one row per index, and on Start does what a person does on
+  Runs on niftyindices.com only. It opens a small panel, one row per index (showing 2/12 files while running; two small rings at the top right show files done and the wait before the next file), and on Start does what a person does on
   the Historical Data page: opens "Total returns Index Values", picks an index, sets a date range, presses Submit,
   then presses the page's own "csv format" button. The files are the ones the page produces, named by the page,
   exactly as a manual download. Where the browser allows it (Chrome, Edge) Start asks for a folder once and the files
@@ -86,23 +86,31 @@
         if (f < s) f = s;
         if (t > today) t = today;
       } else if (mode === 'U' && l) f = day(l, 1);
-      return { n: x[0], l: x[1], f: f, t: t, w: wins(f, t), first: mode === 'U' && !l };
+      return { i: i, n: x[0], l: x[1], f: f, t: t, w: wins(f, t), first: mode === 'U' && !l };
     });
   };
 
+  var ring = function (id, tip) {
+    return '<svg id="' + id + '" width="28" height="28" viewBox="0 0 28 28" style="display:none"><title>' + tip + '</title><circle cx="14" cy="14" r="11" fill="none" stroke="#27272a" stroke-width="3"/><circle cx="14" cy="14" r="11" fill="none" stroke="#4ade80" stroke-width="3" stroke-dasharray="69.1" stroke-dashoffset="69.1" transform="rotate(-90 14 14)"/><text x="14" y="17" text-anchor="middle" font-size="9" fill="#fafafa"></text></svg>';
+  };
+  var turn = function (id, f, t) {
+    var e = q(id);
+    e.style.display = 'block';
+    e.children[2].setAttribute('stroke-dashoffset', 69.1 * (1 - f));
+    e.lastChild.textContent = t;
+  };
   var box = document.createElement('div');
   box.id = 'xfina-bm';
   box.innerHTML =
     '<style>#xfina-bm{position:fixed;top:16px;right:16px;z-index:2147483647;width:400px;max-height:92vh;overflow:auto;background:#0a0a0b;color:#fafafa;font:13px/1.5 system-ui,sans-serif;border:1px solid #3f3f46;border-radius:8px;padding:14px;box-shadow:0 8px 30px #0008}' +
     '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm label{display:flex;gap:8px;align-items:baseline;margin:2px 0;}#xfina-bm label .g{margin-left:auto;text-align:right}' +
     '#xfina-bm button{height:28px;padding:0 10px;border:1px solid #3f3f46;border-radius:6px;background:0;color:#fafafa;cursor:pointer}#xfina-bm .on,#xfina-bm #xg{background:#fafafa;color:#0a0a0b;border:0;font-weight:600}' +
-    '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark}#xfina-bm .w{border:1px solid #f59e0b;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:12px}</style>' +
-    '<div style="display:flex;justify-content:space-between;font-weight:600;font-size:15px">Xfina - NSE Indices - Download<span id="xx" style="cursor:pointer" class="g" title="Stop and close">✕</span></div>' +
+    '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark}#xfina-bm #xs:empty{display:none}#xfina-bm .w{border:1px solid #f59e0b;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:12px}</style>' +
+    '<div style="display:flex;justify-content:space-between;font-weight:600;font-size:15px">Xfina - NSE Indices - Download<span style="display:flex;gap:8px;align-items:center">' + ring('xo', 'Files done') + ring('xz', 'Next file in (seconds)') + '<span id="xx" style="cursor:pointer" class="g" title="Stop and close">✕</span></span></div>' +
     '<div class="g" style="margin:2px 0 8px">Keep this tab in front. Nothing goes to Xfina.</div>' +
     X.map(function (x, i) { return '<label><span>' + x[1] + '</span><span class="g" id="xr' + i + '"></span></label>'; }).join('') +
     '<div id="xc" class="g" style="display:none;margin:6px 0">From <input type="date" id="xf"> to <input type="date" id="xt"></div>' +
     '<div id="xs" style="margin-top:8px;font-size:12px"></div>' +
-    '<div style="height:4px;background:#27272a;border-radius:4px;margin:4px 0 8px"><div id="xb" style="height:100%;width:0;background:#4ade80"></div></div>' +
     '<div class="w" id="xn" style="display:none">Your browser may ask to allow multiple downloads: choose <b>Allow</b>. Carrying on in <b id="xk"></b>s. <u id="xu" style="cursor:pointer">Continue now</u></div>' +
     '<div class="w" id="xw" style="display:none">Your browser blocks storage for this site, so Update will fetch the full history each time.</div>' +
     '<div style="display:flex;gap:6px;margin-top:8px">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (m) { return '<button id="xm' + m[0] + '">' + m[1] + '</button>'; }).join('') + '<button id="xg" style="margin-left:auto;padding:0 18px">Start</button></div>';
@@ -160,9 +168,10 @@
     q('xg').textContent = 'Cancel';
     var saved = 0;
     var done = 0;
-    var cur = '';
-    var say = function (t) { cur = t; q('xs').textContent = t; };
-    var nap = async function (n) { for (; n > 0 && !stop; n--) { q('xs').textContent = cur + ' · saved, next file in ' + n + 's'; await pause(1000); } };
+    var say = function (t) { q('xs').textContent = t; };
+    var nap = async function (m) { for (var n = m; n > 0 && !stop; n--) { turn('xz', n / m, n); await pause(1000); } q('xz').style.display = 'none'; };
+    say('');
+    q('xo').style.display = 'none';
     var dir = null;
     if (window.showDirectoryPicker) {
       say('Choose a folder for the files (asked once)...');
@@ -171,7 +180,6 @@
     var gentle = function (a, b) { return pause(saved >= FAST || dir ? a + Math.random() * (b - a) : 250); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
-      say('Opening the page\'s Total Returns section...');
       document.querySelector('li.form5').click();
       await pause(1200);
       $('#ddlHistoricalreturntypee').val('Equity').trigger('change');
@@ -183,10 +191,10 @@
         var p = todo[i];
         if (!$('#ddlHistoricalreturntypeeindex option').filter(function () { return this.value === p.n; }).length) { done += p.w.length; continue; }
         $('#ddlHistoricalreturntypeeindex').val(p.n).trigger('change');
+        q('xr' + p.i).textContent = '0/' + p.w.length + ' files';
         await gentle(800, 1500);
         for (var k = 0; k < p.w.length && !stop; k++) {
           var w = p.w[k];
-          say(p.l + ' (' + (i + 1) + '/' + todo.length + '), file ' + (k + 1) + '/' + p.w.length + ': ' + nice(w[0]) + ' to ' + nice(w[1]));
           var before = first();
           $('#datepickerFromtotalindex').datepicker('setDate', w[0]);
           $('#datepickerTototalindex').datepicker('setDate', w[1]);
@@ -207,6 +215,7 @@
               await ws.close();
             } else ex.click();
             saved++;
+            q('xr' + p.i).textContent = (k + 1) + '/' + p.w.length + ' files';
             if (!mem[p.n] || e > mem[p.n]) { mem[p.n] = e; save(); }
             if (!(i === todo.length - 1 && k === p.w.length - 1)) {
               if (dir) await nap(4 + Math.floor(Math.random() * 4));
@@ -219,7 +228,7 @@
             }
           }
           done++;
-          q('xb').style.width = Math.round((100 * done) / r.n) + '%';
+          turn('xo', done / r.n, done);
         }
       }
       say(stop ? 'Stopped.' : 'Done: ' + saved + ' files saved' + (dir ? ' to the folder you chose.' : ' by your browser.'));
