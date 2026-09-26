@@ -1,7 +1,7 @@
 /*
   Xfina bookmarklet: NSE Indices, Total Returns Index history. Made once, used again and again.
 
-  Runs on niftyindices.com only. It opens a small panel, one row per index (showing 2/12 files while running; two small rings at the top right show files done and the wait before the next file), and on Start does what a person does on
+  Runs on niftyindices.com only. It opens a small panel, one row per index (showing 2/12 files while running; two small rings at the top right show files done and the wait before the next file, always 8 seconds), and on Start does what a person does on
   the Historical Data page: opens "Total returns Index Values", picks an index, sets a date range, presses Submit,
   then presses the page's own "csv format" button. The files are the ones the page produces, named by the page,
   exactly as a manual download. Where the browser allows it (Chrome, Edge) Start asks for a folder once and the files
@@ -32,6 +32,7 @@
   var DAY = 864e5;
   var FAST = 3;
   var WAIT = 15;
+  var GAP = 8;
   var MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
   var host = location.hostname;
   if (host.replace(/^www\./, '') !== HOST) { alert('Xfina: open niftyindices.com (Reports, Historical Data) and click this bookmark again.'); return; }
@@ -115,6 +116,8 @@
     '<div class="w" id="xw" style="display:none">Your browser blocks storage for this site, so Update will fetch the full history each time.</div>' +
     '<div style="display:flex;gap:6px;margin-top:8px">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (m) { return '<button id="xm' + m[0] + '">' + m[1] + '</button>'; }).join('') + '<button id="xg" style="margin-left:auto;padding:0 18px">Start</button></div>';
   document.body.appendChild(box);
+  turn('xo', 0, 0);
+  turn('xz', 1, GAP);
 
   var render = function () {
     var p = plan();
@@ -169,16 +172,16 @@
     var saved = 0;
     var done = 0;
     var say = function (t) { q('xs').textContent = t; };
-    var nap = async function (m) { for (var n = m; n > 0 && !stop; n -= 0.25) { turn('xz', n / m, Math.ceil(n)); await pause(250); } turn('xz', 0, ''); };
+    var nap = async function (m) { for (var n = m; n > 0 && !stop; n -= 0.25) { turn('xz', n / m, Math.ceil(n)); await pause(250); } turn('xz', 1, GAP); };
     say('');
     turn('xo', 0, 0);
-    turn('xz', 0, '');
+    turn('xz', 1, GAP);
     var dir = null;
     if (window.showDirectoryPicker) {
       say('Choose a folder for the files (asked once)...');
       try { dir = await window.showDirectoryPicker({ mode: 'readwrite' }); } catch (e0) { dir = null; }
     }
-    var gentle = function (a, b) { return saved >= FAST || dir ? nap((a + Math.random() * (b - a)) / 1000) : pause(250); };
+    var gentle = function () { return pause(1000); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
       document.querySelector('li.form5').click();
@@ -219,13 +222,12 @@
             q('xr' + p.i).textContent = (k + 1) + '/' + p.w.length + ' files';
             if (!mem[p.n] || e > mem[p.n]) { mem[p.n] = e; save(); }
             if (!(i === todo.length - 1 && k === p.w.length - 1)) {
-              if (dir) await nap(4 + Math.floor(Math.random() * 4));
-              else if (saved === FAST) {
+              if (!dir && saved === FAST) {
                 q('xn').style.display = 'block';
                 skip = 0;
                 for (var s = WAIT; s > 0 && !skip && !stop; s--) { q('xk').textContent = s; turn('xz', s / WAIT, s); await pause(1000); }
-                q('xn').style.display = 'none'; turn('xz', 0, '');
-              } else if (saved >= FAST) await nap(3.5 + Math.random() * 3);
+                q('xn').style.display = 'none'; turn('xz', 1, GAP);
+              } else await nap(GAP);
             }
           }
           done++;
