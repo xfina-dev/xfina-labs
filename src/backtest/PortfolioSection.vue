@@ -55,7 +55,7 @@ const period = ref('Whole period');
 
     <div class="space-y-8">
       <Card class="bg-card border-border shadow-sm">
-        <CardHeader class="pb-4"><CardTitle class="text-xl">Investment</CardTitle><CardDescription>Inputs follow the RealValue SIP engine.</CardDescription></CardHeader>
+        <CardHeader class="pb-4"><CardTitle class="text-xl">Monthly Investment</CardTitle><CardDescription>What you start with and what you add each month.</CardDescription></CardHeader>
         <CardContent class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <Field v-model="lumpsum" label="Lumpsum" />
