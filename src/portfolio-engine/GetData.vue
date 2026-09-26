@@ -296,7 +296,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 </a>
               </li>
               <li>
-                Click the bookmark. A small panel opens on that page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new since your last run. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the files it will download before you press Start.
+                Click the bookmark. A small panel opens on that page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new, starting the day after the newest date it already has. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the files it will download before you press Start.
               </li>
               <li>Press <strong>Start</strong> and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
               <li>It fills in the page's form and presses its <strong>csv format</strong> button for you, index after index. The first three files go out back to back so your browser asks to <strong>allow multiple downloads</strong>: choose Allow. It waits about 15 seconds for that (or press Continue now in its panel), then carries on at a gentler pace with a short pause between files. That's the same download you'd do by hand, without the clicking.</li>
