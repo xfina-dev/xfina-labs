@@ -13,8 +13,8 @@ import tree from './tree.json';
 
 export const CLASSES = [
   { id: 'equity', title: 'Equity', blurb: 'Stock indices, index ETFs and index funds' },
-  { id: 'gold', title: 'Gold', blurb: 'Gold price, gold ETFs and gold funds' },
   { id: 'debt', title: 'Debt', blurb: 'Short and long duration government debt' },
+  { id: 'gold', title: 'Gold', blurb: 'Gold price, gold ETFs and gold funds' },
 ];
 export const REGIONS = [
   { id: 'india', title: 'India', blurb: 'INR, Indian markets' },

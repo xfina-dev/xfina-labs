@@ -7,8 +7,17 @@ import nseEtf from './bookmarklets/nse-etf.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
 import { nodes } from './guide.js';
 
-// The indexes the NSE Indices page lists under Total Returns (Broad Market). Debt indices are not among them.
+// The equity indexes the NSE Indices page lists under Total Returns (Broad Market).
 const NSE_SUPPORTED = ['Nifty 50', 'Nifty Next 50', 'Nifty Midcap 150', 'Nifty Smallcap 250'];
+
+// Debt indexes are not under Total Returns. The site serves them under Historical Index Data (Fixed Income), keyed by
+// the catalogue's name for the index: [the page's index name, its group there, a label].
+const NSE_DEBT = {
+  'Nifty 10 yr Benchmark G-Sec Index': ['NIFTY 10 YR BENCHMARK G-SEC', 'Government Securities', 'Nifty 10 yr Benchmark G-Sec'],
+  'NSE short-duration debt index (Liquid or 1D Rate)': ['NIFTY 1D RATE INDEX', 'Money Market', 'Nifty 1D Rate Index'],
+};
+// When the catalogue has no start date for a debt index, ask from here; earlier years just come back empty.
+const DEBT_FROM = '2010-01-01';
 
 const BUILDERS = {
   'NSE Indices': (items) => {
@@ -17,8 +26,12 @@ const BUILDERS = {
     const all = nodes
       .filter((n) => n.vehicle === 'index' && n.class === 'equity' && n.region === 'india' && NSE_SUPPORTED.includes(n.asset))
       .flatMap((n) => n.instruments.filter((i) => i.inception).map((i) => [n.asset.toUpperCase(), n.asset, i.inception]));
-    const supported = items.filter((i) => i.kind === 'Index' && NSE_SUPPORTED.includes(i.asset));
+    const supported = items.filter((i) => i.kind === 'Index' && (NSE_SUPPORTED.includes(i.asset) || NSE_DEBT[i.name]));
     const chosen = all.filter((x) => supported.some((i) => i.asset === x[1]));
+    supported.filter((i) => NSE_DEBT[i.name]).forEach((i) => {
+      const d = NSE_DEBT[i.name];
+      chosen.push([d[0], d[2], i.inception || DEBT_FROM, 'h', 'Fixed Income', d[1]]);
+    });
     if (!chosen.length) return null;
     return {
       site: 'NSE Indices',

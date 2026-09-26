@@ -7,6 +7,11 @@
   exactly as a manual download. Where the browser allows it (Chrome, Edge) Start asks for a folder once and the files
   are written there with no further prompts; otherwise the browser downloads them as usual. Nothing is sent to Xfina.
 
+  Equity indexes are taken from Total returns Index Values. Debt indexes are not offered there, so they are taken from
+  Historical Index Data (Fixed Income): the same steps on that form, and NSE's own file for it (named ..._Historical_PR_...,
+  the index level: Date, Open, High, Low, Close). An entry is [page name, label, first date] for equity, or
+  [page name, label, first date, "h", "Fixed Income", group] for debt.
+
   Modes: Update (default) fetches only what is new: it remembers, per index, the newest date that came back and
   starts the day after (an index it has never done gets its full history). Full history redoes everything from each
   index's start. Custom takes a start and an end date. The end is today unless a custom end is set. Files for
@@ -45,6 +50,10 @@
   var old = document.getElementById('xfina-bm');
   if (old) old.remove();
 
+  var SEC = {
+    t: { li: 'li.form5', ty: '#ddlHistoricalreturntypee', su: '#ddlHistoricalreturntypeeSubindex', ix: '#ddlHistoricalreturntypeeindex', from: '#datepickerFromtotalindex', to: '#datepickerTototalindex', go: '#submit_totalindexhistorical', ex: '#exportTotalindex', rows: '#historytotalindex tr' },
+    h: { li: 'li.form1', ty: '#ddlHistoricaltypee', su: '#ddlHistoricaltypeeSubindex', ix: '#ddlHistoricaltypeeindex', from: '#datepickerFrom', to: '#datepickerTo', go: '#submit_button', ex: '#exporthistorical', rows: '#history tr' }
+  };
   var q = function (id) { return document.getElementById(id); };
   var day = function (d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); };
   var parse = function (s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); };
@@ -102,7 +111,7 @@
         if (f < s) f = s;
         if (t > today) t = today;
       } else if (mode === 'U' && l) f = day(l, 1);
-      return { i: i, n: x[0], l: x[1], f: f, t: t, w: wins(f, t), first: mode === 'U' && !l };
+      return { i: i, n: x[0], l: x[1], k: x[3] || 't', ty: x[4] || 'Equity', g: x[5] || 'Broad Market Indices', f: f, t: t, w: wins(f, t), first: mode === 'U' && !l };
     });
   };
 
@@ -165,7 +174,8 @@
 
   var alerts = [];
   var realAlert = window.alert;
-  var rows = function () { return document.querySelectorAll('#historytotalindex tr'); };
+  var cur = SEC.t;
+  var rows = function () { return document.querySelectorAll(cur.rows); };
   var first = function () { var r = rows(); return r.length > 1 ? r[1].textContent : ''; };
   var newest = function () {
     var r = rows();
@@ -211,48 +221,54 @@
     window.alert = function (m) { alerts.push(String(m)); };
     try {
       var tap = function (el) { ['mousedown', 'mouseup', 'click'].forEach(function (t) { el.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })); }); };
-      var menu = document.querySelector('a.btn-select');
-      var li = document.querySelector('li.form5');
-      if (menu && !menu.classList.contains('active')) {
-        await look(menu);
-        tap(menu);
-        await pause(700);
-      }
-      await look(li);
-      tap(li);
-      await pause(800);
-      await look('#ddlHistoricalreturntypee');
-      $('#ddlHistoricalreturntypee').val('Equity').trigger('change');
-      if (!(await wait(function () { return $('#ddlHistoricalreturntypeeSubindex option').length > 1; }, 10000))) throw new Error('the page did not list index groups');
-      await look('#ddlHistoricalreturntypeeSubindex');
-      $('#ddlHistoricalreturntypeeSubindex').val('Broad Market Indices').trigger('change');
-      if (!(await wait(function () { return $('#ddlHistoricalreturntypeeindex option').length > 1; }, 10000))) throw new Error('the page did not list indexes');
       var todo = r.p.filter(function (p) { return p && p.w.length; });
+      todo.sort(function (a, b) { return (a.k + a.ty + a.g < b.k + b.ty + b.g) ? -1 : (a.k + a.ty + a.g > b.k + b.ty + b.g) ? 1 : a.i - b.i; });
+      var at = '';
       for (var i = 0; i < todo.length && !stop; i++) {
         var p = todo[i];
-        if (!$('#ddlHistoricalreturntypeeindex option').filter(function () { return this.value === p.n; }).length) { done += p.w.length; continue; }
-        await look('#ddlHistoricalreturntypeeindex');
-        $('#ddlHistoricalreturntypeeindex').val(p.n).trigger('change');
+        cur = SEC[p.k];
+        if (at !== p.k + p.ty + p.g) {
+          var menu = document.querySelector('a.btn-select');
+          var li = document.querySelector(cur.li);
+          if (menu && !menu.classList.contains('active')) {
+            await look(menu);
+            tap(menu);
+            await pause(700);
+          }
+          await look(li);
+          tap(li);
+          await pause(800);
+          await look(cur.ty);
+          $(cur.ty).val(p.ty).trigger('change');
+          if (!(await wait(function () { return $(cur.su + ' option').length > 1; }, 10000))) throw new Error('the page did not list index groups');
+          await look(cur.su);
+          $(cur.su).val(p.g).trigger('change');
+          if (!(await wait(function () { return $(cur.ix + ' option').length > 1; }, 10000))) throw new Error('the page did not list indexes');
+          at = p.k + p.ty + p.g;
+        }
+        if (!$(cur.ix + ' option').filter(function () { return this.value === p.n; }).length) { q('xr' + p.i).textContent = 'not on the page'; done += p.w.length; continue; }
+        await look(cur.ix);
+        $(cur.ix).val(p.n).trigger('change');
         q('xr' + p.i).textContent = '0/' + p.w.length + ' files';
         await gentle(800, 1500);
         for (var k = 0; k < p.w.length && !stop; k++) {
           var w = p.w[k];
           var before = first();
-          await look('#datepickerFromtotalindex');
-          put('#datepickerFromtotalindex', w[0]);
-          await look('#datepickerTototalindex');
-          put('#datepickerTototalindex', w[1]);
+          await look(cur.from);
+          put(cur.from, w[0]);
+          await look(cur.to);
+          put(cur.to, w[1]);
           var half = (6 + Math.floor(Math.random() * 4)) / 2;
           await nap(half);
           alerts = [];
-          await look('#submit_totalindexhistorical');
-          document.getElementById('submit_totalindexhistorical').click();
+          await look(cur.go);
+          $(cur.go)[0].click();
           var got = await wait(function () { return alerts.length || (first() && first() !== before); }, 20000);
           if (alerts.length) throw new Error(alerts[0]);
           if (got) {
             await nap(half);
             var e = iso(newest() || w[1]);
-            var ex = document.getElementById('exportTotalindex');
+            var ex = $(cur.ex)[0];
             await look(ex);
             if (dir) {
               $(ex).triggerHandler('click');
