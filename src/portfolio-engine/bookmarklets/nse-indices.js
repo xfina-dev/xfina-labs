@@ -50,6 +50,15 @@
   var parse = function (s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); };
   var iso = function (d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
   var nice = function (d) { return MON[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); };
+  var look = async function (el) {
+    el = $(el)[0];
+    if (!el) return;
+    el.scrollIntoView({ block: 'center' });
+    var o = el.style.outline;
+    el.style.outline = '3px solid #4ade80';
+    await pause(600);
+    el.style.outline = o;
+  };
   var pause = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   var today = day(new Date(), 0);
 
@@ -117,6 +126,14 @@
     '<div class="w" id="xw" style="display:none">Your browser blocks storage for this site, so Update will fetch the full history each time.</div>' +
     '<div style="display:flex;gap:6px;margin-top:8px">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (m) { return '<button id="xm' + m[0] + '">' + m[1] + '</button>'; }).join('') + '<button id="xg" style="margin-left:auto;padding:0 18px">Start</button></div>';
   document.body.appendChild(box);
+  box.firstElementChild.style.cursor = 'move';
+  box.firstElementChild.onmousedown = function (ev) {
+    if (ev.target.id === 'xx') return;
+    var dx = ev.clientX - box.offsetLeft;
+    var dy = ev.clientY - box.offsetTop;
+    document.onmousemove = function (m) { box.style.left = m.clientX - dx + 'px'; box.style.top = m.clientY - dy + 'px'; box.style.right = 'auto'; };
+    document.onmouseup = function () { document.onmousemove = document.onmouseup = null; };
+  };
   turn('xz', 1, GAP);
 
   var render = function () {
@@ -184,33 +201,41 @@
     var gentle = function () { return pause(300); };
     window.alert = function (m) { alerts.push(String(m)); };
     try {
-      document.querySelector('li.form5').click();
-      await pause(1200);
+      var li = document.querySelector('li.form5');
+      await look(li);
+      ['mousedown', 'mouseup', 'click'].forEach(function (t) { li.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })); });
+      await pause(800);
+      await look('#ddlHistoricalreturntypee');
       $('#ddlHistoricalreturntypee').val('Equity').trigger('change');
       if (!(await wait(function () { return $('#ddlHistoricalreturntypeeSubindex option').length > 1; }, 10000))) throw new Error('the page did not list index groups');
+      await look('#ddlHistoricalreturntypeeSubindex');
       $('#ddlHistoricalreturntypeeSubindex').val('Broad Market Indices').trigger('change');
       if (!(await wait(function () { return $('#ddlHistoricalreturntypeeindex option').length > 1; }, 10000))) throw new Error('the page did not list indexes');
       var todo = r.p.filter(function (p) { return p && p.w.length; });
       for (var i = 0; i < todo.length && !stop; i++) {
         var p = todo[i];
         if (!$('#ddlHistoricalreturntypeeindex option').filter(function () { return this.value === p.n; }).length) { done += p.w.length; continue; }
+        await look('#ddlHistoricalreturntypeeindex');
         $('#ddlHistoricalreturntypeeindex').val(p.n).trigger('change');
         q('xr' + p.i).textContent = '0/' + p.w.length + ' files';
         await gentle(800, 1500);
         for (var k = 0; k < p.w.length && !stop; k++) {
           var w = p.w[k];
           var before = first();
+          await look('#datepickerFromtotalindex');
           $('#datepickerFromtotalindex').datepicker('setDate', w[0]);
+          await look('#datepickerTototalindex');
           $('#datepickerTototalindex').datepicker('setDate', w[1]);
           await nap(6 + Math.floor(Math.random() * 4));
           alerts = [];
+          await look('#submit_totalindexhistorical');
           document.getElementById('submit_totalindexhistorical').click();
           var got = await wait(function () { return alerts.length || (first() && first() !== before); }, 20000);
           if (alerts.length) throw new Error(alerts[0]);
           if (got) {
-            await gentle(500, 1200);
             var e = iso(newest() || w[1]);
             var ex = document.getElementById('exportTotalindex');
+            await look(ex);
             if (dir) {
               $(ex).triggerHandler('click');
               var fh = await dir.getFileHandle(ex.download, { create: true });
