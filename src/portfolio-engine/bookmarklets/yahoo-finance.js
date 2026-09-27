@@ -65,8 +65,8 @@
   var box = document.createElement('div');
   box.id = 'xfina-bm';
   box.innerHTML =
-    '<style>#xfina-bm{position:fixed;top:16px;right:16px;z-index:2147483647;width:360px;background:#0a0a0b;color:#fafafa;font:13px/1.5 system-ui,sans-serif;border:1px solid #3f3f46;border-radius:8px;padding:14px;box-shadow:0 8px 30px #0008}' +
-    '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm label{display:flex;gap:8px;align-items:baseline;margin:2px 0}#xfina-bm label .g{margin-left:auto;text-align:right}' +
+    '<style>#xfina-bm{position:fixed;top:16px;right:16px;z-index:2147483647;width:400px;max-height:92vh;overflow:auto;background:#0a0a0b;color:#fafafa;font:13px/1.5 system-ui,sans-serif;border:1px solid #3f3f46;border-radius:8px;padding:14px;box-shadow:0 8px 30px #0008}' +
+    '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm label{display:flex;gap:8px;align-items:baseline;margin:2px 0;}#xfina-bm label .g{margin-left:auto;text-align:right}' +
     '#xfina-bm button{height:28px;padding:0 10px;border:1px solid #3f3f46;border-radius:6px;background:0;color:#fafafa;cursor:pointer}#xfina-bm .on,#xfina-bm #xg{background:#fafafa;color:#0a0a0b;border:0;font-weight:600}' +
     '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark}#xfina-bm #xs:empty{display:none}#xfina-bm .w{border:1px solid #f59e0b;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:12px}</style>' +
     '<div style="display:flex;justify-content:space-between;font-weight:600;font-size:15px">Xfina - Yahoo Finance - Download<span id="xx" style="cursor:pointer" class="g" title="Close">✕</span></div>' +
@@ -74,7 +74,7 @@
     '<label><span>' + TICKER + '</span><span class="g" id="xr0"></span></label>' +
     '<div id="xc" class="g" style="display:none;margin:6px 0">From <input type="date" id="xf"> to <input type="date" id="xt"></div>' +
     '<div id="xs" style="margin-top:8px;font-size:12px"></div>' +
-    '<div class="w" id="xw" style="display:none">Your browser blocks storage for this site, so it cannot remember where it left off; Update will fetch the full history each time.</div>' +
+    '<div class="w" id="xw" style="display:none">Your browser blocks storage for this site, so Update will fetch the full history each time.</div>' +
     '<div style="display:flex;gap:6px;margin-top:8px">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (mm) { return '<button id="xm' + mm[0] + '">' + mm[1] + '</button>'; }).join('') + '<button id="xg" style="margin-left:auto;padding:0 18px">Save CSV</button></div>';
   document.body.appendChild(box);
   box.firstElementChild.style.cursor = 'move';
