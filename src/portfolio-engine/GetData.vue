@@ -85,20 +85,31 @@ watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } c
 // The download list is grouped by website, so each site is visited once. A page link that every
 // dataset in the group shares (for example the NSE Indices historical data page) shows once at the
 // top; links specific to one dataset (a ticker's own page) stay on its row.
+//
+// Sites are ordered Indian entities first, then Global (a site is "Indian" if any of its items is
+// region 'india'; every source in practice serves one bucket only, never a mix), and within each,
+// Index before ETF before MF (a site with mixed vehicles, only Yahoo Finance does this, sorts by the
+// earliest vehicle it carries; its items are sorted the same way inside the group).
+const VEHICLE_ORDER = { index: 0, etf: 1, mf: 2 };
+const vehicleRank = (i) => VEHICLE_ORDER[i.vehicle] ?? 3;
 const bySite = computed(() => {
   const m = new Map();
   for (const i of list.value) {
     const site = HOW[i.how].site;
     m.set(site, [...(m.get(site) || []), i]);
   }
-  return [...m.entries()].map(([site, its]) => {
+  const groups = [...m.entries()].map(([site, its]) => {
+    its = [...its].sort((a, b) => vehicleRank(a) - vehicleRank(b));
     const urls = new Map();
     for (const i of its) for (const l of i.links) urls.set(l.url, { l, n: (urls.get(l.url)?.n || 0) + 1 });
     const shared = its.length > 1 ? [...urls.values()].filter((u) => u.n === its.length).map((u) => u.l) : [];
     const sharedUrls = new Set(shared.map((l) => l.url));
     const hows = [...new Set(its.map((i) => i.how))].map((h) => HOW[h]);
-    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its) };
+    const region = its.some((i) => i.region === 'india') ? 0 : 1;
+    const vehicle = Math.min(...its.map(vehicleRank));
+    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its), region, vehicle };
   });
+  return groups.sort((a, b) => a.region - b.region || a.vehicle - b.vehicle || a.site.localeCompare(b.site));
 });
 
 // Clicking a bookmarklet link on this page would run it here, where it does nothing useful. It is for dragging.
@@ -125,6 +136,12 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
     </div>
 
     <!-- 1. Picker, full width -->
+    <section id="select" class="space-y-4 scroll-mt-8">
+      <div class="flex items-center gap-3">
+        <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">1</span>
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Select Datasets For Download</h2>
+        <div class="h-px flex-1 bg-border" />
+      </div>
     <Card class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
         <CardTitle>Find your data</CardTitle>
@@ -207,8 +224,15 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         </section>
       </CardContent>
     </Card>
+    </section>
 
     <!-- 2. Everything selected -->
+    <section id="review" class="space-y-4 scroll-mt-8">
+      <div class="flex items-center gap-3">
+        <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">2</span>
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Review Selected Datasets</h2>
+        <div class="h-px flex-1 bg-border" />
+      </div>
     <Card class="bg-card border-border shadow-sm">
       <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
         <div class="space-y-1.5">
@@ -244,10 +268,16 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         </div>
       </CardContent>
     </Card>
+    </section>
 
     <!-- 3. Download list, by website -->
-    <div v-if="list.length" class="space-y-8">
-      <h2 class="text-xl font-semibold tracking-tight">Download list</h2>
+    <section v-if="list.length" id="download" class="space-y-4 scroll-mt-8">
+      <div class="flex items-center gap-3">
+        <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">3</span>
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Download Datasets</h2>
+        <div class="h-px flex-1 bg-border" />
+      </div>
+      <div class="space-y-8">
       <Card v-for="g in bySite" :key="g.site" class="bg-card border-border shadow-sm">
         <CardHeader class="pb-4">
           <CardTitle class="text-xl">{{ g.site }}</CardTitle>
@@ -356,6 +386,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </section>
   </AppShell>
 </template>
