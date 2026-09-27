@@ -2628,6 +2628,56 @@
      ]
     }
    ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "index",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "idx-y-gspc",
+     "name": "S&P 500 (^GSPC, price only)",
+     "inception": "1927-12-30",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "yahoo",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "^GSPC on Yahoo Finance",
+       "url": "https://finance.yahoo.com/quote/%5EGSPC/history/"
+      }
+     ],
+     "asset": "S&P 500"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "index",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "idx-y-ndx",
+     "name": "Nasdaq-100 (^NDX, price only)",
+     "inception": "1985-10-01",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "yahoo",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "^NDX on Yahoo Finance",
+       "url": "https://finance.yahoo.com/quote/%5ENDX/history/"
+      }
+     ],
+     "asset": "Nasdaq 100"
+    }
+   ]
   }
  ]
 }

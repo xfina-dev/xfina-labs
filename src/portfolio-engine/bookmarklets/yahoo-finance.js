@@ -29,6 +29,9 @@
   var HOST = 'finance.yahoo.com';
   var KEY = 'xfina.yahooFinance.v1';
   var DAY = 864e5;
+  // A floor for "Full history" on a ticker with no known start (not in __STARTS__): far enough back that Yahoo clips
+  // to the real earliest bar it has, the same as clicking the page's own date-range picker's "Max" button does.
+  var FLOOR = '-3000000000';
   var STARTS = JSON.parse('__STARTS__');
   var MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
   if (location.hostname !== HOST) { alert('Xfina: open a ticker\'s history page on finance.yahoo.com (for example finance.yahoo.com/quote/VOO/history/) and click this bookmark again.'); return; }
@@ -113,7 +116,7 @@
     var btn = q('xg');
     btn.disabled = true;
     var p = plan();
-    var wantPeriod1 = p.f ? epoch(p.f) : '0';
+    var wantPeriod1 = p.f ? epoch(p.f) : FLOOR;
     var wantPeriod2 = epoch(day(p.t, 1));
     var qs = new URLSearchParams(location.search);
     var nowSec = Math.floor(Date.now() / 1000);

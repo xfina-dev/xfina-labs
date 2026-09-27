@@ -223,8 +223,13 @@ const INDICES = [
   // Start dates are the oldest rows NSE Indices returns for each Total Returns Index (measured by calling the same
   // endpoint the historical data page uses, on 2026-09-26).
   ...[['Nifty 50', '1999-06-30'], ['Nifty Next 50', '2002-11-08'], ['Nifty Midcap 150', '2005-04-01'], ['Nifty Smallcap 250', '2005-04-01']].map(([a, since]) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since })),
-  // No US equity index rows. S&P DJI's site downloads only the last 10 years, and Nasdaq's calendar only reaches ten years
-  // back; we do only what a site's own page allows, so neither is offered, and the ETFs go further back.
+  // US equity indexes, price only (no dividends), from Yahoo Finance: its date-range picker has a genuine "Max"
+  // button (not a param bypass, confirmed by clicking it on 2026-09-27) that gives the full history, further back than
+  // either S&P DJI's own site (10 years only) or Nasdaq's own calendar (also ~10 years) allow. No free total-return
+  // series exists for either on Yahoo: ^SP500TR only starts 1988 and needs its own row if added; ^XNDX (Nasdaq-100 TR)
+  // has no history at all, just today's value.
+  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 (^GSPC, price only)', how: 'yahoo', ccy: 'USD', since: '1927-12-30', src: 'yahoo', ret: 'Price only', links: [L('^GSPC on Yahoo Finance', 'https://finance.yahoo.com/quote/%5EGSPC/history/')] },
+  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 (^NDX, price only)', how: 'yahoo', ccy: 'USD', since: '1985-10-01', src: 'yahoo', ret: 'Price only', links: [L('^NDX on Yahoo Finance', 'https://finance.yahoo.com/quote/%5ENDX/history/')] },
   // Free full history on the index's own page (Performance tab, Cumulative performance, Full history, the download
   // icon), no account needed: confirmed for all three, monthly, starting 1998-12-31, on 2026-09-27. The page shows one
   // return variant with no toggle and no label, so the name says just "Index", not Price/Gross/Net Total Return.
