@@ -2108,6 +2108,24 @@
       }
      ],
      "asset": "Gold"
+    },
+    {
+     "id": "etf-kilo.u",
+     "name": "Purpose Gold Bullion Fund (USD)",
+     "code": "KILO.U",
+     "inception": "2018-10-29",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "yahoo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "KILO.U price history",
+       "url": "https://finance.yahoo.com/quote/KILO-U.TO/history/"
+      }
+     ],
+     "asset": "Gold"
     }
    ]
   },
