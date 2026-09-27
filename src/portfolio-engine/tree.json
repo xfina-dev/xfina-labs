@@ -2263,37 +2263,6 @@
    ]
   },
   {
-   "class": "debt",
-   "region": "global",
-   "vehicle": "etf",
-   "listing": "irish",
-   "asset": "Aggregate",
-   "instruments": [
-    {
-     "id": "etf-aggg",
-     "name": "iShares Core Global Aggregate Bond UCITS ETF",
-     "code": "AGGG",
-     "inception": "2017-11-21",
-     "dateSource": "issuer",
-     "ccy": "USD",
-     "returnType": "NAV",
-     "how": "ishares",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "AGGG NAV history (Excel)",
-       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=291773&component=fundDownloadV2&userType=individual"
-      },
-      {
-       "label": "AGGG fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/291773/ishares-core-global-aggregate-bond-ucits-etf"
-      }
-     ],
-     "asset": "Aggregate"
-    }
-   ]
-  },
-  {
    "class": "equity",
    "region": "us",
    "vehicle": "etf",

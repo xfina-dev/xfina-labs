@@ -215,7 +215,8 @@ const ETFS = [
   { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'irish', name: 'iShares $ Treasury Bond 20+yr UCITS ETF USD (Acc)', code: 'DTLA', page: ishUk(297191, 'ishares-treasury-bond-20-yr-ucits-etf-usd-acc-fund') },
   // Debt / Global
   { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-06', manualSrc: 'yahoo', links: [L('BNDW price history', yahoo('BNDW'))] },
-  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'irish', name: 'iShares Core Global Aggregate Bond UCITS ETF', code: 'AGGG', page: ishUk(291773, 'ishares-core-global-aggregate-bond-ucits-etf') },
+  // No AGGG (Irish): it's Distributing, and its only accumulating share classes are currency-hedged (EUR/USD/CHF),
+  // which would change the fund's exposure, not just its distribution policy. BNDW (US) covers this asset instead.
 ];
 
 // Indices: one instrument per asset, the benchmark itself. Start dates are only given where the
