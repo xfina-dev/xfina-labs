@@ -14,7 +14,13 @@
   already (the same two-click redirect as NSE Indices' www move) and, once there, reads the table and saves it.
   Files overlap harmlessly: the importer merges by date, newer replacing older.
 
-  It takes no parameter: whichever ticker's page is open when it's clicked is the one it saves.
+  It works on whichever ticker's page is open when it's clicked, including ones not in __STARTS__ below (then the
+  panel says "from the earliest date shown" instead of a date, and Full history still asks Yahoo for everything by
+  using period1=0; it works, there is just no known date to preview).
+
+  Parameter, filled in when the bookmark is generated (bookmarklet.js): __STARTS__, JSON, {"VOO": "2010-09-09", ...}:
+  the earliest date Yahoo's own table returns for each ticker in Xfina's catalogue, so the panel can show it before
+  a run; purely a display nicety, not required for the fetch itself to work.
 
   Written to be minified: statements end in semicolons, no line comments inside.
   If the page changes, this is the one file to fix.
@@ -23,6 +29,7 @@
   var HOST = 'finance.yahoo.com';
   var KEY = 'xfina.yahooFinance.v1';
   var DAY = 864e5;
+  var STARTS = JSON.parse('__STARTS__');
   var MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
   if (location.hostname !== HOST) { alert('Xfina: open a ticker\'s history page on finance.yahoo.com (for example finance.yahoo.com/quote/VOO/history/) and click this bookmark again.'); return; }
   var m = location.pathname.match(/\/quote\/([^/]+)\/history/i);
@@ -50,12 +57,13 @@
   var ct = '';
   var last = mem[TICKER] ? parse(mem[TICKER]) : null;
 
+  var known = STARTS[TICKER] ? parse(STARTS[TICKER]) : null;
   var plan = function () {
-    var f = last ? day(last, 1) : null;
+    var f = last ? day(last, 1) : known;
     var t = today;
-    if (mode === 'F') f = null;
+    if (mode === 'F') f = known;
     else if (mode === 'C') {
-      f = cf ? parse(cf) : (last ? day(last, 1) : null);
+      f = cf ? parse(cf) : (last ? day(last, 1) : known);
       if (ct) t = parse(ct);
       if (t > today) t = today;
     }

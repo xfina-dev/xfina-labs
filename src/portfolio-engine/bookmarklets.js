@@ -69,19 +69,25 @@ const BUILDERS = {
   },
   // Yahoo Finance: only for the handful of funds with no issuer, exchange or index NAV source. Takes no per-item
   // parameters; it works whichever ticker's own history page is open when it's clicked, one file per click.
-  'Yahoo Finance': (items) => ({
-    site: 'Yahoo Finance',
-    openUrl: `https://finance.yahoo.com/quote/${items[0].code}/history/`,
-    openLabel: `Open ${items[0].code} on Yahoo Finance`,
-    termsUrl: 'https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html',
-    label: 'Xfina · Yahoo Finance',
-    href: bookmarkletHref(yahooFinance, {}),
-    indexes: items.map((i) => i.code),
-    action: 'Save CSV',
-    oneShot: true,
-    caution: 'Yahoo\'s terms bar automated collection for any purpose, with no personal-use exception, and Yahoo removed its own download button. This bookmark opens a small panel on the ticker\'s own history page and, on a click, saves the same table you would otherwise copy out by hand: nothing it could not equally get by a person reading the page. Used only where no fund, exchange or index has a real download.',
-    skipped: 0,
-  }),
+  'Yahoo Finance': (items) => {
+    // Yahoo's own ticker in the page address (e.g. VUAA.L for the LSE listing) can differ from the catalogue's
+    // display code; it only lives in the item's own Yahoo link, so read it from there rather than from `code`.
+    const yTicker = (i) => i.links.find((l) => l.url.includes('finance.yahoo.com'))?.url.match(/\/quote\/([^/]+)\//)?.[1] || i.code;
+    const starts = Object.fromEntries(items.filter((i) => i.inception).map((i) => [yTicker(i), i.inception]));
+    return {
+      site: 'Yahoo Finance',
+      openUrl: `https://finance.yahoo.com/quote/${yTicker(items[0])}/history/`,
+      openLabel: `Open ${items[0].code} on Yahoo Finance`,
+      termsUrl: 'https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html',
+      label: 'Xfina · Yahoo Finance',
+      href: bookmarkletHref(yahooFinance, { STARTS: starts }),
+      indexes: items.map((i) => i.code),
+      action: 'Save CSV',
+      oneShot: true,
+      caution: 'Yahoo\'s terms bar automated collection for any purpose, with no personal-use exception, and Yahoo removed its own download button. This bookmark opens a small panel on the ticker\'s own history page and, on a click, saves the same table you would otherwise copy out by hand: nothing it could not equally get by a person reading the page. Used only where no fund, exchange or index has a real download.',
+      skipped: 0,
+    };
+  },
   // AMFI's own NAV History page, for the mutual fund and fund-of-fund schemes (their first NAV date is known).
   AMFI: (items) => {
     const funds = items.filter((i) => i.kind === 'MF' && i.inception);

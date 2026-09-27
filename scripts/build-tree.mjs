@@ -180,15 +180,17 @@ const ishNavUk = (id) => `https://www.blackrock.com/varnish-api/uk-retail01-prod
 // State Street's own NAV history file for an SPDR ETF (confirmed for SPY, 2026-09-27).
 const ssgaNav = (t) => `https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-${t.toLowerCase()}.xlsx`;
 
-// listing: 'irish' | 'us' | 'canada'. `page` is scraped for the inception date; `manual` is a typed date.
+// listing: 'irish' | 'us' | 'canada'. `page` is scraped for the inception date; `manual` is a typed date, and
+// `manualSrc` overrides its dateSource label when the date is a confirmed reading (e.g. 'yahoo': the earliest row
+// Yahoo Finance's own history table returns), rather than an unverified launch date from a search result.
 const ETFS = [
   // Equity / US
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'SPDR S&P 500 ETF Trust', code: 'SPY', manual: '1993-01-22', links: [L('SPY price history', yahoo('SPY'))] },
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'iShares Core S&P 500 ETF', code: 'IVV', page: ishUs(239726, 'ishares-core-sp-500-etf'), links: [L('IVV price history', yahoo('IVV'))] },
-  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'Vanguard S&P 500 ETF', code: 'VOO', manual: '2010-09-07', links: [L('VOO price history', yahoo('VOO'))] },
-  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco QQQ Trust', code: 'QQQ', manual: '1999-03-10', links: [L('QQQ price history', yahoo('QQQ'))] },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'Vanguard S&P 500 ETF', code: 'VOO', manual: '2010-09-09', manualSrc: 'yahoo', links: [L('VOO price history', yahoo('VOO'))] },
+  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco QQQ Trust', code: 'QQQ', manual: '1999-03-10', manualSrc: 'yahoo', links: [L('QQQ price history', yahoo('QQQ'))] },
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'irish', name: 'iShares Core S&P 500 UCITS ETF (Acc)', code: 'CSPX', page: ishUk(253743, 'ishares-core-sp-500-ucits-etf') },
-  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'irish', name: 'Vanguard S&P 500 UCITS ETF (Acc)', code: 'VUAA', manual: '2019-05-14', links: [L('VUAA price history', yahoo('VUAA.L'))] },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'irish', name: 'Vanguard S&P 500 UCITS ETF (Acc)', code: 'VUAA', manual: '2019-05-14', manualSrc: 'yahoo', links: [L('VUAA price history', yahoo('VUAA.L'))] },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'irish', name: 'iShares Nasdaq 100 UCITS ETF (Acc)', code: 'CNDX', page: ishUk(253741, 'ishares-nasdaq-100-ucits-etf') },
   // Equity / Global
   { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'irish', name: 'iShares MSCI ACWI UCITS ETF (Acc)', code: 'SSAC', page: ishUk(251850, 'ishares-msci-acwi-ucits-etf') },
@@ -203,7 +205,7 @@ const ETFS = [
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
   // Gold, Canada domiciled (Global only): a physically backed trust that also trades on the NYSE in USD.
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') },
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-25', links: [L('PHYS price history', yahoo('PHYS'))] },
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-26', manualSrc: 'yahoo', links: [L('PHYS price history', yahoo('PHYS'))] },
   // Debt / US
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf'), links: [L('SGOV price history', yahoo('SGOV'))] },
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'SPDR Bloomberg 1-3 Month T-Bill ETF', code: 'BIL', manual: '2007-05-30', links: [L('BIL price history', yahoo('BIL'))] },
@@ -211,7 +213,7 @@ const ETFS = [
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'irish', name: 'iShares $ Treasury Bond 0-1yr UCITS ETF', code: 'IB01', page: ishUk(307243, 'ishares-usd-treasury-bond-01yr-ucits-etf'), extra: [L('IB01 price history', yahoo('IB01.L'))] },
   { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'irish', name: 'iShares $ Treasury Bond 20+yr UCITS ETF', code: 'IDTL', page: ishUk(272124, 'ishares-usd-treasury-bond-20-yr-ucits-etf') },
   // Debt / Global
-  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-04', links: [L('BNDW price history', yahoo('BNDW'))] },
+  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-06', manualSrc: 'yahoo', links: [L('BNDW price history', yahoo('BNDW'))] },
   { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'irish', name: 'iShares Core Global Aggregate Bond UCITS ETF', code: 'AGGG', page: ishUk(291773, 'ishares-core-global-aggregate-bond-ucits-etf') },
 ];
 
@@ -277,7 +279,7 @@ console.log('Reading ETF inception dates ...');
 const SSGA_NAV = new Set(['SPY', 'BIL']);
 const SPDR_GOLD_NAV = new Set(['GLD']);
 const etfInst = await pool(ETFS, 6, async (e) => {
-  let inception = e.manual || null, dateSource = e.manual ? 'manual' : null;
+  let inception = e.manual || null, dateSource = e.manual ? (e.manualSrc || 'manual') : null;
   if (e.page) { const d = await isharesInception(e.page); if (d) { inception = d; dateSource = 'issuer'; } else console.warn(`  ! no inception found on ${e.page}`); }
   const ishMatch = e.page && e.page.match(/ishares\.com\/(us\/products|uk\/individual\/en\/products)\/(\d+)\//);
   let how = 'yahoo', returnType = 'Market price', links;
