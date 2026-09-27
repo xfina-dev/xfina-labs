@@ -2043,6 +2043,24 @@
    "asset": "Gold",
    "instruments": [
     {
+     "id": "etf-zgldus",
+     "name": "Swisscanto (CH) Gold ETF (USD)",
+     "code": "ZGLDUS",
+     "inception": "2009-01-15",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "yahoo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "ZGLDUS price history",
+       "url": "https://finance.yahoo.com/quote/ZGLDUS.SW/history/"
+      }
+     ],
+     "asset": "Gold"
+    },
+    {
      "id": "etf-csgold",
      "name": "iShares Gold ETF (CH)",
      "code": "CSGOLD",
@@ -2100,6 +2118,24 @@
    "listing": "irish",
    "asset": "Gold",
    "instruments": [
+    {
+     "id": "etf-sgld",
+     "name": "Invesco Physical Gold ETC",
+     "code": "SGLD",
+     "inception": "2009-06-26",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "yahoo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SGLD price history",
+       "url": "https://finance.yahoo.com/quote/SGLD.L/history/"
+      }
+     ],
+     "asset": "Gold"
+    },
     {
      "id": "etf-sgln",
      "name": "iShares Physical Gold ETC",

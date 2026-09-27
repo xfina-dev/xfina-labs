@@ -219,17 +219,26 @@ const ETFS = [
   // choices, Switzerland first. US gold has no domicile choice, so its ETFs carry no listing.
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', links: [L('GLD price history', yahoo('GLD'))] },
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
-  // Switzerland: a genuine Swiss collective investment scheme under CISA (FINMA-regulated), holding physical gold
-  // directly as fund property. Not a UCITS fund and not a debt security (unlike the Irish ETC below): Switzerland
-  // is outside the UCITS Directive, so it has no need for the debt-note workaround. Confirmed 2026-09-27: NAV
-  // download link scraped live off the fund page, returns a real .xls (200 OK).
+  // Switzerland: genuine Swiss collective investment schemes under CISA (FINMA-regulated), holding physical gold
+  // directly as fund property. Not UCITS funds and not debt securities (unlike the Irish ETCs below): Switzerland
+  // is outside the UCITS Directive, so it has no need for the debt-note workaround.
+  // CSGOLD: confirmed 2026-09-27, NAV download link scraped live off the fund page, returns a real .xls (200 OK).
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'iShares Gold ETF (CH)', code: 'CSGOLD', page: ishCh(261149, 'ishares-gold-ch-fund') },
-  // Canada: an Ontario trust holding physical gold directly as trust property (also not a debt security).
+  // ZGLDUS: the underlying ZKB/Swisscanto Gold ETF dates to 2006, but that is the CHF fund; the USD share class
+  // (ZGLDUS) only launched 2009-01-15, confirmed as Yahoo Finance's own earliest row for the ticker (2026-09-27) —
+  // barely older than CSGOLD, not meaningfully longer history once you're limited to the USD line. No issuer NAV
+  // download found (checked swissfunddata.ch and the Swisscanto site), so this one is Yahoo-sourced, market price.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'Swisscanto (CH) Gold ETF (USD)', code: 'ZGLDUS', manual: '2009-01-15', manualSrc: 'yahoo', links: [L('ZGLDUS price history', yahoo('ZGLDUS.SW'))] },
+  // Canada: an Ontario trust holding physical gold directly as trust property (also not a debt security). iShares'
+  // own CGL (2009-05-19) and Central GoldTrust (2003, merged into this same PHYS in 2016) are both older, but
+  // CGL has no USD unit (CAD-hedged or CAD-unhedged only) and GTU no longer trades independently — so PHYS remains
+  // the oldest currently-tradeable USD option here.
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-26', manualSrc: 'yahoo', links: [L('PHYS price history', yahoo('PHYS'))] },
   // Ireland: legally a series of secured debt securities (limited-recourse bonds collateralised by gold) issued by
-  // iShares Physical Metals plc, not fund units — UCITS forbids a fund from holding a single physical commodity, so
-  // the gold-tracking product is structured as debt instead (UCITS-eligible under Article 50(1) of the Directive).
+  // the ETC provider, not fund units — UCITS forbids a fund from holding a single physical commodity, so the
+  // gold-tracking product is structured as debt instead (UCITS-eligible under Article 50(1) of the Directive).
   // Kept for comparison; Switzerland and Canada above are the ones without this structural wrinkle.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'Invesco Physical Gold ETC', code: 'SGLD', manual: '2009-06-26', manualSrc: 'yahoo', links: [L('SGLD price history', yahoo('SGLD.L'))] },
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') },
   // Debt / US
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf'), links: [L('SGOV price history', yahoo('SGOV'))] },
