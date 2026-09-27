@@ -2647,6 +2647,31 @@
      "asset": "Nasdaq 100"
     }
    ]
+  },
+  {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "idx-mcx-gold-spot",
+     "name": "MCX Spot Market Price: Gold (Ahmedabad)",
+     "inception": "2005-06-06",
+     "dateSource": "mcx",
+     "ccy": "INR",
+     "returnType": "Spot price",
+     "how": "mcxSpot",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "MCX Spot Market Price",
+       "url": "https://www.mcxindia.com/market-data/spot-market-price"
+      }
+     ],
+     "asset": "Gold"
+    }
+   ]
   }
  ]
 }

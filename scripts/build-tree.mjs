@@ -236,9 +236,13 @@ const INDICES = [
   // icon), no account needed: confirmed for all three, monthly, starting 1998-12-31, on 2026-09-27. The page shows one
   // return variant with no toggle and no label, so the name says just "Index", not Price/Gross/Net Total Return.
   ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Index`, how: 'msci', ccy: 'USD', since: '1998-12-31', src: 'publisher', ret: 'Level (variant unconfirmed)', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
-  // Gold has no Index option. World-wide: the LBMA Gold Price history needs an IBA licence (MyLBMA portal, free only on
-  // application for non-commercial use). India: no free downloadable index history: IBJA (ibjarates.com) publishes today's rate and the last
-  // 30 days only, and its API with history is paid. Indian gold is covered by gold ETFs and funds instead.
+  // Gold has no Index option world-wide: the LBMA Gold Price history needs an IBA licence (MyLBMA portal, free only
+  // on application for non-commercial use), and no free spot-gold ticker exists on Yahoo (only GC=F, a futures
+  // contract, excluded on purpose). India: MCX Spot Market Price for GOLD, Ahmedabad (the only location MCX polls
+  // gold at, checked across all locations on 2026-09-27), real data from 2005-06-06, polled several times a day.
+  // This is also, since 1 April 2026, what SEBI requires Indian gold ETFs and funds to value themselves against
+  // (domestic exchange spot prices, replacing LBMA), so it is the closest thing to their own benchmark.
+  { cls: 'gold', region: 'india', asset: 'Gold', name: 'MCX Spot Market Price: Gold (Ahmedabad)', how: 'mcxSpot', ccy: 'INR', since: '2005-06-06', src: 'mcx', ret: 'Spot price', links: [L('MCX Spot Market Price', 'https://www.mcxindia.com/market-data/spot-market-price')] },
   // Debt start dates: the first rows Historical Index Data (Fixed Income) returns for Nifty 1D Rate Index and Nifty 10 yr
   // Benchmark G-Sec, found by asking year by year on the page (2010 empty, 2011 from 3 Jan), on 2026-09-27.
   { cls: 'debt', region: 'india', asset: 'Short duration', name: 'NSE short-duration debt index (Liquid or 1D Rate)', how: 'nseTri', ccy: 'INR', since: '2011-01-03', links: [L('NSE Indices historical data', NSE_HIST)] },
