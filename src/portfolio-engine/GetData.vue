@@ -118,7 +118,10 @@ const dragHint = ref(false);
 const modes = ref({});
 const mode = (site) => modes.value[site] || 'manual';
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-const tile = (on) => ['text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
+// min-w-0 so a long blurb (e.g. Switzerland's) truncates inside its grid column instead of forcing
+// the column, and the whole grid, wider than its container (a CSS Grid default: a child's intrinsic
+// content width otherwise wins over the column's 1fr share).
+const tile = (on) => ['w-full min-w-0 text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
 </script>
 
