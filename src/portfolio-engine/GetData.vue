@@ -27,8 +27,9 @@ const listings = computed(() => listingsFor(cls.value, region.value, vehicle.val
 const showListing = computed(() => listings.value.length > 0);
 const groups = computed(() => {
   const g = groupsFor(cls.value, region.value, vehicle.value, listing.value);
-  // An index is named after its asset ("Nifty 50" then "Nifty 50 TRI"), so a heading only repeats it: one flat list.
-  return vehicle.value === 'index' ? (g.length ? [{ asset: null, instruments: g.flatMap((x) => x.instruments) }] : []) : g;
+  // An index is named after its own asset ("Nifty 50" then "Nifty 50 TRI"), so a per-asset heading would just
+  // repeat it: one flat list under a single "<Region> Index" heading instead, comparable to ETF/MF's per-asset one.
+  return vehicle.value === 'index' ? (g.length ? [{ asset: `${regionTitle(region.value)} Index`, instruments: g.flatMap((x) => x.instruments) }] : []) : g;
 });
 
 // Bring the lanes back to a valid state after any change. Irish ETFs are the default listing.
