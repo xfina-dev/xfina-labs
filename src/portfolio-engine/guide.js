@@ -87,8 +87,8 @@ export const HOW = {
   msci: {
     site: 'MSCI',
     title: 'MSCI: index levels',
-    steps: ['Open the index page, then End of Day Index Data.', 'Choose the Net Total Return variant in USD.', 'Set the widest date range and download.'],
-    format: 'A date and an index level, as MSCI publishes it.',
+    steps: ['Open the index page and its Performance tab.', 'Under Cumulative performance, choose Full history.', 'Press the download icon next to Compare. No account is needed.'],
+    format: 'An Excel file with a date and the index level, monthly, as MSCI publishes it. Full history on the free page starts 1998-12-31; MSCI\'s own longer history is licensed. The page shows one return variant with no way to switch it, and it is not labelled Price, Gross or Net, so check the numbers before assuming which one it is.',
   },
 };
 

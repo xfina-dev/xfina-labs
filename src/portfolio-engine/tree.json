@@ -2517,11 +2517,11 @@
    "instruments": [
     {
      "id": "idx-7",
-     "name": "MSCI ACWI Net Total Return",
-     "inception": null,
-     "dateSource": null,
+     "name": "MSCI ACWI Index",
+     "inception": "1998-12-31",
+     "dateSource": "publisher",
      "ccy": "USD",
-     "returnType": "Total return",
+     "returnType": "Level (variant unconfirmed)",
      "how": "msci",
      "kind": "Index",
      "links": [
@@ -2541,11 +2541,11 @@
    "instruments": [
     {
      "id": "idx-8",
-     "name": "MSCI World Net Total Return",
-     "inception": null,
-     "dateSource": null,
+     "name": "MSCI World Index",
+     "inception": "1998-12-31",
+     "dateSource": "publisher",
      "ccy": "USD",
-     "returnType": "Total return",
+     "returnType": "Level (variant unconfirmed)",
      "how": "msci",
      "kind": "Index",
      "links": [
@@ -2565,11 +2565,11 @@
    "instruments": [
     {
      "id": "idx-9",
-     "name": "MSCI Emerging Markets Net Total Return",
-     "inception": null,
-     "dateSource": null,
+     "name": "MSCI Emerging Markets Index",
+     "inception": "1998-12-31",
+     "dateSource": "publisher",
      "ccy": "USD",
-     "returnType": "Total return",
+     "returnType": "Level (variant unconfirmed)",
      "how": "msci",
      "kind": "Index",
      "links": [

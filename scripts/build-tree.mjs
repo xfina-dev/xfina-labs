@@ -223,7 +223,10 @@ const INDICES = [
   ...[['Nifty 50', '1999-06-30'], ['Nifty Next 50', '2002-11-08'], ['Nifty Midcap 150', '2005-04-01'], ['Nifty Smallcap 250', '2005-04-01']].map(([a, since]) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since })),
   // No US equity index rows. S&P DJI's site downloads only the last 10 years, and Nasdaq's calendar only reaches ten years
   // back; we do only what a site's own page allows, so neither is offered, and the ETFs go further back.
-  ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Net Total Return`, how: 'msci', ccy: 'USD', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
+  // Free full history on the index's own page (Performance tab, Cumulative performance, Full history, the download
+  // icon), no account needed: confirmed for all three, monthly, starting 1998-12-31, on 2026-09-27. The page shows one
+  // return variant with no toggle and no label, so the name says just "Index", not Price/Gross/Net Total Return.
+  ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Index`, how: 'msci', ccy: 'USD', since: '1998-12-31', src: 'publisher', ret: 'Level (variant unconfirmed)', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
   // Gold has no Index option. World-wide: the LBMA Gold Price history needs an IBA licence (MyLBMA portal, free only on
   // application for non-commercial use). India: no free downloadable index history: IBJA (ibjarates.com) publishes today's rate and the last
   // 30 days only, and its API with history is paid. Indian gold is covered by gold ETFs and funds instead.
