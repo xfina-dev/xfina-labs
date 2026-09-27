@@ -267,15 +267,14 @@ for (const { e, inst } of etfInst) {
   const n = node(e.cls, e.region, 'etf', e.listing, e.asset);
   n.instruments.push({ ...inst, asset: e.asset });
 }
-// Indian ETFs that track US and global indices: listed on NSE in INR. The date is the first NAV AMFI holds
+// Indian ETFs that track US indices: listed on NSE in INR. Global equity has none: the Hang Seng ones do not
+// follow the MSCI indexes that Global equity is built on. The date is the first NAV AMFI holds
 // for the same fund, found by name, so nothing here is typed.
 const FOREIGN = [
   { sym: 'MON100', name: 'Motilal Oswal Nasdaq 100 ETF', region: 'us', asset: 'Nasdaq 100', re: /motilal.*nasdaq\s*100 etf/i },
   { sym: 'MASPTOP50', name: 'Mirae Asset S&P 500 Top 50 ETF', region: 'us', asset: 'S&P 500 Top 50', re: /mirae.*s&p 500 top 50 etf\s*$/i },
   { sym: 'MAFANG', name: 'Mirae Asset NYSE FANG+ ETF', region: 'us', asset: 'NYSE FANG+', re: /mirae.*fang.*etf\s*$/i },
   { sym: 'MONQ50', name: 'Motilal Oswal Nasdaq Q 50 ETF', region: 'us', asset: 'Nasdaq Q-50', re: /motilal.*nasdaq q.?50 etf/i },
-  { sym: 'HNGSNGBEES', name: 'Nippon India ETF Hang Seng BeES', region: 'global', asset: 'Hang Seng', re: /hang seng (bees|etf)/i, no: /tech/i },
-  { sym: 'MAHKTECH', name: 'Mirae Asset Hang Seng TECH ETF', region: 'global', asset: 'Hang Seng', re: /hang seng tech etf/i },
 ];
 console.log('Reading Indian ETFs on foreign indices ...');
 for (const f of FOREIGN) {

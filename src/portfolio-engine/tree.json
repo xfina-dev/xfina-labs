@@ -2387,57 +2387,6 @@
   },
   {
    "class": "equity",
-   "region": "global",
-   "vehicle": "etf",
-   "listing": "india",
-   "asset": "Hang Seng",
-   "instruments": [
-    {
-     "id": "nse-hngsngbees",
-     "name": "Nippon India ETF Hang Seng BeES",
-     "code": "HNGSNGBEES",
-     "inception": "2016-11-07",
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "Price only",
-     "how": "nseEtf",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NSE historical price data",
-       "url": "https://www.nseindia.com/report-detail/eq_security"
-      },
-      {
-       "label": "HNGSNGBEES on NSE",
-       "url": "https://www.nseindia.com/get-quotes/equity?symbol=HNGSNGBEES"
-      }
-     ]
-    },
-    {
-     "id": "nse-mahktech",
-     "name": "Mirae Asset Hang Seng TECH ETF",
-     "code": "MAHKTECH",
-     "inception": "2021-12-07",
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "Price only",
-     "how": "nseEtf",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NSE historical price data",
-       "url": "https://www.nseindia.com/report-detail/eq_security"
-      },
-      {
-       "label": "MAHKTECH on NSE",
-       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MAHKTECH"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
    "region": "india",
    "vehicle": "index",
    "asset": "Nifty 50",
