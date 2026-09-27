@@ -192,34 +192,32 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         </div>
 
         <!-- Every asset for the path, grouped, each with its oldest three -->
-        <section v-if="vehicle" class="space-y-6 border-t pt-6">
-          <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 class="text-sm font-semibold">Oldest Datasets</h3>
-            <span v-if="vehicle !== 'index'" class="text-xs text-muted-foreground">The three with the longest history for each, oldest first</span>
-          </div>
+        <section v-if="vehicle" class="space-y-4 border-t pt-6">
           <p v-if="!groups.length" class="text-sm text-muted-foreground">Nothing is listed for this yet.</p>
-          <div v-for="g in groups" :key="g.asset || 'indexes'" class="space-y-2">
-            <div v-if="g.asset" class="text-sm font-medium">{{ g.asset }}</div>
-            <ol class="divide-y rounded-md border">
-              <li v-for="(i, k) in g.instruments" :key="i.id" class="flex flex-wrap items-center justify-between gap-3 p-3">
-                <div class="flex items-start gap-3 min-w-0">
-                  <span v-if="vehicle !== 'index'" class="inline-grid place-items-center w-6 h-6 shrink-0 rounded-full bg-muted text-xs font-semibold">{{ k + 1 }}</span>
-                  <div class="min-w-0">
-                    <div class="font-medium">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag> <Tag v-if="i.plan" variant="warn">{{ i.plan }}</Tag></div>
-                    <div class="text-xs text-muted-foreground mt-0.5">
-                      <span class="font-mono text-foreground">{{ dateNote(i) }}</span>
-                      <span v-if="dateSourceNote(i)"> ({{ dateSourceNote(i) }})</span> · {{ i.ccy }} · {{ i.returnType }}
-                    </div>
-                  </div>
-                </div>
-                <div class="flex items-center gap-3">
-                  <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="inline-flex h-9 w-20 items-center justify-center whitespace-nowrap rounded-md border border-primary/20 bg-primary/10 px-3 text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
-                  <Button :variant="has(i.id) ? 'default' : 'outline'" size="sm" class="w-28 justify-center" @click="toggle(i.id)">
-                    <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
-                  </Button>
-                </div>
-              </li>
-            </ol>
+          <div v-else class="overflow-x-auto rounded-md border">
+            <table class="w-full min-w-[760px] text-sm">
+              <tbody v-for="g in groups" :key="g.asset || 'indexes'">
+                <tr v-if="g.asset"><th colspan="7" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
+                <tr v-for="i in g.instruments" :key="i.id" class="border-t">
+                  <td class="px-3 py-2 min-w-0 whitespace-nowrap" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">
+                    <span class="font-medium">{{ clip(i.name) }}</span>
+                    <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag>
+                  </td>
+                  <td class="px-3 py-2 whitespace-nowrap"><Tag>{{ i.kind }}</Tag></td>
+                  <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ HOW[i.how].site }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
+                  </td>
+                  <td class="px-3 py-2 text-right">
+                    <Button :variant="has(i.id) ? 'default' : 'outline'" size="sm" class="w-28 justify-center" @click="toggle(i.id)">
+                      <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
+                    </Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
       </CardContent>
