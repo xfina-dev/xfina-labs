@@ -201,16 +201,16 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <div v-else class="overflow-x-auto rounded-md border">
             <table class="w-full min-w-[760px] text-sm">
               <tbody v-for="g in groups" :key="g.asset || 'indexes'">
-                <tr v-if="g.asset"><th colspan="7" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
+                <tr v-if="g.asset"><th colspan="8" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
                 <tr v-for="i in g.instruments" :key="i.id" class="border-t">
                   <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
-                  <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">
-                    {{ clip(i.name) }}
-                    <Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested in the fund' : 'Distributing: income is paid out, not reinvested'">{{ distFlag(i) }}</Tag>
-                  </td>
+                  <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ clip(i.name) }}</td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ HOW[i.how].site }}</td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    <Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested in the fund' : 'Distributing: income is paid out, not reinvested'">{{ distFlag(i) }}</Tag>
+                  </td>
                   <td class="px-3 py-2 whitespace-nowrap">
                     <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
                   </td>
