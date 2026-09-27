@@ -87,13 +87,13 @@ export const HOW = {
   nasdaqIdx: {
     site: 'Nasdaq Indexes',
     title: 'Nasdaq Indexes: history',
-    steps: ['Open the index history page.', 'Set the date range as wide as allowed.', 'Download the levels. This is the total return series, XNDX.'],
+    steps: ['Open the index history page.', 'Set the date range as wide as allowed.', 'Download the levels for the series on the row: XNDX is total return, NDX is the price index without dividends.'],
     format: 'A date and an index level, as Nasdaq publishes it.',
   },
   spdji: {
     site: 'S&P Dow Jones Indices',
     title: 'S&P Dow Jones Indices',
-    steps: ['Open the index page and look for its historical data or performance download.', 'Choose the Total Return series.', 'Full daily history is normally for subscribers. If it is not offered to you, use an ETF instead.'],
+    steps: ['Open the index page and look for its historical data or performance download.', 'Choose the series on the row: Total Return, or the price index (no dividends).', 'Full daily history is normally for subscribers. If it is not offered to you, use an ETF instead.'],
     format: 'A date and an index level, as S&P publishes it.',
   },
 };

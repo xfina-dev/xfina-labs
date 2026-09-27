@@ -2490,8 +2490,8 @@
     {
      "id": "idx-5",
      "name": "S&P 500 Total Return",
-     "inception": null,
-     "dateSource": null,
+     "inception": "1988-01-04",
+     "dateSource": "manual",
      "ccy": "USD",
      "returnType": "Total return",
      "how": "spdji",
@@ -2502,6 +2502,23 @@
        "url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/"
       }
      ]
+    },
+    {
+     "id": "idx-sp500-price",
+     "name": "S&P 500 (price index, no dividends)",
+     "inception": "1928-01-03",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "spdji",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "S&P 500 on S&P Dow Jones Indices",
+       "url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/"
+      }
+     ],
+     "asset": "S&P 500"
     }
    ]
   },
@@ -2514,8 +2531,8 @@
     {
      "id": "idx-6",
      "name": "Nasdaq-100 Total Return (XNDX)",
-     "inception": null,
-     "dateSource": null,
+     "inception": "1985-02-01",
+     "dateSource": "manual",
      "ccy": "USD",
      "returnType": "Total return",
      "how": "nasdaqIdx",
@@ -2526,6 +2543,23 @@
        "url": "https://indexes.nasdaqomx.com/Index/History/XNDX"
       }
      ]
+    },
+    {
+     "id": "idx-ndx-price",
+     "name": "Nasdaq-100 (NDX, price index, no dividends)",
+     "inception": "1985-01-31",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "nasdaqIdx",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NDX history",
+       "url": "https://indexes.nasdaqomx.com/Index/History/NDX"
+      }
+     ],
+     "asset": "Nasdaq 100"
     }
    ]
   },
