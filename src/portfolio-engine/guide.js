@@ -99,7 +99,7 @@ export const HOW = {
   lbma: {
     site: 'LBMA',
     title: 'LBMA: Gold Price',
-    steps: ['Open Precious Metal Prices.', 'Choose the Gold Price (PM), in USD.', 'Download the full history.'],
+    steps: ['Open LBMA Precious Metal Prices. Since November 2025 the full history is in the MyLBMA portal, not on the public page.', 'Create a MyLBMA profile and apply for non-commercial or educational access, which is free. Anyone else needs a licence from ICE Benchmark Administration (IBA), who administer the price.', 'In the portal, open the Gold Price (PM), in USD, and download the history.'],
     format: 'A date and a USD price, as LBMA publishes it.',
   },
 };
