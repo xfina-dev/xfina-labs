@@ -87,7 +87,7 @@ export const HOW = {
   nasdaqIdx: {
     site: 'Nasdaq Indexes',
     title: 'Nasdaq Indexes: history',
-    steps: ['Open the index history page.', 'Set the date range as wide as allowed.', 'Download the levels for the series on the row: XNDX is total return, NDX is the price index without dividends.'],
+    steps: ['Open the index history page.', 'Set the start and end dates. The calendar\'s year list only reaches ten years back. For earlier dates, press Download once and then edit startDate and endDate in the download address (for example startDate=1999-03-01T00:00:00.000).', 'Download the levels for the series on the row: XNDX is total return (from March 1999), NDX is the price index without dividends (from 1985).'],
     format: 'A date and an index level, as Nasdaq publishes it.',
   },
   spdji: {
@@ -99,7 +99,7 @@ export const HOW = {
 };
 
 
-const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices' };
+const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices', nasdaq: 'first row on Nasdaq Indexes' };
 export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
 // Whole years of history up to today, rounded down; null when the start date is not known.
 export const yearsOf = (i) => (i.inception ? Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5))) : null);
