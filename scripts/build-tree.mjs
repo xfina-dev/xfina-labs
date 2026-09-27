@@ -75,17 +75,21 @@ async function measure(cands) {
   const rows = await pool(cands, 8, async (c) => {
     const j = await getJson(`https://api.mfapi.in/mf/${c.schemeCode}`);
     if (!j?.data?.length) return null;
-    const first = iso(j.data.at(-1).date), last = iso(j.data[0].date);
+    const firstNav = iso(j.data.at(-1).date), last = iso(j.data[0].date);
     if (TODAY - day(last) > STALE_DAYS) return null;
-    return { c, meta: j.meta, first, last, n: j.data.length };
+    // Direct plans only exist from 2013-01-01. AMFI sometimes carries an older plan's NAVs under the Direct code, so a
+    // Direct plan never starts before that.
+    const clamped = /direct/i.test(c.schemeName) && firstNav < DIRECT_START;
+    return { c, meta: j.meta, first: clamped ? DIRECT_START : firstNav, clamped, last, n: j.data.length };
   });
   return rows.filter(Boolean);
 }
+const DIRECT_START = '2013-01-01';
 function toInstrument(r, vehicle) {
   const name = r.c.schemeName.replace(/\s+/g, ' ').trim();
   return {
     id: `mf${r.c.schemeCode}`, name, code: String(r.c.schemeCode), plan: planOf(name) || undefined,
-    inception: r.first, lastNav: r.last, observations: r.n, dateSource: 'mfapi',
+    inception: r.first, lastNav: r.last, observations: r.n, dateSource: r.clamped ? 'direct' : 'mfapi',
     ccy: 'INR', returnType: 'Adjusted price', how: 'mfapi', kind: vehicle === 'etf' ? 'ETF' : 'MF',
     links: [L('AMFI NAV history', AMFI)],
   };
