@@ -325,16 +325,24 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
                 </a>
               </li>
-              <li>
-                Click the bookmark. A small panel opens on that page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new, starting the day after the newest date it already has. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the files it will download before you press Start.
-              </li>
-              <li>Press <strong>Start</strong> and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
-              <li>It fills in the page's form and presses its <strong>{{ g.bookmarklet.action }}</strong> button for you, one file after another, with a pause of a few seconds each time, as a person would. That's the same download you'd do by hand, without the clicking.</li>
-              <li>In Chrome or Edge it asks for <strong>one folder</strong> (make a new one, as Downloads and Desktop aren't allowed) and saves every file there with no more prompts. In other browsers the files download as usual: the first three go out together so your browser asks to <strong>allow multiple downloads</strong>, so choose Allow; it waits about 15 seconds for that. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the files by date, and a newer file replaces older data for the same dates.</li>
+              <template v-if="g.bookmarklet.oneShot">
+                <li>Click the bookmark. If the page is not already at its widest date range, it moves there and asks you to click the bookmark again once it has loaded &mdash; that only happens once per ticker.</li>
+                <li>A small panel opens with a <strong>{{ g.bookmarklet.action }}</strong> button. Press it: it reads the table the page itself shows and saves it as one CSV file, exactly those values.</li>
+                <li>In Chrome or Edge it asks for a folder the first time (make a new one, as Downloads and Desktop aren't allowed) and saves there; otherwise it's a normal browser download. Repeat for each ticker &mdash; open its page, click the bookmark, press {{ g.bookmarklet.action }}. Then use <strong>Import Files</strong> in Portfolio Engine and pick the files: it merges by date, and a newer file replaces older data for the same dates.</li>
+              </template>
+              <template v-else>
+                <li>
+                  Click the bookmark. A small panel opens on that page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new, starting the day after the newest date it already has. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the files it will download before you press Start.
+                </li>
+                <li>Press <strong>Start</strong> and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
+                <li>It fills in the page's form and presses its <strong>{{ g.bookmarklet.action }}</strong> button for you, one file after another, with a pause of a few seconds each time, as a person would. That's the same download you'd do by hand, without the clicking.</li>
+                <li>In Chrome or Edge it asks for <strong>one folder</strong> (make a new one, as Downloads and Desktop aren't allowed) and saves every file there with no more prompts. In other browsers the files download as usual: the first three go out together so your browser asks to <strong>allow multiple downloads</strong>, so choose Allow; it waits about 15 seconds for that. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the files by date, and a newer file replaces older data for the same dates.</li>
+              </template>
             </ol>
 
             <p class="text-xs text-muted-foreground">
-              The bookmark remembers where it left off in this browser, so clearing that site's data makes the next Update a full history. This just saves you the clicking: the same form and the same download button, so a few years of files take one click instead of many. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}.
+              <template v-if="!g.bookmarklet.oneShot">The bookmark remembers where it left off in this browser, so clearing that site's data makes the next Update a full history. </template>
+              This just saves you the clicking: {{ g.bookmarklet.oneShot ? 'the same page you would read by hand' : 'the same form and the same download button' }}, so {{ g.bookmarklet.oneShot ? 'a file takes one click instead of a manual copy-paste' : 'a few years of files take one click instead of many' }}. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}.
               <template v-if="g.bookmarklet.caution">{{ g.bookmarklet.caution }} Read their
                 <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>.</template>
               <template v-else>Their
