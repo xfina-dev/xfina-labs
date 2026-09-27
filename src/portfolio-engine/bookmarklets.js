@@ -6,6 +6,7 @@ import nseIndices from './bookmarklets/nse-indices.js?raw';
 import nseEtf from './bookmarklets/nse-etf.js?raw';
 import amfiNav from './bookmarklets/amfi-nav.js?raw';
 import yahooFinance from './bookmarklets/yahoo-finance.js?raw';
+import mcxSpot from './bookmarklets/mcx-spot.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
 import { nodes } from './guide.js';
 
@@ -20,6 +21,13 @@ const NSE_DEBT = {
 };
 // When the catalogue has no start date for a debt index, ask from here; earlier years just come back empty.
 const DEBT_FROM = '2010-01-01';
+
+// MCX's own commodity code and the location it is actually polled at, keyed by the catalogue's instrument id.
+// Only gold's Ahmedabad spot price is polled for now (MCX only polls a handful of locations per commodity;
+// Mumbai returns nothing for gold, checked live).
+const MCX_PRODUCTS = {
+  'idx-mcx-gold-spot': ['GOLD', 'AHMEDABAD'],
+};
 
 const BUILDERS = {
   'NSE Indices': (items) => {
@@ -91,6 +99,23 @@ const BUILDERS = {
       oneShot: true,
       caution: 'Yahoo\'s terms bar automated collection for any purpose, with no personal-use exception, and Yahoo removed its own download button. This bookmark opens a small panel on the ticker\'s own history page and, on a click, saves the same table you would otherwise copy out by hand: nothing it could not equally get by a person reading the page. Used only where no fund, exchange or index has a real download.',
       skipped: 0,
+    };
+  },
+  // MCX's own Spot Market Price Archives, for the spot indexes it polls (gold only, at Ahmedabad, for now).
+  MCX: (items) => {
+    const spots = items.filter((i) => i.how === 'mcxSpot' && MCX_PRODUCTS[i.id]);
+    if (!spots.length) return null;
+    return {
+      site: 'MCX',
+      openUrl: 'https://www.mcxindia.com/market-data/spot-market-price',
+      openLabel: 'Open MCX Spot Market Price',
+      termsUrl: 'https://www.mcxindia.com/terms-and-conditions-of-usage-for-website',
+      label: 'Xfina · MCX Spot Price',
+      href: bookmarkletHref(mcxSpot, { PRODUCTS: spots.map((i) => [...MCX_PRODUCTS[i.id], i.name, i.inception]) }),
+      indexes: spots.map((i) => i.name),
+      action: 'Excel export',
+      caution: 'MCX\'s terms of use restrict automated data collection, the same as NSE\'s. This bookmark only does the clicking you would do on that page, one file at a time and at a human pace, but the terms say what they say, so the decision to use it is yours.',
+      skipped: items.length - spots.length,
     };
   },
   // AMFI's own NAV History page, for the mutual fund and fund-of-fund schemes (their first NAV date is known).

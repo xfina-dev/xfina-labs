@@ -98,8 +98,8 @@ export const HOW = {
   mcxSpot: {
     site: 'MCX',
     title: 'MCX: Spot Market Price',
-    steps: ['Open Spot Market Price and its Archives tab.', 'Set Commodity to GOLD and Location to AHMEDABAD (the only location MCX polls gold at; other cities return nothing).', 'Set the date range and press Show. Results are paginated; step through the pages for the full range.', 'Copy or note down the rows; there is no confirmed download button for this query yet.'],
-    format: 'Commodity, unit, location, spot price in INR per 10 grams, and a date and time, as MCX publishes it. Prices are polled several times a day, not once, so pick one reading per day (for example the latest) when importing.',
+    steps: ['Open Spot Market Price and its Archives tab.', 'Set Commodity to GOLD and Location to AHMEDABAD (the only location MCX polls gold at; other cities return nothing).', 'Set the widest date range the site allows (there is no cap: one query returns the full history).', 'Press Show, then press the page\'s own Excel export button.'],
+    format: 'Commodity, unit, location, spot price in INR per 10 grams, an up/down mark, and a date and time, as MCX publishes it, wrapped as an .xls file. Prices are polled several times a day, not once (and MCX\'s own Session tag for which poll is inconsistent before recent years), so every reading is kept; pick one reading per day (for example the latest) on import.',
   },
 };
 
