@@ -2501,7 +2501,8 @@
        "label": "S&P 500 on S&P Dow Jones Indices",
        "url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/"
       }
-     ]
+     ],
+     "maxYears": 10
     },
     {
      "id": "idx-sp500-price",
@@ -2518,7 +2519,8 @@
        "url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/"
       }
      ],
-     "asset": "S&P 500"
+     "asset": "S&P 500",
+     "maxYears": 10
     }
    ]
   },

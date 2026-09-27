@@ -93,16 +93,20 @@ export const HOW = {
   spdji: {
     site: 'S&P Dow Jones Indices',
     title: 'S&P Dow Jones Indices',
-    steps: ['Open the index page and look for its historical data or performance download.', 'Choose the series on the row: Total Return, or the price index (no dividends).', 'Full daily history is normally for subscribers. If it is not offered to you, use an ETF instead.'],
+    steps: ['Open the index page and look for its historical data or performance download.', 'Choose the series on the row: Total Return, or the price index (no dividends).', 'The site downloads only the last 10 years (1Y, 5Y and 10Y); changing dates or options in the address gives nothing more. Longer history is licensed from S&P Dow Jones Indices. If you need it, use an ETF instead.'],
     format: 'A date and an index level, as S&P publishes it.',
   },
 };
 
 
 const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices', nasdaq: 'first row on Nasdaq Indexes' };
-export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
-// Whole years of history up to today, rounded down; null when the start date is not known.
-export const yearsOf = (i) => (i.inception ? Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5))) : null);
+export const dateNote = (i) => (i.inception ? `History from ${i.inception}${i.maxYears ? `; the site downloads the last ${i.maxYears} years` : ''}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
+// Whole years of history up to today, rounded down, and no more than the source lets you download; null when the start date is not known.
+export const yearsOf = (i) => {
+  if (!i.inception) return null;
+  const y = Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5)));
+  return i.maxYears ? Math.min(y, i.maxYears) : y;
+};
 export const dateSourceNote = (i) => (i.inception ? DATE_SOURCE[i.dateSource] || '' : '');
 
 export const nodes = tree.nodes;

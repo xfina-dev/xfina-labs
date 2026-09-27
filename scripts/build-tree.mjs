@@ -210,11 +210,13 @@ const INDICES = [
   // Start dates are the oldest rows NSE Indices returns for each Total Returns Index (measured by calling the same
   // endpoint the historical data page uses, on 2026-09-26).
   ...[['Nifty 50', '1999-06-30'], ['Nifty Next 50', '2002-11-08'], ['Nifty Midcap 150', '2005-04-01'], ['Nifty Smallcap 250', '2005-04-01']].map(([a, since]) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since })),
-  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 Total Return', how: 'spdji', ccy: 'USD', since: '1988-01-04', src: 'manual', links: [L('S&P 500 on S&P Dow Jones Indices', 'https://www.spglobal.com/spdji/en/indices/equity/sp-500/')] },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 Total Return', how: 'spdji', ccy: 'USD', since: '1988-01-04', src: 'manual', maxYears: 10, links: [L('S&P 500 on S&P Dow Jones Indices', 'https://www.spglobal.com/spdji/en/indices/equity/sp-500/')] },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 Total Return (XNDX)', how: 'nasdaqIdx', ccy: 'USD', since: '1999-03-01', src: 'nasdaq', links: [L('XNDX history', 'https://indexes.nasdaqomx.com/Index/History/XNDX')] },
   // Nasdaq start dates are the first rows its export returns (checked 2026-09-27: XNDX from 1999-03-01, NDX from 1985-01-31).
+  // S&P DJI's site downloads only the last 10 years (1Y, 5Y and 10Y windows; edited dates or flags change nothing), so
+  // the S&P rows carry maxYears: 10. Longer history is licensed.
   // The same two without dividends reinvested: a longer history, but it leaves out the dividend return, so it understates gains.
-  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 (price index, no dividends)', how: 'spdji', ccy: 'USD', ret: 'Price only', since: '1928-01-03', src: 'manual', links: [L('S&P 500 on S&P Dow Jones Indices', 'https://www.spglobal.com/spdji/en/indices/equity/sp-500/')] },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 (price index, no dividends)', how: 'spdji', ccy: 'USD', ret: 'Price only', since: '1928-01-03', src: 'manual', maxYears: 10, links: [L('S&P 500 on S&P Dow Jones Indices', 'https://www.spglobal.com/spdji/en/indices/equity/sp-500/')] },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 (NDX, price index, no dividends)', how: 'nasdaqIdx', ccy: 'USD', ret: 'Price only', since: '1985-01-31', src: 'nasdaq', links: [L('NDX history', 'https://indexes.nasdaqomx.com/Index/History/NDX')] },
   ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Net Total Return`, how: 'msci', ccy: 'USD', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
   // Gold has no Index option. World-wide: the LBMA Gold Price history needs an IBA licence (MyLBMA portal, free only on
@@ -294,7 +296,7 @@ for (const f of FOREIGN) {
 
 for (const i of INDICES) {
   const n = node(i.cls, i.region, 'index', null, i.asset);
-  n.instruments.push({ id: `idx-${++seq}`, name: i.name, inception: i.since || null, dateSource: i.since ? (i.src || 'nse') : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
+  n.instruments.push({ id: `idx-${++seq}`, name: i.name, inception: i.since || null, ...(i.maxYears ? { maxYears: i.maxYears } : {}), dateSource: i.since ? (i.src || 'nse') : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
 }
 
 // Oldest first; instruments without a known date go last. Keep the top KEEP.
