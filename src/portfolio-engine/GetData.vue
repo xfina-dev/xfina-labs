@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
-import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf } from './guide.js';
+import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
@@ -204,7 +204,10 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <tr v-if="g.asset"><th colspan="7" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
                 <tr v-for="i in g.instruments" :key="i.id" class="border-t">
                   <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
-                  <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ clip(i.name) }}</td>
+                  <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">
+                    {{ clip(i.name) }}
+                    <Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested in the fund' : 'Distributing: income is paid out, not reinvested'">{{ distFlag(i) }}</Tag>
+                  </td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ HOW[i.how].site }}</td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
@@ -289,7 +292,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <ul class="divide-y rounded-md border">
               <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
                 <div class="min-w-0 text-sm">
-                  <span class="font-medium">{{ clip(i.name) }}</span> <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag>
+                  <span class="font-medium">{{ clip(i.name) }}</span> <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag> <Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag>
                   <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.returnType }}</div>
                 </div>
                 <div class="flex items-center gap-1.5">

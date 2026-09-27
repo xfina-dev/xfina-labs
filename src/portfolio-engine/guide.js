@@ -126,16 +126,32 @@ export const assetsFor = (cls, region, vehicle, listing) => [...new Set(nodes.fi
 export const instrumentsFor = (cls, region, vehicle, listing, asset) => nodes.find((n) => same(n, cls, region, vehicle, listing) && n.asset === asset)?.instruments || [];
 
 // Every asset for the chosen path, each with its instruments, oldest first. The guide groups by asset
-// instead of asking the user to pick one.
-export const groupsFor = (cls, region, vehicle, listing) => nodes.filter((n) => same(n, cls, region, vehicle, listing)).map((n) => ({ asset: n.asset, instruments: n.instruments }));
+// instead of asking the user to pick one. Each instrument carries its node's own asset/region/listing (not
+// just the group), so a row can be read on its own, e.g. by distFlag below.
+const withNode = (n) => n.instruments.map((i) => ({ ...i, asset: n.asset, cls: n.class, region: n.region, vehicle: n.vehicle, listing: n.listing || null }));
+export const groupsFor = (cls, region, vehicle, listing) => nodes.filter((n) => same(n, cls, region, vehicle, listing)).map((n) => ({ asset: n.asset, instruments: withNode(n) }));
 
 // Indexes are simply listed: there is no listing or asset to choose, every index for the region is shown.
-export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls && n.region === region && n.vehicle === 'index').flatMap((n) => n.instruments.map((i) => ({ ...i, asset: n.asset })));
+export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls && n.region === region && n.vehicle === 'index').flatMap(withNode);
+
+// Accumulating vs distributing, shown only where it is a real, made choice: an ETF holding an income-bearing
+// asset (equity, bonds -- not gold, which yields nothing to distribute). A UCITS/CH fund names its own
+// share class ("... UCITS ETF (Acc)"); one with no such marker is the Distributing share class (the Acc
+// alternative either doesn't exist or wasn't picked, IB01 being the one case here without an Acc option).
+// A native US listing is Distributing by law -- a '40 Act RIC must pay out at least 90% of its net income
+// every year to keep its pass-through tax status, not a per-fund choice. India (domestic listing, or the
+// India-listed feeder ETFs on foreign indices) uses neither UCITS term, so it is left out here.
+export function distFlag(i) {
+  if (i.kind !== 'ETF' || i.asset === 'Gold' || i.region === 'india' || i.listing === 'india') return null;
+  if (/\(Acc\)/i.test(i.name)) return 'Acc';
+  if (/\(Dist\)/i.test(i.name)) return 'Dist';
+  return 'Dist';
+}
 
 export function findDataset(id) {
   for (const n of nodes) {
     const hit = n.instruments.find((i) => i.id === id);
-    if (hit) return { ...hit, asset: n.asset, cls: n.class, region: n.region, vehicle: n.vehicle };
+    if (hit) return { ...hit, asset: n.asset, cls: n.class, region: n.region, vehicle: n.vehicle, listing: n.listing || null };
   }
   return null;
 }
