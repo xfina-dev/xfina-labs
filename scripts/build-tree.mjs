@@ -220,8 +220,10 @@ const INDICES = [
   // Gold has no Index option. World-wide: the LBMA Gold Price history needs an IBA licence (MyLBMA portal, free only on
   // application for non-commercial use). India: no free downloadable index history: IBJA (ibjarates.com) publishes today's rate and the last
   // 30 days only, and its API with history is paid. Indian gold is covered by gold ETFs and funds instead.
-  { cls: 'debt', region: 'india', asset: 'Short duration', name: 'NSE short-duration debt index (Liquid or 1D Rate)', how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)] },
-  { cls: 'debt', region: 'india', asset: 'Long duration', name: 'Nifty 10 yr Benchmark G-Sec Index', how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)] },
+  // Debt start dates: the first rows Historical Index Data (Fixed Income) returns for Nifty 1D Rate Index and Nifty 10 yr
+  // Benchmark G-Sec, found by asking year by year on the page (2010 empty, 2011 from 3 Jan), on 2026-09-27.
+  { cls: 'debt', region: 'india', asset: 'Short duration', name: 'NSE short-duration debt index (Liquid or 1D Rate)', how: 'nseTri', ccy: 'INR', since: '2011-01-03', links: [L('NSE Indices historical data', NSE_HIST)] },
+  { cls: 'debt', region: 'india', asset: 'Long duration', name: 'Nifty 10 yr Benchmark G-Sec Index', how: 'nseTri', ccy: 'INR', since: '2011-01-03', links: [L('NSE Indices historical data', NSE_HIST)] },
 ];
 
 // ---------------------------------------------------------------- assemble

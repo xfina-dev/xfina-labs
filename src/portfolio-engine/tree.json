@@ -2562,8 +2562,8 @@
     {
      "id": "idx-12",
      "name": "NSE short-duration debt index (Liquid or 1D Rate)",
-     "inception": null,
-     "dateSource": null,
+     "inception": "2011-01-03",
+     "dateSource": "nse",
      "ccy": "INR",
      "returnType": "Total return",
      "how": "nseTri",
@@ -2586,8 +2586,8 @@
     {
      "id": "idx-13",
      "name": "Nifty 10 yr Benchmark G-Sec Index",
-     "inception": null,
-     "dateSource": null,
+     "inception": "2011-01-03",
+     "dateSource": "nse",
      "ccy": "INR",
      "returnType": "Total return",
      "how": "nseTri",
