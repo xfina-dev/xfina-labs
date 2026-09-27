@@ -2485,49 +2485,6 @@
    "class": "equity",
    "region": "us",
    "vehicle": "index",
-   "asset": "S&P 500",
-   "instruments": [
-    {
-     "id": "idx-5",
-     "name": "S&P 500 Total Return",
-     "inception": "1988-01-04",
-     "dateSource": "manual",
-     "ccy": "USD",
-     "returnType": "Total return",
-     "how": "spdji",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "S&P 500 on S&P Dow Jones Indices",
-       "url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/"
-      }
-     ],
-     "maxYears": 10
-    },
-    {
-     "id": "idx-sp500-price",
-     "name": "S&P 500 (price index, no dividends)",
-     "inception": "1928-01-03",
-     "dateSource": "manual",
-     "ccy": "USD",
-     "returnType": "Price only",
-     "how": "spdji",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "S&P 500 on S&P Dow Jones Indices",
-       "url": "https://www.spglobal.com/spdji/en/indices/equity/sp-500/"
-      }
-     ],
-     "asset": "S&P 500",
-     "maxYears": 10
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "us",
-   "vehicle": "index",
    "asset": "Nasdaq 100",
    "instruments": [
     {

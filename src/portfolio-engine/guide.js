@@ -90,12 +90,6 @@ export const HOW = {
     steps: ['Open the index history page.', 'Set the start and end dates. The calendar\'s year list only reaches ten years back. For earlier dates, press Download once and then edit startDate and endDate in the download address (for example startDate=1999-03-01T00:00:00.000).', 'Download the levels for the series on the row: XNDX is total return (from March 1999), NDX is the price index without dividends (from 1985).'],
     format: 'A date and an index level, as Nasdaq publishes it.',
   },
-  spdji: {
-    site: 'S&P Dow Jones Indices',
-    title: 'S&P Dow Jones Indices',
-    steps: ['Open the index page and look for its historical data or performance download.', 'Choose the series on the row: Total Return, or the price index (no dividends).', 'The site downloads only the last 10 years (1Y, 5Y and 10Y); changing dates or options in the address gives nothing more. Longer history is licensed from S&P Dow Jones Indices. If you need it, use an ETF instead.'],
-    format: 'A date and an index level, as S&P publishes it.',
-  },
 };
 
 
