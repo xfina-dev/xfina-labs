@@ -166,17 +166,33 @@ async function isharesInception(url) {
     let m = t.match(/inceptionDate-data">(\d{1,2})\/([A-Za-z]+)\/(\d{4})/) || t.match(/launchDate-data">(\d{1,2})\/([A-Za-z]+)\/(\d{4})/);
     if (m) return fmt(m[3], m[2], m[1]);
     m = t.match(/"Fund Inception","value":"([A-Za-z]+) (\d{1,2}), (\d{4})"/);
-    return m ? fmt(m[3], m[1], m[2]) : null;
+    if (m) return fmt(m[3], m[1], m[2]);
+    // CH pages carry neither: read the first point of the NAV performance chart's own data series instead
+    // (var navData = [{x:Date.UTC(2009,9,5),...}, the earliest date the fund itself has a NAV for).
+    m = t.match(/navData\s*=\s*\[\{x:Date\.UTC\((\d{4}),(\d{1,2}),(\d{1,2})\)/);
+    return m ? `${m[1]}-${String(+m[2] + 1).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}` : null;
   } catch { return null; }
 }
 const yahoo = (t) => `https://finance.yahoo.com/quote/${t}/history/`;
 const ishUk = (id, slug) => `https://www.ishares.com/uk/individual/en/products/${id}/${slug}`;
 const ishUs = (id, slug) => `https://www.ishares.com/us/products/${id}/${slug}`;
+const ishCh = (id, slug) => `https://www.ishares.com/ch/individual/en/products/${id}/${slug}`;
 // iShares' own "Data Download" file (Excel/XML), the same one the fund page's Data Download link gives: a Historical
 // (US) or Historical NAVs (UK) sheet with one row per day back to the fund's start. Confirmed for IVV, SWDA, and the
 // rest of the Irish-domiciled set (2026-09-27); the US and UK sites use different API hosts.
 const ishNavUs = (id) => `https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=${id}&component=fundDownload&userType=individual`;
 const ishNavUk = (id) => `https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=${id}&component=fundDownloadV2&userType=individual`;
+// The Swiss site has no such generic template: its "Historical NAVs" download link embeds a per-page document id
+// that isn't just the portfolioId, so it is scraped straight off the fund page instead. Confirmed for CSGOLD
+// (iShares Gold ETF (CH)), 2026-09-27.
+async function ishNavCh(pageUrl) {
+  try {
+    const r = await fetch(pageUrl, { headers: { 'User-Agent': UA } });
+    const t = await r.text();
+    const m = t.match(/href="([^"]*\.ajax\?fileType=xls&fileName=[^"]*&dataType=fund)"/);
+    return m ? new URL(m[1], pageUrl).href : null;
+  } catch { return null; }
+}
 // State Street's own NAV history file for an SPDR ETF (confirmed for SPY, 2026-09-27).
 const ssgaNav = (t) => `https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-${t.toLowerCase()}.xlsx`;
 
@@ -199,13 +215,22 @@ const ETFS = [
   { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'us', name: 'iShares MSCI ACWI ETF', code: 'ACWI', page: ishUs(239600, 'ishares-msci-acwi-etf'), links: [L('ACWI price history', yahoo('ACWI'))] },
   { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares MSCI Emerging Markets ETF', code: 'EEM', manual: '2003-04-07', page: ishUs(239637, 'ishares-msci-emerging-markets-etf'), links: [L('EEM price history', yahoo('EEM'))] },
   // Gold (priced world-wide in USD)
-  // Gold ETFs: US-domiciled ones under the US region, the Canadian trust under Global. The Irish one (an ETC issued by an
-  // Irish company, not a UCITS ETF) is Global only. US gold has no domicile choice, so its ETFs carry no listing.
+  // Gold ETFs: US-domiciled ones under the US region, Switzerland/Canada/Ireland (all Global-only) as listing
+  // choices, Switzerland first. US gold has no domicile choice, so its ETFs carry no listing.
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', links: [L('GLD price history', yahoo('GLD'))] },
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
-  // Gold, Canada domiciled (Global only): a physically backed trust that also trades on the NYSE in USD.
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') },
+  // Switzerland: a genuine Swiss collective investment scheme under CISA (FINMA-regulated), holding physical gold
+  // directly as fund property. Not a UCITS fund and not a debt security (unlike the Irish ETC below): Switzerland
+  // is outside the UCITS Directive, so it has no need for the debt-note workaround. Confirmed 2026-09-27: NAV
+  // download link scraped live off the fund page, returns a real .xls (200 OK).
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'iShares Gold ETF (CH)', code: 'CSGOLD', page: ishCh(261149, 'ishares-gold-ch-fund') },
+  // Canada: an Ontario trust holding physical gold directly as trust property (also not a debt security).
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-26', manualSrc: 'yahoo', links: [L('PHYS price history', yahoo('PHYS'))] },
+  // Ireland: legally a series of secured debt securities (limited-recourse bonds collateralised by gold) issued by
+  // iShares Physical Metals plc, not fund units — UCITS forbids a fund from holding a single physical commodity, so
+  // the gold-tracking product is structured as debt instead (UCITS-eligible under Article 50(1) of the Directive).
+  // Kept for comparison; Switzerland and Canada above are the ones without this structural wrinkle.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') },
   // Debt / US
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf'), links: [L('SGOV price history', yahoo('SGOV'))] },
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'SPDR Bloomberg 1-3 Month T-Bill ETF', code: 'BIL', manual: '2007-05-30', links: [L('BIL price history', yahoo('BIL'))] },
@@ -292,12 +317,14 @@ const SPDR_GOLD_NAV = new Set(['GLD']);
 const etfInst = await pool(ETFS, 6, async (e) => {
   let inception = e.manual || null, dateSource = e.manual ? (e.manualSrc || 'manual') : null;
   if (e.page) { const d = await isharesInception(e.page); if (d) { inception = d; dateSource = 'issuer'; } else console.warn(`  ! no inception found on ${e.page}`); }
-  const ishMatch = e.page && e.page.match(/ishares\.com\/(us\/products|uk\/individual\/en\/products)\/(\d+)\//);
+  const ishMatch = e.page && e.page.match(/ishares\.com\/(us\/products|uk\/individual\/en\/products|ch\/individual\/en\/products)\/(\d+)\//);
   let how = 'yahoo', returnType = 'Market price', links;
   if (ishMatch) {
     how = 'ishares'; returnType = 'NAV';
-    const navUrl = ishMatch[1].startsWith('us') ? ishNavUs(ishMatch[2]) : ishNavUk(ishMatch[2]);
-    links = [L(`${e.code} NAV history (Excel)`, navUrl), L(`${e.code} fund page`, e.page)];
+    const site = ishMatch[1];
+    const navUrl = site.startsWith('us') ? ishNavUs(ishMatch[2]) : site.startsWith('uk') ? ishNavUk(ishMatch[2]) : await ishNavCh(e.page);
+    if (!navUrl) console.warn(`  ! no NAV download link found on ${e.page}`);
+    links = navUrl ? [L(`${e.code} NAV history (Excel)`, navUrl), L(`${e.code} fund page`, e.page)] : [L(`${e.code} fund page`, e.page)];
   } else if (SSGA_NAV.has(e.code)) {
     how = 'ssga'; returnType = 'NAV';
     links = [L(`${e.code} NAV history (Excel)`, ssgaNav(e.code))];

@@ -31,8 +31,10 @@ export const VEHICLES = [
   { id: 'etf', title: 'ETF', blurb: 'What you could have held on an exchange' },
   { id: 'mf', title: 'MF', blurb: 'Mutual fund NAV' },
 ];
-// The first one that exists for a choice is its default: Canada (only Global gold has it), then Irish, US and India.
+// The first one that exists for a choice is its default: Switzerland (only Global gold has it so far), then
+// Canada, Ireland, US and India.
 export const LISTINGS = [
+  { id: 'switzerland', title: 'Switzerland', blurb: 'Swiss-domiciled funds, listed on SIX, priced in USD' },
   { id: 'canada', title: 'Canada', blurb: 'Canadian trusts and funds, priced in USD or CAD' },
   { id: 'irish', title: 'Ireland', blurb: 'UCITS ETFs, usually listed in London' },
   { id: 'us', title: 'US', blurb: 'US-listed ETFs, in USD' },

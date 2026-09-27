@@ -2039,14 +2039,14 @@
    "class": "gold",
    "region": "global",
    "vehicle": "etf",
-   "listing": "irish",
+   "listing": "switzerland",
    "asset": "Gold",
    "instruments": [
     {
-     "id": "etf-sgln",
-     "name": "iShares Physical Gold ETC",
-     "code": "SGLN",
-     "inception": "2011-04-08",
+     "id": "etf-csgold",
+     "name": "iShares Gold ETF (CH)",
+     "code": "CSGOLD",
+     "inception": "2009-10-05",
      "dateSource": "issuer",
      "ccy": "USD",
      "returnType": "NAV",
@@ -2054,12 +2054,12 @@
      "kind": "ETF",
      "links": [
       {
-       "label": "SGLN NAV history (Excel)",
-       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=258441&component=fundDownloadV2&userType=individual"
+       "label": "CSGOLD NAV history (Excel)",
+       "url": "https://www.ishares.com/ch/individual/en/products/261149/ishares-gold-ch-fund/1535604580403.ajax?fileType=xls&fileName=Gold-ETF-CH_fund&dataType=fund"
       },
       {
-       "label": "SGLN fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/258441/ishares-physical-gold-etc"
+       "label": "CSGOLD fund page",
+       "url": "https://www.ishares.com/ch/individual/en/products/261149/ishares-gold-ch-fund"
       }
      ],
      "asset": "Gold"
@@ -2087,6 +2087,37 @@
       {
        "label": "PHYS price history",
        "url": "https://finance.yahoo.com/quote/PHYS/history/"
+      }
+     ],
+     "asset": "Gold"
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "etf-sgln",
+     "name": "iShares Physical Gold ETC",
+     "code": "SGLN",
+     "inception": "2011-04-08",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SGLN NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=258441&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "SGLN fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/258441/ishares-physical-gold-etc"
       }
      ],
      "asset": "Gold"
