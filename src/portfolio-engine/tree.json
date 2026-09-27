@@ -2681,54 +2681,6 @@
    ]
   },
   {
-   "class": "gold",
-   "region": "us",
-   "vehicle": "index",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "idx-10",
-     "name": "LBMA Gold Price (USD)",
-     "inception": null,
-     "dateSource": null,
-     "ccy": "USD",
-     "returnType": "Price only",
-     "how": "lbma",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "LBMA precious metal prices",
-       "url": "https://www.lbma.org.uk/prices-and-data/precious-metal-prices"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "gold",
-   "region": "global",
-   "vehicle": "index",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "idx-11",
-     "name": "LBMA Gold Price (USD)",
-     "inception": null,
-     "dateSource": null,
-     "ccy": "USD",
-     "returnType": "Price only",
-     "how": "lbma",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "LBMA precious metal prices",
-       "url": "https://www.lbma.org.uk/prices-and-data/precious-metal-prices"
-      }
-     ]
-    }
-   ]
-  },
-  {
    "class": "debt",
    "region": "india",
    "vehicle": "index",

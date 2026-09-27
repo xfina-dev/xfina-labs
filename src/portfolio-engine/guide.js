@@ -96,12 +96,6 @@ export const HOW = {
     steps: ['Open the index page and look for its historical data or performance download.', 'Choose the Total Return series.', 'Full daily history is normally for subscribers. If it is not offered to you, use an ETF instead.'],
     format: 'A date and an index level, as S&P publishes it.',
   },
-  lbma: {
-    site: 'LBMA',
-    title: 'LBMA: Gold Price',
-    steps: ['Open LBMA Precious Metal Prices. Since November 2025 the full history is in the MyLBMA portal, not on the public page.', 'Create a MyLBMA profile and apply for non-commercial or educational access, which is free. Anyone else needs a licence from ICE Benchmark Administration (IBA), who administer the price.', 'In the portal, open the Gold Price (PM), in USD, and download the history.'],
-    format: 'A date and a USD price, as LBMA publishes it.',
-  },
 };
 
 

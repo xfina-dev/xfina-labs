@@ -212,8 +212,8 @@ const INDICES = [
   { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 Total Return', how: 'spdji', ccy: 'USD', links: [L('S&P 500 on S&P Dow Jones Indices', 'https://www.spglobal.com/spdji/en/indices/equity/sp-500/')] },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 Total Return (XNDX)', how: 'nasdaqIdx', ccy: 'USD', links: [L('XNDX history', 'https://indexes.nasdaqomx.com/Index/History/XNDX')] },
   ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Net Total Return`, how: 'msci', ccy: 'USD', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
-  ...['us', 'global'].map((region) => ({ cls: 'gold', region, asset: 'Gold', name: 'LBMA Gold Price (USD)', how: 'lbma', ccy: 'USD', ret: 'Price only', links: [L('LBMA precious metal prices', 'https://www.lbma.org.uk/prices-and-data/precious-metal-prices')] })),
-  // India gold has no free downloadable index history: IBJA (ibjarates.com) publishes today's rate and the last
+  // Gold has no Index option. World-wide: the LBMA Gold Price history needs an IBA licence (MyLBMA portal, free only on
+  // application for non-commercial use). India: no free downloadable index history: IBJA (ibjarates.com) publishes today's rate and the last
   // 30 days only, and its API with history is paid. Indian gold is covered by gold ETFs and funds instead.
   { cls: 'debt', region: 'india', asset: 'Short duration', name: 'NSE short-duration debt index (Liquid or 1D Rate)', how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)] },
   { cls: 'debt', region: 'india', asset: 'Long duration', name: 'Nifty 10 yr Benchmark G-Sec Index', how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)] },
