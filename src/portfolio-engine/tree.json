@@ -2483,47 +2483,6 @@
   },
   {
    "class": "equity",
-   "region": "us",
-   "vehicle": "index",
-   "asset": "Nasdaq 100",
-   "instruments": [
-    {
-     "id": "idx-6",
-     "name": "Nasdaq-100 Total Return (XNDX)",
-     "inception": "1999-03-01",
-     "dateSource": "nasdaq",
-     "ccy": "USD",
-     "returnType": "Total return",
-     "how": "nasdaqIdx",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "XNDX history",
-       "url": "https://indexes.nasdaqomx.com/Index/History/XNDX"
-      }
-     ]
-    },
-    {
-     "id": "idx-ndx-price",
-     "name": "Nasdaq-100 (NDX, price index, no dividends)",
-     "inception": "1985-01-31",
-     "dateSource": "nasdaq",
-     "ccy": "USD",
-     "returnType": "Price only",
-     "how": "nasdaqIdx",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "NDX history",
-       "url": "https://indexes.nasdaqomx.com/Index/History/NDX"
-      }
-     ],
-     "asset": "Nasdaq 100"
-    }
-   ]
-  },
-  {
-   "class": "equity",
    "region": "global",
    "vehicle": "index",
    "asset": "MSCI ACWI",

@@ -84,23 +84,13 @@ export const HOW = {
     steps: ['Open the index page, then End of Day Index Data.', 'Choose the Net Total Return variant in USD.', 'Set the widest date range and download.'],
     format: 'A date and an index level, as MSCI publishes it.',
   },
-  nasdaqIdx: {
-    site: 'Nasdaq Indexes',
-    title: 'Nasdaq Indexes: history',
-    steps: ['Open the index history page.', 'Set the start and end dates. The calendar\'s year list only reaches ten years back. For earlier dates, press Download once and then edit startDate and endDate in the download address (for example startDate=1999-03-01T00:00:00.000).', 'Download the levels for the series on the row: XNDX is total return (from March 1999), NDX is the price index without dividends (from 1985).'],
-    format: 'A date and an index level, as Nasdaq publishes it.',
-  },
 };
 
 
-const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices', nasdaq: 'first row on Nasdaq Indexes' };
-export const dateNote = (i) => (i.inception ? `History from ${i.inception}${i.maxYears ? `; the site downloads the last ${i.maxYears} years` : ''}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
-// Whole years of history up to today, rounded down, and no more than the source lets you download; null when the start date is not known.
-export const yearsOf = (i) => {
-  if (!i.inception) return null;
-  const y = Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5)));
-  return i.maxYears ? Math.min(y, i.maxYears) : y;
-};
+const DATE_SOURCE = { mfapi: 'first NAV on AMFI', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices' };
+export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
+// Whole years of history up to today, rounded down; null when the start date is not known.
+export const yearsOf = (i) => (i.inception ? Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5))) : null);
 export const dateSourceNote = (i) => (i.inception ? DATE_SOURCE[i.dateSource] || '' : '');
 
 export const nodes = tree.nodes;
