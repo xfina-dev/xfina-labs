@@ -211,7 +211,8 @@ const ETFS = [
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'SPDR Bloomberg 1-3 Month T-Bill ETF', code: 'BIL', manual: '2007-05-30', links: [L('BIL price history', yahoo('BIL'))] },
   { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'us', name: 'iShares 20+ Year Treasury Bond ETF', code: 'TLT', page: ishUs(239454, 'ishares-20-year-treasury-bond-etf'), links: [L('TLT price history', yahoo('TLT'))] },
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'irish', name: 'iShares $ Treasury Bond 0-1yr UCITS ETF', code: 'IB01', page: ishUk(307243, 'ishares-usd-treasury-bond-01yr-ucits-etf'), extra: [L('IB01 price history', yahoo('IB01.L'))] },
-  { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'irish', name: 'iShares $ Treasury Bond 20+yr UCITS ETF', code: 'IDTL', page: ishUk(272124, 'ishares-usd-treasury-bond-20-yr-ucits-etf') },
+  // DTLA, not IDTL: IDTL is the Distributing share class; India/Ireland rows use accumulating where one exists (confirmed on ishares.com, 2026-09-27).
+  { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'irish', name: 'iShares $ Treasury Bond 20+yr UCITS ETF USD (Acc)', code: 'DTLA', page: ishUk(297191, 'ishares-treasury-bond-20-yr-ucits-etf-usd-acc-fund') },
   // Debt / Global
   { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-06', manualSrc: 'yahoo', links: [L('BNDW price history', yahoo('BNDW'))] },
   { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'irish', name: 'iShares Core Global Aggregate Bond UCITS ETF', code: 'AGGG', page: ishUk(291773, 'ishares-core-global-aggregate-bond-ucits-etf') },

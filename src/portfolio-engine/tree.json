@@ -2212,10 +2212,10 @@
    "asset": "Long duration",
    "instruments": [
     {
-     "id": "etf-idtl",
-     "name": "iShares $ Treasury Bond 20+yr UCITS ETF",
-     "code": "IDTL",
-     "inception": "2015-01-20",
+     "id": "etf-dtla",
+     "name": "iShares $ Treasury Bond 20+yr UCITS ETF USD (Acc)",
+     "code": "DTLA",
+     "inception": "2018-05-10",
      "dateSource": "issuer",
      "ccy": "USD",
      "returnType": "NAV",
@@ -2223,12 +2223,12 @@
      "kind": "ETF",
      "links": [
       {
-       "label": "IDTL NAV history (Excel)",
-       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=272124&component=fundDownloadV2&userType=individual"
+       "label": "DTLA NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=297191&component=fundDownloadV2&userType=individual"
       },
       {
-       "label": "IDTL fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/272124/ishares-usd-treasury-bond-20-yr-ucits-etf"
+       "label": "DTLA fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/297191/ishares-treasury-bond-20%20yr-ucits-etf-usd-acc-fund"
       }
      ],
      "asset": "Long duration"
