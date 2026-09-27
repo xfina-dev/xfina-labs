@@ -153,8 +153,8 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">3</span>Model it as</h3>
             <div class="grid gap-2">
-              <!-- All three always show; ones with nothing behind them for this class and region are dimmed. -->
-              <button v-for="v in VEHICLES" :key="v.id" type="button" :disabled="!offers(v.id)" :class="[tile(vehicle === v.id), !offers(v.id) && 'opacity-40 cursor-not-allowed']" @click="pick('vehicle', v.id)">
+              <!-- Only the models that exist for this class and region; Gold has no Index, for example. -->
+              <button v-for="v in vehicles" :key="v.id" type="button" :class="tile(vehicle === v.id)" @click="pick('vehicle', v.id)">
                 <div class="font-medium">{{ v.title }}</div><div class="text-xs text-muted-foreground">{{ v.blurb }}</div>
               </button>
             </div>
