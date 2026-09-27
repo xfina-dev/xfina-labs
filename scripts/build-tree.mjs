@@ -89,8 +89,8 @@ function toInstrument(r, vehicle) {
   const name = r.c.schemeName.replace(/\s+/g, ' ').trim();
   return {
     id: `mf${r.c.schemeCode}`, name, code: String(r.c.schemeCode), plan: planOf(name) || undefined,
-    inception: r.first, lastNav: r.last, observations: r.n, dateSource: r.clamped ? 'direct' : 'mfapi',
-    ccy: 'INR', returnType: 'NAV', how: 'mfapi', kind: vehicle === 'etf' ? 'ETF' : 'MF',
+    inception: r.first, lastNav: r.last, observations: r.n, dateSource: r.clamped ? 'direct' : 'amfi',
+    ccy: 'INR', returnType: 'NAV', how: 'amfi', kind: vehicle === 'etf' ? 'ETF' : 'MF',
     links: [L('AMFI NAV history', AMFI)],
   };
 }

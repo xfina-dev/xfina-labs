@@ -17,10 +17,10 @@
      "inception": "2006-04-02",
      "lastNav": "2026-09-25",
      "observations": 5044,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -37,10 +37,10 @@
      "inception": "2006-04-03",
      "lastNav": "2026-09-25",
      "observations": 5043,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -57,10 +57,10 @@
      "inception": "2006-04-03",
      "lastNav": "2026-09-25",
      "observations": 5043,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -86,10 +86,10 @@
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
      "observations": 3381,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -106,10 +106,10 @@
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
      "observations": 3381,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -126,10 +126,10 @@
      "inception": "2013-01-02",
      "lastNav": "2026-09-25",
      "observations": 3379,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -155,10 +155,10 @@
      "inception": "2010-06-29",
      "lastNav": "2026-09-25",
      "observations": 4003,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -175,10 +175,10 @@
      "inception": "2018-06-29",
      "lastNav": "2026-09-25",
      "observations": 2029,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -195,10 +195,10 @@
      "inception": "2019-02-22",
      "lastNav": "2026-09-25",
      "observations": 1869,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -224,10 +224,10 @@
      "inception": "2013-01-02",
      "lastNav": "2026-09-25",
      "observations": 3380,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -244,10 +244,10 @@
      "inception": "2018-06-29",
      "lastNav": "2026-09-25",
      "observations": 2029,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -264,10 +264,10 @@
      "inception": "2019-02-22",
      "lastNav": "2026-09-25",
      "observations": 1869,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -293,10 +293,10 @@
      "inception": "2019-09-11",
      "lastNav": "2026-09-25",
      "observations": 1737,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -313,10 +313,10 @@
      "inception": "2021-02-23",
      "lastNav": "2026-09-25",
      "observations": 1377,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -333,10 +333,10 @@
      "inception": "2021-04-06",
      "lastNav": "2026-09-25",
      "observations": 1350,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -362,10 +362,10 @@
      "inception": "2019-09-11",
      "lastNav": "2026-09-25",
      "observations": 1737,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -382,10 +382,10 @@
      "inception": "2021-02-23",
      "lastNav": "2026-09-25",
      "observations": 1377,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -402,10 +402,10 @@
      "inception": "2021-04-06",
      "lastNav": "2026-09-25",
      "observations": 1350,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -431,10 +431,10 @@
      "inception": "2019-09-11",
      "lastNav": "2026-09-25",
      "observations": 1737,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -451,10 +451,10 @@
      "inception": "2020-10-19",
      "lastNav": "2026-09-25",
      "observations": 1464,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -471,10 +471,10 @@
      "inception": "2021-11-03",
      "lastNav": "2026-09-25",
      "observations": 1206,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -500,10 +500,10 @@
      "inception": "2019-09-11",
      "lastNav": "2026-09-25",
      "observations": 1737,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -520,10 +520,10 @@
      "inception": "2020-10-19",
      "lastNav": "2026-09-25",
      "observations": 1464,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -540,10 +540,10 @@
      "inception": "2021-11-03",
      "lastNav": "2026-09-25",
      "observations": 1206,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -569,10 +569,10 @@
      "inception": "2011-03-11",
      "lastNav": "2026-09-25",
      "observations": 3826,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -589,10 +589,10 @@
      "inception": "2011-03-31",
      "lastNav": "2026-09-25",
      "observations": 3752,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -609,10 +609,10 @@
      "inception": "2011-09-19",
      "lastNav": "2026-09-25",
      "observations": 3639,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -638,10 +638,10 @@
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
      "observations": 3382,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -661,7 +661,7 @@
      "dateSource": "direct",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -678,10 +678,10 @@
      "inception": "2013-01-02",
      "lastNav": "2026-09-25",
      "observations": 3369,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -706,10 +706,10 @@
      "inception": "2006-04-01",
      "lastNav": "2026-09-25",
      "observations": 6293,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -726,10 +726,10 @@
      "inception": "2006-04-01",
      "lastNav": "2026-09-26",
      "observations": 6993,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -746,10 +746,10 @@
      "inception": "2006-04-02",
      "lastNav": "2026-09-25",
      "observations": 6433,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -775,10 +775,10 @@
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
      "observations": 4376,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -798,7 +798,7 @@
      "dateSource": "direct",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -818,7 +818,7 @@
      "dateSource": "direct",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -844,10 +844,10 @@
      "inception": "2006-04-02",
      "lastNav": "2026-09-25",
      "observations": 4948,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -864,10 +864,10 @@
      "inception": "2006-04-02",
      "lastNav": "2026-09-25",
      "observations": 4948,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -884,10 +884,10 @@
      "inception": "2006-04-03",
      "lastNav": "2026-09-25",
      "observations": 4957,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -913,10 +913,10 @@
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
      "observations": 3316,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -933,10 +933,10 @@
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
      "observations": 3318,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -953,10 +953,10 @@
      "inception": "2013-01-02",
      "lastNav": "2026-09-25",
      "observations": 3317,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1479,10 +1479,10 @@
      "inception": "2020-04-29",
      "lastNav": "2026-09-25",
      "observations": 1583,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1508,10 +1508,10 @@
      "inception": "2020-04-29",
      "lastNav": "2026-09-25",
      "observations": 1583,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1536,10 +1536,10 @@
      "inception": "2018-12-03",
      "lastNav": "2026-09-25",
      "observations": 1927,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1556,10 +1556,10 @@
      "inception": "2021-10-19",
      "lastNav": "2026-09-25",
      "observations": 1173,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1575,10 +1575,10 @@
      "inception": "2022-03-25",
      "lastNav": "2026-09-25",
      "observations": 1071,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1604,10 +1604,10 @@
      "inception": "2021-10-19",
      "lastNav": "2026-09-25",
      "observations": 1173,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1624,10 +1624,10 @@
      "inception": "2022-04-25",
      "lastNav": "2026-09-25",
      "observations": 992,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {
@@ -1644,10 +1644,10 @@
      "inception": "2022-11-04",
      "lastNav": "2026-09-25",
      "observations": 940,
-     "dateSource": "mfapi",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
-     "how": "mfapi",
+     "how": "amfi",
      "kind": "MF",
      "links": [
       {

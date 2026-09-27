@@ -48,17 +48,11 @@ export const HOW = {
     steps: ['Open the Historical Data page.', 'Pick the index, then the Total Returns Index series (not the price series).', 'Set the widest date range the site allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
     format: 'NSE\'s own CSV: the index name, the date, the Total Returns Index and the Net Total Return Index. The page exports at most a year at a time, so a long history is several files.',
   },
-  mfapi: {
-    site: 'AMFI',
-    title: 'AMFI: NAV history',
-    steps: ['Open NAV History and choose Historical NAV for a period.', 'Pick the fund house, then the scheme (the plan and option named here).', 'Set From and To. The page allows at most 5 years at a time, so a long history is several downloads.', 'Press Go, then download the Excel file and import every part as it is.'],
-    format: 'AMFI\'s own Excel: the net asset value, repurchase and sale price and the NAV date, one row per day.',
-  },
   amfi: {
     site: 'AMFI',
     title: 'AMFI: NAV history',
-    steps: ['Open NAV History.', 'Choose Historical NAV, then the fund house and the scheme.', 'Pick Direct plan, Growth option so distributions stay reinvested.', 'Set the date range and download.'],
-    format: 'A date and NAV per line, as AMFI publishes it.',
+    steps: ['Open NAV History and choose Historical NAV for a period.', 'Pick the fund house, then the scheme (the plan and option named here).', 'Set From and To. The page allows at most 5 years at a time, so a long history is several downloads.', 'Press Go, then download the Excel file and import every part as it is.'],
+    format: 'AMFI\'s own Excel: the net asset value, repurchase and sale price and the NAV date, one row per day. Nothing here comes from mfapi.in or any other republisher.',
   },
   nseEtf: {
     site: 'NSE',
@@ -99,7 +93,7 @@ export const HOW = {
 };
 
 
-const DATE_SOURCE = { mfapi: 'first NAV on AMFI', direct: 'Direct plans began on 1 Jan 2013', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices' };
+const DATE_SOURCE = { direct: 'Direct plans began on 1 Jan 2013', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices' };
 export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
 // Whole years of history up to today, rounded down; null when the start date is not known.
 export const yearsOf = (i) => (i.inception ? Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5))) : null);
