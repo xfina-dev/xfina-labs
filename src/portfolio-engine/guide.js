@@ -141,7 +141,13 @@ export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls &
 // A native US listing is Distributing by law -- a '40 Act RIC must pay out at least 90% of its net income
 // every year to keep its pass-through tax status, not a per-fund choice. India (domestic listing, or the
 // India-listed feeder ETFs on foreign indices) uses neither UCITS term, so it is left out here.
+//
+// An index has no share class, but the same Acc/Dist question has a direct analogue in its returnType: a
+// Total return index reinvests the dividend into the index level (Acc's own definition), a Price-only one
+// excludes it entirely (the same practical gap as Dist, just not paid to anyone). MSCI's "Level (variant
+// unconfirmed)" and MCX's spot price are left blank rather than guessed.
 export function distFlag(i) {
+  if (i.kind === 'Index') return i.returnType === 'Total return' ? 'Acc' : i.returnType === 'Price only' ? 'Dist' : null;
   if (i.kind !== 'ETF' || i.asset === 'Gold' || i.region === 'india' || i.listing === 'india') return null;
   if (/\(Acc\)/i.test(i.name)) return 'Acc';
   if (/\(Dist\)/i.test(i.name)) return 'Dist';
