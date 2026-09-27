@@ -1975,7 +1975,6 @@
    "class": "gold",
    "region": "us",
    "vehicle": "etf",
-   "listing": "us",
    "asset": "Gold",
    "instruments": [
     {
@@ -2014,60 +2013,6 @@
       {
        "label": "IAU price history",
        "url": "https://finance.yahoo.com/quote/IAU/history/"
-      }
-     ],
-     "asset": "Gold"
-    }
-   ]
-  },
-  {
-   "class": "gold",
-   "region": "us",
-   "vehicle": "etf",
-   "listing": "irish",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "etf-sgln",
-     "name": "iShares Physical Gold ETC",
-     "code": "SGLN",
-     "inception": "2011-04-08",
-     "dateSource": "issuer",
-     "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "ishares",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "SGLN fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/258441/ishares-physical-gold-etc"
-      }
-     ],
-     "asset": "Gold"
-    }
-   ]
-  },
-  {
-   "class": "gold",
-   "region": "global",
-   "vehicle": "etf",
-   "listing": "irish",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "etf-sgln",
-     "name": "iShares Physical Gold ETC",
-     "code": "SGLN",
-     "inception": "2011-04-08",
-     "dateSource": "issuer",
-     "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "ishares",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "SGLN fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/258441/ishares-physical-gold-etc"
       }
      ],
      "asset": "Gold"

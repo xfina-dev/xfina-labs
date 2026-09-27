@@ -186,10 +186,10 @@ const ETFS = [
   { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'us', name: 'iShares MSCI ACWI ETF', code: 'ACWI', page: ishUs(239600, 'ishares-msci-acwi-etf'), links: [L('ACWI price history', yahoo('ACWI'))] },
   { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares MSCI Emerging Markets ETF', code: 'EEM', manual: '2003-04-07', page: ishUs(239590, 'ishares-msci-emerging-markets-etf'), links: [L('EEM price history', yahoo('EEM'))] },
   // Gold (priced world-wide in USD)
-  // The US-domiciled ones belong to the US region only; Global gold has the Irish and Canadian ones.
-  { cls: 'gold', region: 'us', asset: 'Gold', listing: 'us', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', links: [L('GLD price history', yahoo('GLD'))] },
-  { cls: 'gold', region: 'us', asset: 'Gold', listing: 'us', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
-  ...['us', 'global'].map((region) => ({ cls: 'gold', region, asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') })),
+  // Gold ETFs: US-domiciled ones under the US region, the Canadian trust under Global. No Irish ones (the physical
+  // gold ETC is not a UCITS ETF). US gold has no domicile choice, so its ETFs carry no listing.
+  { cls: 'gold', region: 'us', asset: 'Gold', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', links: [L('GLD price history', yahoo('GLD'))] },
+  { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
   // Gold, Canada domiciled (Global only): a physically backed trust that also trades on the NYSE in USD.
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-25', links: [L('PHYS price history', yahoo('PHYS'))] },
   // Debt / US
