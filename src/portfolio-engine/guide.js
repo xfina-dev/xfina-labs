@@ -62,9 +62,14 @@ export const HOW = {
   },
   yahoo: {
     site: 'Yahoo Finance',
-    title: 'Yahoo Finance: price history',
-    steps: ['Open the history page for the ticker.', 'Set the time period to Max and the frequency to Daily.', 'Download. Keep the Adj Close column: it includes dividends.'],
-    format: 'A CSV with Date, Open, High, Low, Close, Adj Close and Volume. No issuer NAV history is known for this one yet, so this is the exchange price, adjusted for dividends and splits.',
+    title: 'Yahoo Finance: price history (by hand, no download)',
+    steps: [
+      'Open the history page for the ticker.',
+      'Open the date-range picker and set the start as early as it goes (back past the fund\'s launch is fine) and the end to today. Yahoo removed its Download button, so there is no file to fetch.',
+      'Set the frequency to Monthly, so the table is a manageable size to work with.',
+      'Select the table (click the first row, then shift-click the last) and copy it. Paste into a spreadsheet and save as CSV, or type the rows in by hand for a short run.',
+    ],
+    format: 'Date, Open, High, Low, Close, Adj Close and Volume, as shown on the page. Adj Close includes dividends. This is exchange price, not the fund\'s own NAV; used only where no issuer or exchange NAV history is available.',
   },
   ishares: {
     site: 'iShares',
