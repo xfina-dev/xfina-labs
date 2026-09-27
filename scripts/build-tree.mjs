@@ -186,11 +186,12 @@ const ETFS = [
   { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'us', name: 'iShares MSCI ACWI ETF', code: 'ACWI', page: ishUs(239600, 'ishares-msci-acwi-etf'), links: [L('ACWI price history', yahoo('ACWI'))] },
   { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares MSCI Emerging Markets ETF', code: 'EEM', manual: '2003-04-07', page: ishUs(239590, 'ishares-msci-emerging-markets-etf'), links: [L('EEM price history', yahoo('EEM'))] },
   // Gold (priced world-wide in USD)
-  // Gold ETFs: US-domiciled ones under the US region, the Canadian trust under Global. No Irish ones (the physical
-  // gold ETC is not a UCITS ETF). US gold has no domicile choice, so its ETFs carry no listing.
+  // Gold ETFs: US-domiciled ones under the US region, the Canadian trust under Global. The Irish one (an ETC issued by an
+  // Irish company, not a UCITS ETF) is Global only. US gold has no domicile choice, so its ETFs carry no listing.
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', links: [L('GLD price history', yahoo('GLD'))] },
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
   // Gold, Canada domiciled (Global only): a physically backed trust that also trades on the NYSE in USD.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') },
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-25', links: [L('PHYS price history', yahoo('PHYS'))] },
   // Debt / US
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf'), links: [L('SGOV price history', yahoo('SGOV'))] },
