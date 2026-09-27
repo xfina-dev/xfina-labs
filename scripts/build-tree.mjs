@@ -232,10 +232,11 @@ const ETFS = [
   // Canada: Ontario trusts holding physical gold directly as trust property (not debt securities). iShares' own CGL
   // (2009-05-19) and Central GoldTrust (2003, merged into this same PHYS in 2016) are both older, but CGL has no
   // USD unit (CAD-hedged or CAD-unhedged only) and GTU no longer trades independently — so PHYS remains the oldest
-  // currently-tradeable USD option here. KILO.U (Purpose Gold Bullion Fund) is younger but has a lower TER (0.28%
-  // vs PHYS's 0.39%, both confirmed 2026-09-27); added for that reason, not for history.
+  // currently-tradeable USD option here. KILO.U and VALT.U are both younger but cheaper (TER, confirmed 2026-09-27):
+  // PHYS 0.39%, KILO.U 0.28%, VALT.U 0.16% (the cheapest of the three) — added for that reason, not for history.
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-26', manualSrc: 'yahoo', links: [L('PHYS price history', yahoo('PHYS'))] },
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Purpose Gold Bullion Fund (USD)', code: 'KILO.U', manual: '2018-10-29', manualSrc: 'yahoo', links: [L('KILO.U price history', yahoo('KILO-U.TO'))] },
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'CI Gold Bullion ETF (USD)', code: 'VALT.U', manual: '2021-01-14', manualSrc: 'yahoo', links: [L('VALT.U price history', yahoo('VALT-U.TO'))] },
   // Ireland: legally a series of secured debt securities (limited-recourse bonds collateralised by gold) issued by
   // the ETC provider, not fund units — UCITS forbids a fund from holding a single physical commodity, so the
   // gold-tracking product is structured as debt instead (UCITS-eligible under Article 50(1) of the Directive).

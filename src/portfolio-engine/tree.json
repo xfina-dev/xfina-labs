@@ -2126,6 +2126,24 @@
       }
      ],
      "asset": "Gold"
+    },
+    {
+     "id": "etf-valt.u",
+     "name": "CI Gold Bullion ETF (USD)",
+     "code": "VALT.U",
+     "inception": "2021-01-14",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "yahoo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "VALT.U price history",
+       "url": "https://finance.yahoo.com/quote/VALT-U.TO/history/"
+      }
+     ],
+     "asset": "Gold"
     }
    ]
   },
