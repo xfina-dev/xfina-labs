@@ -90,7 +90,7 @@ function toInstrument(r, vehicle) {
   return {
     id: `mf${r.c.schemeCode}`, name, code: String(r.c.schemeCode), plan: planOf(name) || undefined,
     inception: r.first, lastNav: r.last, observations: r.n, dateSource: r.clamped ? 'direct' : 'mfapi',
-    ccy: 'INR', returnType: 'Adjusted price', how: 'mfapi', kind: vehicle === 'etf' ? 'ETF' : 'MF',
+    ccy: 'INR', returnType: 'NAV', how: 'mfapi', kind: vehicle === 'etf' ? 'ETF' : 'MF',
     links: [L('AMFI NAV history', AMFI)],
   };
 }
@@ -144,7 +144,7 @@ async function indiaEtfs() {
       const t = NSE_ETF[r.symbol];
       return {
         id: `nse-${r.symbol.toLowerCase()}`, name: t ? t[0] : r.symbol, code: r.symbol, inception: t ? t[1] : null, dateSource: t ? t[2] : null,
-        turnover: Number(r.trdVal) || 0, ccy: 'INR', returnType: 'Price only', how: 'nseEtf', kind: 'ETF',
+        turnover: Number(r.trdVal) || 0, ccy: 'INR', returnType: 'Market price', how: 'nseEtf', kind: 'ETF',
         links: [L('NSE historical price data', NSE_REPORT), L(`${r.symbol} on NSE`, `https://www.nseindia.com/get-quotes/equity?symbol=${r.symbol}`)],
       };
     });
@@ -172,6 +172,13 @@ async function isharesInception(url) {
 const yahoo = (t) => `https://finance.yahoo.com/quote/${t}/history/`;
 const ishUk = (id, slug) => `https://www.ishares.com/uk/individual/en/products/${id}/${slug}`;
 const ishUs = (id, slug) => `https://www.ishares.com/us/products/${id}/${slug}`;
+// iShares' own "Data Download" file (Excel/XML), the same one the fund page's Data Download link gives: a Historical
+// (US) or Historical NAVs (UK) sheet with one row per day back to the fund's start. Confirmed for IVV, SWDA, and the
+// rest of the Irish-domiciled set (2026-09-27); the US and UK sites use different API hosts.
+const ishNavUs = (id) => `https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=${id}&component=fundDownload&userType=individual`;
+const ishNavUk = (id) => `https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=${id}&component=fundDownloadV2&userType=individual`;
+// State Street's own NAV history file for an SPDR ETF (confirmed for SPY, 2026-09-27).
+const ssgaNav = (t) => `https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-${t.toLowerCase()}.xlsx`;
 
 // listing: 'irish' | 'us' | 'canada'. `page` is scraped for the inception date; `manual` is a typed date.
 const ETFS = [
@@ -188,7 +195,7 @@ const ETFS = [
   { cls: 'equity', region: 'global', asset: 'MSCI World', listing: 'irish', name: 'iShares Core MSCI World UCITS ETF (Acc)', code: 'SWDA', page: ishUk(251882, 'ishares-msci-world-ucits-etf-acc-fund'), extra: [L('IWDA price history', yahoo('IWDA.L'))] },
   { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'irish', name: 'iShares Core MSCI EM IMI UCITS ETF (Acc)', code: 'EIMI', page: ishUk(264659, 'ishares-core-msci-em-imi-ucits-etf') },
   { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'us', name: 'iShares MSCI ACWI ETF', code: 'ACWI', page: ishUs(239600, 'ishares-msci-acwi-etf'), links: [L('ACWI price history', yahoo('ACWI'))] },
-  { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares MSCI Emerging Markets ETF', code: 'EEM', manual: '2003-04-07', page: ishUs(239590, 'ishares-msci-emerging-markets-etf'), links: [L('EEM price history', yahoo('EEM'))] },
+  { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares MSCI Emerging Markets ETF', code: 'EEM', manual: '2003-04-07', page: ishUs(239637, 'ishares-msci-emerging-markets-etf'), links: [L('EEM price history', yahoo('EEM'))] },
   // Gold (priced world-wide in USD)
   // Gold ETFs: US-domiciled ones under the US region, the Canadian trust under Global. The Irish one (an ETC issued by an
   // Irish company, not a UCITS ETF) is Global only. US gold has no domicile choice, so its ETFs carry no listing.
@@ -261,13 +268,32 @@ await indiaEtfs();
 // Feeder ETFs are listed under Indian ETFs (below), so only the funds are taken here.
 for (const d of FEEDERS) await fromSchemes(d, 'us', 'equity', { etfs: false });
 console.log('Reading ETF inception dates ...');
+// Issuer NAV history, found and checked by hand on 2026-09-27 (see nse-data-sources notes): iShares' own "Data
+// Download" file covers every iShares fund on both the US and UK sites; State Street publishes the same for SPY and
+// GLD. Where none is known yet (VOO, QQQ, VUAA, PHYS, BIL, BNDW) the row still falls back to Yahoo's market price.
+const SSGA_NAV = new Set(['SPY']);
+const SPDR_GOLD_NAV = new Set(['GLD']);
 const etfInst = await pool(ETFS, 6, async (e) => {
   let inception = e.manual || null, dateSource = e.manual ? 'manual' : null;
   if (e.page) { const d = await isharesInception(e.page); if (d) { inception = d; dateSource = 'issuer'; } else console.warn(`  ! no inception found on ${e.page}`); }
-  const links = e.links || [L(`${e.code} fund page`, e.page)];
-  if (e.page && e.links) links.unshift(L(`${e.code} fund page`, e.page));
+  const ishMatch = e.page && e.page.match(/ishares\.com\/(us\/products|uk\/individual\/en\/products)\/(\d+)\//);
+  let how = 'yahoo', returnType = 'Market price', links;
+  if (ishMatch) {
+    how = 'ishares'; returnType = 'NAV';
+    const navUrl = ishMatch[1].startsWith('us') ? ishNavUs(ishMatch[2]) : ishNavUk(ishMatch[2]);
+    links = [L(`${e.code} NAV history (Excel)`, navUrl), L(`${e.code} fund page`, e.page)];
+  } else if (SSGA_NAV.has(e.code)) {
+    how = 'ssga'; returnType = 'NAV';
+    links = [L(`${e.code} NAV history (Excel)`, ssgaNav(e.code))];
+  } else if (SPDR_GOLD_NAV.has(e.code)) {
+    how = 'spdrgold'; returnType = 'NAV';
+    links = [L(`${e.code} historical data (Excel)`, 'https://api.spdrgoldshares.com/api/v1/historical-archive?product=gld&exchange=NYSE&lang=en')];
+  } else {
+    links = e.links || [L(`${e.code} fund page`, e.page)];
+    if (e.page && e.links) links.unshift(L(`${e.code} fund page`, e.page));
+  }
   if (e.extra) links.push(...e.extra);
-  return { e, inst: { id: `etf-${e.code.toLowerCase()}`, name: e.name, code: e.code, inception, dateSource, ccy: 'USD', returnType: 'Adjusted price', how: e.page && e.listing === 'irish' ? 'ishares' : 'yahoo', kind: 'ETF', links } };
+  return { e, inst: { id: `etf-${e.code.toLowerCase()}`, name: e.name, code: e.code, inception, dateSource, ccy: 'USD', returnType, how, kind: 'ETF', links } };
 });
 for (const { e, inst } of etfInst) {
   const n = node(e.cls, e.region, 'etf', e.listing, e.asset);
@@ -289,7 +315,7 @@ for (const f of FOREIGN) {
   if (!live) console.warn(`  ! no live AMFI record for ${f.sym}`);
   node('equity', f.region, 'etf', 'india', f.asset).instruments.push({
     id: `nse-${f.sym.toLowerCase()}`, name: f.name, code: f.sym, inception: live?.first || null, dateSource: live ? 'amfi' : null,
-    ccy: 'INR', returnType: 'Price only', how: 'nseEtf', kind: 'ETF',
+    ccy: 'INR', returnType: 'Market price', how: 'nseEtf', kind: 'ETF',
     links: [L('NSE historical price data', 'https://www.nseindia.com/report-detail/eq_security'), L(`${f.sym} on NSE`, `https://www.nseindia.com/get-quotes/equity?symbol=${f.sym}`)],
   });
 }

@@ -19,7 +19,7 @@
      "observations": 5044,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -39,7 +39,7 @@
      "observations": 5043,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -59,7 +59,7 @@
      "observations": 5043,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -88,7 +88,7 @@
      "observations": 3381,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -108,7 +108,7 @@
      "observations": 3381,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -128,7 +128,7 @@
      "observations": 3379,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -157,7 +157,7 @@
      "observations": 4003,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -177,7 +177,7 @@
      "observations": 2029,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -197,7 +197,7 @@
      "observations": 1869,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -226,7 +226,7 @@
      "observations": 3380,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -246,7 +246,7 @@
      "observations": 2029,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -266,7 +266,7 @@
      "observations": 1869,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -295,7 +295,7 @@
      "observations": 1737,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -315,7 +315,7 @@
      "observations": 1377,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -335,7 +335,7 @@
      "observations": 1350,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -364,7 +364,7 @@
      "observations": 1737,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -384,7 +384,7 @@
      "observations": 1377,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -404,7 +404,7 @@
      "observations": 1350,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -433,7 +433,7 @@
      "observations": 1737,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -453,7 +453,7 @@
      "observations": 1464,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -473,7 +473,7 @@
      "observations": 1206,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -502,7 +502,7 @@
      "observations": 1737,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -522,7 +522,7 @@
      "observations": 1464,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -542,7 +542,7 @@
      "observations": 1206,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -571,7 +571,7 @@
      "observations": 3826,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -591,7 +591,7 @@
      "observations": 3752,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -611,7 +611,7 @@
      "observations": 3639,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -640,7 +640,7 @@
      "observations": 3382,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -660,7 +660,7 @@
      "observations": 3778,
      "dateSource": "direct",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -680,7 +680,7 @@
      "observations": 3369,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -708,7 +708,7 @@
      "observations": 6293,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -728,7 +728,7 @@
      "observations": 6993,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -748,7 +748,7 @@
      "observations": 6433,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -777,7 +777,7 @@
      "observations": 4376,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -797,7 +797,7 @@
      "observations": 4240,
      "dateSource": "direct",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -817,7 +817,7 @@
      "observations": 6063,
      "dateSource": "direct",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -846,7 +846,7 @@
      "observations": 4948,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -866,7 +866,7 @@
      "observations": 4948,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -886,7 +886,7 @@
      "observations": 4957,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -915,7 +915,7 @@
      "observations": 3316,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -935,7 +935,7 @@
      "observations": 3318,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -955,7 +955,7 @@
      "observations": 3317,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -980,7 +980,7 @@
      "inception": "2002-01-08",
      "dateSource": "manual",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1001,7 +1001,7 @@
      "inception": "2008-07-17",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1022,7 +1022,7 @@
      "inception": "2010-07-30",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1051,7 +1051,7 @@
      "inception": "2003-02-21",
      "dateSource": "manual",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1072,7 +1072,7 @@
      "inception": "2018-08-24",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1093,7 +1093,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1122,7 +1122,7 @@
      "inception": "2019-02-01",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1143,7 +1143,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1164,7 +1164,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1193,7 +1193,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1214,7 +1214,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1235,7 +1235,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1264,7 +1264,7 @@
      "inception": "2007-03-08",
      "dateSource": "manual",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1285,7 +1285,7 @@
      "inception": "2008-02-27",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1306,7 +1306,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1335,7 +1335,7 @@
      "inception": "2003-07-08",
      "dateSource": "manual",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1356,7 +1356,7 @@
      "inception": "2023-01-31",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1377,7 +1377,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1406,7 +1406,7 @@
      "inception": "2014-12-26",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1427,7 +1427,7 @@
      "inception": "2016-07-07",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1448,7 +1448,7 @@
      "inception": null,
      "dateSource": null,
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -1481,7 +1481,7 @@
      "observations": 1583,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1510,7 +1510,7 @@
      "observations": 1583,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1538,7 +1538,7 @@
      "observations": 1927,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1558,7 +1558,7 @@
      "observations": 1173,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1577,7 +1577,7 @@
      "observations": 1071,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1606,7 +1606,7 @@
      "observations": 1173,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1626,7 +1626,7 @@
      "observations": 992,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1646,7 +1646,7 @@
      "observations": 940,
      "dateSource": "mfapi",
      "ccy": "INR",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "mfapi",
      "kind": "MF",
      "links": [
@@ -1672,13 +1672,13 @@
      "inception": "1993-01-22",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ssga",
      "kind": "ETF",
      "links": [
       {
-       "label": "SPY price history",
-       "url": "https://finance.yahoo.com/quote/SPY/history/"
+       "label": "SPY NAV history (Excel)",
+       "url": "https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-spy.xlsx"
       }
      ],
      "asset": "S&P 500"
@@ -1690,17 +1690,17 @@
      "inception": "2000-05-15",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "IVV fund page",
-       "url": "https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf"
+       "label": "IVV NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239726&component=fundDownload&userType=individual"
       },
       {
-       "label": "IVV price history",
-       "url": "https://finance.yahoo.com/quote/IVV/history/"
+       "label": "IVV fund page",
+       "url": "https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf"
       }
      ],
      "asset": "S&P 500"
@@ -1712,7 +1712,7 @@
      "inception": "2010-09-07",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "Market price",
      "how": "yahoo",
      "kind": "ETF",
      "links": [
@@ -1739,7 +1739,7 @@
      "inception": "1999-03-10",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "Market price",
      "how": "yahoo",
      "kind": "ETF",
      "links": [
@@ -1766,10 +1766,14 @@
      "inception": "2010-05-19",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
+      {
+       "label": "CSPX NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=253743&component=fundDownloadV2&userType=individual"
+      },
       {
        "label": "CSPX fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/253743/ishares-core-sp-500-ucits-etf"
@@ -1784,7 +1788,7 @@
      "inception": "2019-05-14",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "Market price",
      "how": "yahoo",
      "kind": "ETF",
      "links": [
@@ -1811,10 +1815,14 @@
      "inception": "2010-01-26",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
+      {
+       "label": "CNDX NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=253741&component=fundDownloadV2&userType=individual"
+      },
       {
        "label": "CNDX fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/253741/ishares-nasdaq-100-ucits-etf"
@@ -1838,10 +1846,14 @@
      "inception": "2011-10-21",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
+      {
+       "label": "SSAC NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=251850&component=fundDownloadV2&userType=individual"
+      },
       {
        "label": "SSAC fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/251850/ishares-msci-acwi-ucits-etf"
@@ -1865,17 +1877,17 @@
      "inception": "2009-09-25",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "SWDA fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/251882/ishares-msci-world-ucits-etf-acc-fund"
+       "label": "SWDA NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=251882&component=fundDownloadV2&userType=individual"
       },
       {
-       "label": "IWDA price history",
-       "url": "https://finance.yahoo.com/quote/IWDA.L/history/"
+       "label": "SWDA fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/251882/ishares-msci-world-ucits-etf-acc-fund"
       }
      ],
      "asset": "MSCI World"
@@ -1896,10 +1908,14 @@
      "inception": "2014-05-30",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
+      {
+       "label": "EIMI NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=264659&component=fundDownloadV2&userType=individual"
+      },
       {
        "label": "EIMI fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/264659/ishares-core-msci-em-imi-ucits-etf"
@@ -1923,17 +1939,17 @@
      "inception": "2008-03-26",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "ACWI fund page",
-       "url": "https://www.ishares.com/us/products/239600/ishares-msci-acwi-etf"
+       "label": "ACWI NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239600&component=fundDownload&userType=individual"
       },
       {
-       "label": "ACWI price history",
-       "url": "https://finance.yahoo.com/quote/ACWI/history/"
+       "label": "ACWI fund page",
+       "url": "https://www.ishares.com/us/products/239600/ishares-msci-acwi-etf"
       }
      ],
      "asset": "MSCI ACWI"
@@ -1954,17 +1970,17 @@
      "inception": "2003-04-07",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "EEM fund page",
-       "url": "https://www.ishares.com/us/products/239590/ishares-msci-emerging-markets-etf"
+       "label": "EEM NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239637&component=fundDownload&userType=individual"
       },
       {
-       "label": "EEM price history",
-       "url": "https://finance.yahoo.com/quote/EEM/history/"
+       "label": "EEM fund page",
+       "url": "https://www.ishares.com/us/products/239590/ishares-msci-emerging-markets-etf"
       }
      ],
      "asset": "MSCI Emerging Markets"
@@ -1984,13 +2000,13 @@
      "inception": "2004-11-18",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "spdrgold",
      "kind": "ETF",
      "links": [
       {
-       "label": "GLD price history",
-       "url": "https://finance.yahoo.com/quote/GLD/history/"
+       "label": "GLD historical data (Excel)",
+       "url": "https://api.spdrgoldshares.com/api/v1/historical-archive?product=gld&exchange=NYSE&lang=en"
       }
      ],
      "asset": "Gold"
@@ -2002,17 +2018,17 @@
      "inception": "2005-01-21",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "IAU fund page",
-       "url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund"
+       "label": "IAU NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239561&component=fundDownload&userType=individual"
       },
       {
-       "label": "IAU price history",
-       "url": "https://finance.yahoo.com/quote/IAU/history/"
+       "label": "IAU fund page",
+       "url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund"
       }
      ],
      "asset": "Gold"
@@ -2033,10 +2049,14 @@
      "inception": "2011-04-08",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
+      {
+       "label": "SGLN NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=258441&component=fundDownloadV2&userType=individual"
+      },
       {
        "label": "SGLN fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/258441/ishares-physical-gold-etc"
@@ -2060,7 +2080,7 @@
      "inception": "2010-02-25",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "Market price",
      "how": "yahoo",
      "kind": "ETF",
      "links": [
@@ -2087,7 +2107,7 @@
      "inception": "2007-05-30",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "Market price",
      "how": "yahoo",
      "kind": "ETF",
      "links": [
@@ -2105,17 +2125,17 @@
      "inception": "2020-05-26",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "SGOV fund page",
-       "url": "https://www.ishares.com/us/products/314116/ishares-0-3-month-treasury-bond-etf"
+       "label": "SGOV NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=314116&component=fundDownload&userType=individual"
       },
       {
-       "label": "SGOV price history",
-       "url": "https://finance.yahoo.com/quote/SGOV/history/"
+       "label": "SGOV fund page",
+       "url": "https://www.ishares.com/us/products/314116/ishares-0-3-month-treasury-bond-etf"
       }
      ],
      "asset": "Short duration"
@@ -2136,17 +2156,17 @@
      "inception": "2002-07-22",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "TLT fund page",
-       "url": "https://www.ishares.com/us/products/239454/ishares-20-year-treasury-bond-etf"
+       "label": "TLT NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239454&component=fundDownload&userType=individual"
       },
       {
-       "label": "TLT price history",
-       "url": "https://finance.yahoo.com/quote/TLT/history/"
+       "label": "TLT fund page",
+       "url": "https://www.ishares.com/us/products/239454/ishares-20-year-treasury-bond-etf"
       }
      ],
      "asset": "Long duration"
@@ -2167,17 +2187,17 @@
      "inception": "2019-02-20",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "IB01 fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/307243/ishares-usd-treasury-bond-01yr-ucits-etf"
+       "label": "IB01 NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=307243&component=fundDownloadV2&userType=individual"
       },
       {
-       "label": "IB01 price history",
-       "url": "https://finance.yahoo.com/quote/IB01.L/history/"
+       "label": "IB01 fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/307243/ishares-usd-treasury-bond-01yr-ucits-etf"
       }
      ],
      "asset": "Short duration"
@@ -2198,10 +2218,14 @@
      "inception": "2015-01-20",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
+      {
+       "label": "IDTL NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=272124&component=fundDownloadV2&userType=individual"
+      },
       {
        "label": "IDTL fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/272124/ishares-usd-treasury-bond-20-yr-ucits-etf"
@@ -2225,7 +2249,7 @@
      "inception": "2018-09-04",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "Market price",
      "how": "yahoo",
      "kind": "ETF",
      "links": [
@@ -2252,10 +2276,14 @@
      "inception": "2017-11-21",
      "dateSource": "issuer",
      "ccy": "USD",
-     "returnType": "Adjusted price",
+     "returnType": "NAV",
      "how": "ishares",
      "kind": "ETF",
      "links": [
+      {
+       "label": "AGGG NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=291773&component=fundDownloadV2&userType=individual"
+      },
       {
        "label": "AGGG fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/291773/ishares-core-global-aggregate-bond-ucits-etf"
@@ -2279,7 +2307,7 @@
      "inception": "2011-03-30",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -2309,7 +2337,7 @@
      "inception": "2021-09-21",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -2339,7 +2367,7 @@
      "inception": "2021-05-07",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
@@ -2369,7 +2397,7 @@
      "inception": "2021-12-29",
      "dateSource": "amfi",
      "ccy": "INR",
-     "returnType": "Price only",
+     "returnType": "Market price",
      "how": "nseEtf",
      "kind": "ETF",
      "links": [
