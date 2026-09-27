@@ -148,23 +148,21 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-6">
-        <!-- Its own full-width row, not a lane: only 3 options, so each gets enough room for the title
-             and blurb to sit on one line, instead of wrapping in a narrow quarter-width column. -->
-        <section class="space-y-2">
-          <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">1</span>Asset class</h3>
-          <div class="grid gap-2 sm:grid-cols-3">
-            <button v-for="c in CLASSES" :key="c.id" type="button" :class="[tile(cls === c.id), 'sm:flex sm:items-baseline sm:gap-2 sm:whitespace-nowrap']" @click="pick('cls', c.id)">
-              <div class="font-medium">{{ c.title }}</div><div class="text-xs text-muted-foreground">{{ c.blurb }}</div>
-            </button>
-          </div>
-        </section>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <section class="space-y-2">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">1</span>Asset class</h3>
+            <div class="grid gap-2">
+              <button v-for="c in CLASSES" :key="c.id" type="button" :class="tile(cls === c.id)" @click="pick('cls', c.id)">
+                <div class="font-medium">{{ c.title }}</div><div class="text-xs text-muted-foreground truncate">{{ c.blurb }}</div>
+              </button>
+            </div>
+          </section>
 
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <section class="space-y-2">
             <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">2</span>Region</h3>
             <div class="grid gap-2">
               <button v-for="r in REGIONS" :key="r.id" type="button" :class="tile(region === r.id)" @click="pick('region', r.id)">
-                <div class="font-medium">{{ r.title }}</div><div class="text-xs text-muted-foreground">{{ r.blurb }}</div>
+                <div class="font-medium">{{ r.title }}</div><div class="text-xs text-muted-foreground truncate">{{ r.blurb }}</div>
               </button>
             </div>
           </section>
@@ -174,7 +172,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="grid gap-2">
               <!-- Only the models that exist for this class and region; Gold has no Index, for example. -->
               <button v-for="v in vehicles" :key="v.id" type="button" :class="tile(vehicle === v.id)" @click="pick('vehicle', v.id)">
-                <div class="font-medium">{{ v.title }}</div><div class="text-xs text-muted-foreground">{{ v.blurb }}</div>
+                <div class="font-medium">{{ v.title }}</div><div class="text-xs text-muted-foreground truncate">{{ v.blurb }}</div>
               </button>
             </div>
           </section>
@@ -186,7 +184,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>{{ vehicle === 'mf' ? 'Which plan' : 'ETF Domicile' }}</h3>
               <div class="grid gap-2">
                 <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
-                  <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground">{{ l.blurb }}</div>
+                  <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground truncate">{{ l.blurb }}</div>
                 </button>
               </div>
             </template>
