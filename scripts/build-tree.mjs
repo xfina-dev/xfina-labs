@@ -274,7 +274,7 @@ console.log('Reading ETF inception dates ...');
 // Issuer NAV history, found and checked by hand on 2026-09-27 (see nse-data-sources notes): iShares' own "Data
 // Download" file covers every iShares fund on both the US and UK sites; State Street publishes the same for SPY and
 // GLD. Where none is known yet (VOO, QQQ, VUAA, PHYS, BIL, BNDW) the row still falls back to Yahoo's market price.
-const SSGA_NAV = new Set(['SPY']);
+const SSGA_NAV = new Set(['SPY', 'BIL']);
 const SPDR_GOLD_NAV = new Set(['GLD']);
 const etfInst = await pool(ETFS, 6, async (e) => {
   let inception = e.manual || null, dateSource = e.manual ? 'manual' : null;

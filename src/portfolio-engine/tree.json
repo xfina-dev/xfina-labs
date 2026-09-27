@@ -2107,13 +2107,13 @@
      "inception": "2007-05-30",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "Market price",
-     "how": "yahoo",
+     "returnType": "NAV",
+     "how": "ssga",
      "kind": "ETF",
      "links": [
       {
-       "label": "BIL price history",
-       "url": "https://finance.yahoo.com/quote/BIL/history/"
+       "label": "BIL NAV history (Excel)",
+       "url": "https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-bil.xlsx"
       }
      ],
      "asset": "Short duration"
