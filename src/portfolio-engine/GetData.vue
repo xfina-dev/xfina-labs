@@ -298,6 +298,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                     <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="dateSourceNote(i)">{{ i.inception || '—' }}</td>
                     <td class="px-3 py-2 text-right">
                       <div class="flex items-center justify-end gap-1.5">
                         <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
