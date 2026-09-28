@@ -299,7 +299,12 @@ const INDICES = [
   // Free full history on the index's own page (Performance tab, Cumulative performance, Full history, the download
   // icon), no account needed: confirmed for all three, monthly, starting 1998-12-31, on 2026-09-27. The page shows one
   // return variant with no toggle and no label, so the name says just "Index", not Price/Gross/Net Total Return.
-  ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Index`, how: 'msci', ccy: 'USD', since: '1998-12-31', src: 'publisher', ret: 'Level (variant unconfirmed)', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
+  // The free page's own performance chart makes its own request to /indexes/api/index/performance with a
+  // variant= query param -- confirmed live 2026-09-28 for MSCI ACWI and MSCI World (both "Full history" and the
+  // default 1yr view): variant=NETR, i.e. Net Total Return, USD. Not shown anywhere in the page's own UI text,
+  // only in that request; taken as confirmed for MSCI Emerging Markets too (same page template, only indexCode
+  // differs).
+  ...[['MSCI ACWI', 892400], ['MSCI World', 990100], ['MSCI Emerging Markets', 891800]].map(([a, id]) => ({ cls: 'equity', region: 'global', asset: a, name: `${a} Index`, how: 'msci', ccy: 'USD', since: '1998-12-31', src: 'publisher', ret: 'Net Total Return', links: [L(`${a} on MSCI`, `https://www.msci.com/indexes/index/${id}`)] })),
   // Gold has no Index option world-wide: the LBMA Gold Price history needs an IBA licence (MyLBMA portal, free only
   // on application for non-commercial use), and no free spot-gold ticker exists on Yahoo (only GC=F, a futures
   // contract, excluded on purpose). India: MCX Spot Market Price for GOLD, Ahmedabad (the only location MCX polls

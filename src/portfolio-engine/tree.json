@@ -2689,7 +2689,7 @@
      "inception": "1998-12-31",
      "dateSource": "publisher",
      "ccy": "USD",
-     "returnType": "Level (variant unconfirmed)",
+     "returnType": "Net Total Return",
      "how": "msci",
      "kind": "Index",
      "links": [
@@ -2713,7 +2713,7 @@
      "inception": "1998-12-31",
      "dateSource": "publisher",
      "ccy": "USD",
-     "returnType": "Level (variant unconfirmed)",
+     "returnType": "Net Total Return",
      "how": "msci",
      "kind": "Index",
      "links": [
@@ -2737,7 +2737,7 @@
      "inception": "1998-12-31",
      "dateSource": "publisher",
      "ccy": "USD",
-     "returnType": "Level (variant unconfirmed)",
+     "returnType": "Net Total Return",
      "how": "msci",
      "kind": "Index",
      "links": [

@@ -95,7 +95,7 @@ export const HOW = {
     site: 'MSCI',
     title: 'MSCI: index levels',
     steps: ['Open the index page and its Performance tab.', 'Under Cumulative performance, choose Full history.', 'Press the download icon next to Compare. No account is needed.'],
-    format: 'An Excel file with a date and the index level, monthly, as MSCI publishes it. Full history on the free page starts 1998-12-31; MSCI\'s own longer history is licensed. The page shows one return variant with no way to switch it, and it is not labelled Price, Gross or Net, so check the numbers before assuming which one it is.',
+    format: 'An Excel file with a date and the index level, monthly, as MSCI publishes it: Net Total Return, USD (the page itself never labels this; found in its own chart\'s network request, variant=NETR). Full history on the free page starts 1998-12-31; MSCI\'s own longer history, and other variants (Price, Gross), are licensed.',
   },
   nasdaqIndex: {
     site: 'Nasdaq',
@@ -148,12 +148,12 @@ export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls &
 // every year to keep its pass-through tax status, not a per-fund choice. India (domestic listing, or the
 // India-listed feeder ETFs on foreign indices) uses neither UCITS term, so it is left out here.
 //
-// An index has no share class, but the same Acc/Dist question has a direct analogue in its returnType: a
-// Total return index reinvests the dividend into the index level (Acc's own definition), a Price-only one
-// excludes it entirely (the same practical gap as Dist, just not paid to anyone). MSCI's "Level (variant
-// unconfirmed)" and MCX's spot price are left blank rather than guessed.
+// An index has no share class, but the same Acc/Dist question has a direct analogue in its returnType: any
+// total-return variant (plain "Total return", or MSCI's "Net Total Return") reinvests the dividend into the
+// index level (Acc's own definition), a Price-only one excludes it entirely (the same practical gap as Dist,
+// just not paid to anyone). MCX's spot price is left blank rather than guessed (no return concept at all).
 export function distFlag(i) {
-  if (i.kind === 'Index') return i.returnType === 'Total return' ? 'Acc' : i.returnType === 'Price only' ? 'Dist' : null;
+  if (i.kind === 'Index') return /total return/i.test(i.returnType || '') ? 'Acc' : i.returnType === 'Price only' ? 'Dist' : null;
   if (i.kind !== 'ETF' || i.asset === 'Gold' || i.region === 'india' || i.listing === 'india') return null;
   if (/\(Acc\)/i.test(i.name)) return 'Acc';
   if (/\(Dist\)/i.test(i.name)) return 'Dist';
