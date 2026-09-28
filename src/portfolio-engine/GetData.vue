@@ -298,13 +298,18 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <div>
             <div class="font-medium text-muted-foreground text-xs mb-1">Good to know</div>
             <ul class="list-disc pl-5 space-y-0.5 text-muted-foreground">
+              <li>Each button is set up with the datasets you selected: drag it again after changing the list.</li>
               <li>The next run fetches only what's new.</li>
               <li>Chrome and Edge save to one folder you pick; elsewhere, allow multiple downloads.</li>
-              <li>Runs only in your browser. Xfina never sees the data and isn't affiliated with these sites.</li>
             </ul>
           </div>
         </div>
       </div>
+      <!-- Where the data goes, for both ways of downloading -->
+      <blockquote class="border-l-2 border-primary pl-4 text-sm text-muted-foreground">
+        Files download straight from each source to your computer, and Portfolio Engine reads them in your browser.
+        No server is involved: Xfina never sees the data, and isn't affiliated with these sites.
+      </blockquote>
       <div class="space-y-8">
       <Card v-for="g in bySite" :key="g.site" class="bg-card border-border shadow-sm">
         <CardHeader class="flex flex-col gap-3 space-y-0 pb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -312,8 +317,6 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <CardTitle class="text-xl">{{ g.site }}</CardTitle>
             <CardDescription>
               {{ g.items.length }} dataset{{ g.items.length > 1 ? 's' : '' }} to download here. Follow the steps, then import the files.
-              <!-- On a single-page site the bookmark carries the selected datasets; Yahoo's works on whichever ticker page is open -->
-              <template v-if="g.bookmarklet && g.page"><br />Its Xfina bookmarklet is set up with {{ g.items.length - g.bookmarklet.skipped > 1 ? 'these datasets' : 'this dataset' }}: drag it again after changing the list.</template>
             </CardDescription>
           </div>
           <!-- The bookmark (to drag), the site's one download page where it has one, and its terms of use -->
