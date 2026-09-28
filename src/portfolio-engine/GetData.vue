@@ -402,7 +402,14 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ dragFor.label }}</a>
             </div>
           </li>
-          <li>Open {{ dragFor.site }}, then click the bookmark there.</li>
+          <li>
+            Open {{ dragFor.site }}, then click the bookmark there:
+            <div class="mt-2">
+              <a :href="dragFor.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline">
+                <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ dragFor.openLabel }}</Button>
+              </a>
+            </div>
+          </li>
         </ol>
       </DialogContent>
     </Dialog>
