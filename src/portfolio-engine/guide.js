@@ -52,13 +52,15 @@ const names = (xs) => xs.join(', ').replace(/, ([^,]*)$/, ' and $1');
 
 // How a source is downloaded and what you get. `site` is the website: the download list groups by it,
 // so a user visits each site once. `terms` is the site's terms of use; `page` is its one download page, where
-// there is a single page for every dataset (otherwise each dataset carries its own link). `steps` and `format`
+// there is a single page for every dataset (otherwise each dataset carries its own link), and `pageLabel` that
+// page's own heading on the site, so the card, the bookmarklet dialog and the site all name it the same. `steps` and `format`
 // are text, or a function of the datasets selected for that source when what to pick depends on them.
 // Steps are short on purpose.
 export const HOW = {
   nseTri: {
     site: 'NSE Indices',
     page: 'https://www.niftyindices.com/reports/historical-data',
+    pageLabel: 'Historical Data Reports',
     terms: 'https://www.niftyindices.com/terms-of-use',
     title: 'NSE Indices: Total Returns Index',
     // Equity total return is its own report; debt is on the default one (walked through live on the site).
@@ -76,6 +78,7 @@ export const HOW = {
   amfi: {
     site: 'AMFI',
     page: 'https://www.amfiindia.com/net-asset-value/nav-history',
+    pageLabel: 'NAV History',
     terms: 'https://www.amfiindia.com/terms-of-use',
     title: 'AMFI: NAV history',
     steps: ['Open NAV History and choose Historical NAV for a period.', 'Pick the fund house, then the scheme (the plan and option named here).', 'Set From and To. The page allows at most 5 years at a time, so a long history is several downloads.', 'Press Go, then download the Excel file and import every part as it is.'],
@@ -84,9 +87,10 @@ export const HOW = {
   nseEtf: {
     site: 'NSE',
     page: 'https://www.nseindia.com/report-detail/eq_security',
+    pageLabel: 'Security-wise Archives (Equities)',
     terms: 'https://www.nseindia.com/nse-terms-of-use',
     title: 'NSE: ETF price history',
-    steps: ['Open the NSE historical price report.', 'Choose Security-wise price and volume data, then enter the ETF\'s symbol and the EQ series.', 'Set the widest date range the report allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
+    steps: ['Open Security-wise Archives (Equities).', 'Choose Security-wise price and volume data, then enter the ETF\'s symbol and the EQ series.', 'Set the widest date range the report allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
     format: 'NSE\'s price and volume table, with a row per trading day. It is the exchange price, not NAV.',
   },
   yahoo: {
@@ -139,6 +143,7 @@ export const HOW = {
   mcxSpot: {
     site: 'MCX',
     page: 'https://www.mcxindia.com/market-data/spot-market-price',
+    pageLabel: 'Spot Market Price',
     terms: 'https://www.mcxindia.com/terms-and-conditions-of-usage-for-website',
     title: 'MCX: Spot Market Price',
     steps: ['Open Spot Market Price and its Archives tab.', 'Set Commodity to GOLD and Location to AHMEDABAD (the only location MCX polls gold at; other cities return nothing).', 'Set the widest date range the site allows (there is no cap: one query returns the full history).', 'Press Show, then press the page\'s own Excel export button.'],

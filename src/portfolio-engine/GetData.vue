@@ -107,7 +107,7 @@ const bySite = computed(() => {
     its = [...its].sort((a, b) => vehicleRank(a) - vehicleRank(b));
     // Each source with the datasets it serves here, since its steps can depend on them.
     const hows = [...new Set(its.map((i) => i.how))].map((h) => ({ ...HOW[h], items: its.filter((i) => i.how === h) }));
-    return { site, items: its, page: hows[0].page, terms: hows[0].terms, hows, bookmarklet: bookmarkletFor(site, its) };
+    return { site, items: its, page: hows[0].page, pageLabel: hows[0].pageLabel, terms: hows[0].terms, hows, bookmarklet: bookmarkletFor(site, its) };
   });
   return groups.sort((a, b) => siteRank(a.site) - siteRank(b.site) || a.site.localeCompare(b.site));
 });
@@ -337,7 +337,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               @click.prevent="dragFor = g.bookmarklet"
             ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.label }}</a>
             <a v-if="g.page" :href="g.page" target="_blank" rel="noopener noreferrer" class="no-underline">
-              <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Downloads page</Button>
+              <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Open {{ g.pageLabel }}</Button>
             </a>
             <a v-if="g.terms" :href="g.terms" target="_blank" rel="noopener noreferrer" class="no-underline">
               <Button variant="ghost" size="sm" class="text-muted-foreground"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Terms</Button>

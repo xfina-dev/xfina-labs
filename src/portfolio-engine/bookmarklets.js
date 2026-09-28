@@ -8,7 +8,7 @@ import amfiNav from './bookmarklets/amfi-nav.js?raw';
 import yahooFinance from './bookmarklets/yahoo-finance.js?raw';
 import mcxSpot from './bookmarklets/mcx-spot.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
-import { nodes, NSE_DEBT } from './guide.js';
+import { nodes, NSE_DEBT, HOW } from './guide.js';
 
 // The equity indexes the NSE Indices page lists under Total Returns (Broad Market).
 const NSE_SUPPORTED = ['Nifty 50', 'Nifty Next 50', 'Nifty Midcap 150', 'Nifty Smallcap 250'];
@@ -20,8 +20,11 @@ const DEBT_FROM = '2010-01-01';
 // Only gold's Ahmedabad spot price is polled for now (MCX only polls a handful of locations per commodity;
 // Mumbai returns nothing for gold, checked live).
 const MCX_PRODUCTS = {
-  'idx-mcx-gold-spot': ['GOLD', 'AHMEDABAD'],
+  'idx-mcx-spot-market-price-gold-ahmedabad': ['GOLD', 'AHMEDABAD'],
 };
+
+// A single-page site's own download page, named as the card names it (HOW's page and pageLabel).
+const open = (how) => ({ openUrl: how.page, openLabel: `Open ${how.pageLabel}` });
 
 const BUILDERS = {
   'NSE Indices': (items) => {
@@ -39,8 +42,7 @@ const BUILDERS = {
     if (!chosen.length) return null;
     return {
       site: 'NSE Indices',
-      openUrl: 'https://www.niftyindices.com/reports/historical-data',
-      openLabel: 'Open NSE Indices',
+      ...open(HOW.nseTri),
       termsUrl: 'https://www.niftyindices.com/terms-of-use',
       label: 'Xfina · NSE Indices',
       href: bookmarkletHref(nseIndices, { INDEXES: chosen }),
@@ -58,8 +60,7 @@ const BUILDERS = {
     const symbols = etfs.map((i) => [i.code, i.name, i.inception || '2014-01-01']);
     return {
       site: 'NSE',
-      openUrl: 'https://www.nseindia.com/report-detail/eq_security',
-      openLabel: 'Open NSE Security-wise Archives',
+      ...open(HOW.nseEtf),
       termsUrl: 'https://www.nseindia.com/nse-terms-of-use',
       label: 'Xfina · NSE ETFs',
       href: bookmarkletHref(nseEtf, { SYMBOLS: symbols }),
@@ -101,8 +102,7 @@ const BUILDERS = {
     if (!spots.length) return null;
     return {
       site: 'MCX',
-      openUrl: 'https://www.mcxindia.com/market-data/spot-market-price',
-      openLabel: 'Open MCX Spot Market Price',
+      ...open(HOW.mcxSpot),
       termsUrl: 'https://www.mcxindia.com/terms-and-conditions-of-usage-for-website',
       label: 'Xfina · MCX Spot Price',
       href: bookmarkletHref(mcxSpot, { PRODUCTS: spots.map((i) => [...MCX_PRODUCTS[i.id], i.name, i.inception]) }),
@@ -118,8 +118,7 @@ const BUILDERS = {
     if (!funds.length) return null;
     return {
       site: 'AMFI',
-      openUrl: 'https://www.amfiindia.com/net-asset-value/nav-history',
-      openLabel: 'Open AMFI NAV History',
+      ...open(HOW.amfi),
       termsUrl: 'https://www.amfiindia.com/terms-of-use',
       label: 'Xfina · AMFI NAV',
       href: bookmarkletHref(amfiNav, { SCHEMES: funds.map((i) => [i.name, i.name, i.inception]) }),
