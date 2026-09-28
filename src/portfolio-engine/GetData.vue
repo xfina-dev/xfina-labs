@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
-import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
+import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
@@ -75,6 +75,8 @@ const selectedRows = computed(() => CLASSES.map((cls) => {
   return { cls, rows: [...rows.values()].sort((a, b) => order(a) - order(b)) };
 }).filter((g) => g.rows.length));
 const REGION_CODE = { india: 'IN', us: 'US', global: 'GL' };
+// Every dataset in the catalogue, counted once (an instrument can sit under more than one path).
+const TOTAL = new Set(nodes.flatMap((n) => n.instruments.map((i) => i.id))).size;
 const regionTitle = (id) => REGIONS.find((r) => r.id === id)?.title || id;
 
 onMounted(() => {
@@ -157,9 +159,12 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <div class="h-px flex-1 bg-border" />
       </div>
     <Card class="bg-card border-border shadow-sm">
-      <CardHeader class="pb-4">
-        <CardTitle>Find your data</CardTitle>
-        <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
+      <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
+        <div class="space-y-1.5">
+          <CardTitle>Find your data</CardTitle>
+          <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
+        </div>
+        <span class="shrink-0 text-sm text-muted-foreground"><span class="font-semibold text-foreground">{{ TOTAL }}</span> datasets</span>
       </CardHeader>
       <CardContent class="space-y-6">
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
