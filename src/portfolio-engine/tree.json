@@ -2610,6 +2610,22 @@
        "url": "https://finance.yahoo.com/quote/%5EGSPC/history/"
       }
      ]
+    },
+    {
+     "id": "idx-s-p-500-total-return-sp500tr",
+     "name": "S&P 500 Total Return (^SP500TR)",
+     "inception": "1988-01-04",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Total return",
+     "how": "yahoo",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "^SP500TR on Yahoo Finance",
+       "url": "https://finance.yahoo.com/quote/%5ESP500TR/history/"
+      }
+     ]
     }
    ]
   },

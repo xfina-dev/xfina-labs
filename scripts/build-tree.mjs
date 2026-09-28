@@ -272,12 +272,13 @@ const INDICES = [
   // Start dates are the oldest rows NSE Indices returns for each Total Returns Index (measured by calling the same
   // endpoint the historical data page uses, on 2026-09-26).
   ...[['Nifty 50', '1999-06-30'], ['Nifty Next 50', '2002-11-08'], ['Nifty Midcap 150', '2005-04-01'], ['Nifty Smallcap 250', '2005-04-01']].map(([a, since]) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since })),
-  // S&P 500, price only (no dividends), from Yahoo Finance: its date-range picker has a genuine "Max" button (not
-  // a param bypass, confirmed by clicking it on 2026-09-27) that gives the full history, further back than S&P
-  // DJI's own site (10 years only) allows. No free total-return series exists for it on Yahoo: ^SP500TR only
-  // starts 1988, a real find but not pursued here (a straight swap would cost 60 years of the price-only series'
-  // own history; left as a possible future addition, not a replacement).
+  // S&P 500, both from Yahoo Finance, both with a genuine "Max" button (not a param bypass, confirmed by clicking
+  // it on 2026-09-27 for ^GSPC and live again on 2026-09-28 for ^SP500TR): ^GSPC (price only) back to 1927, further
+  // than S&P DJI's own site (10 years only) allows; ^SP500TR (Total Return, the Acc-equivalent series -- dividends
+  // reinvested into the index level) genuinely from 1988-01-04, confirmed 9,756 rows live. Kept as two rows, not a
+  // swap: ^SP500TR does not reach back anywhere near as far as ^GSPC's own price-only history.
   { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 (^GSPC, price only)', how: 'yahoo', ccy: 'USD', since: '1927-12-30', src: 'yahoo', ret: 'Price only', links: [L('^GSPC on Yahoo Finance', 'https://finance.yahoo.com/quote/%5EGSPC/history/')] },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 Total Return (^SP500TR)', how: 'yahoo', ccy: 'USD', since: '1988-01-04', src: 'yahoo', ret: 'Total return', links: [L('^SP500TR on Yahoo Finance', 'https://finance.yahoo.com/quote/%5ESP500TR/history/')] },
   // Nasdaq-100: Nasdaq's own index portal (indexes.nasdaq.com, a different site from the nasdaq.com consumer page,
   // whose own calendar is ~10 years) has a real "All" range and a direct, no-login .xlsx export
   // (Index/ExportHistory/<symbol>?startDate=...&endDate=...&timeOfDay=EOD), confirmed live 2026-09-28: both NDX
