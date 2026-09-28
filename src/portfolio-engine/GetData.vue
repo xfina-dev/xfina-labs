@@ -90,10 +90,11 @@ watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } c
 // has one (HOW's `page`), shows once in the card header; links specific to one dataset (a ticker's own page) stay
 // on its row.
 //
-// Sites are ordered Indian entities first, then Global (a site is "Indian" if any of its items is
-// region 'india'; every source in practice serves one bucket only, never a mix), and within each,
-// Index before ETF before MF (a site with mixed vehicles, only Yahoo Finance does this, sorts by the
-// earliest vehicle it carries; its items are sorted the same way inside the group).
+// Sites are in a fixed order: by where the source is (India, then US, then global), and within each, index
+// publisher before exchange prices before fund NAVs. A site that serves more than one region (Yahoo Finance,
+// iShares) sits with the first. Within a site, datasets go Index before ETF before MF.
+const SITE_ORDER = ['NSE Indices', 'NSE', 'MCX', 'AMFI', 'Nasdaq', 'Yahoo Finance', 'iShares', 'SSGA', 'SPDR Gold Shares', 'MSCI'];
+const siteRank = (site) => (SITE_ORDER.includes(site) ? SITE_ORDER.indexOf(site) : SITE_ORDER.length);
 const VEHICLE_ORDER = { index: 0, etf: 1, mf: 2 };
 const vehicleRank = (i) => VEHICLE_ORDER[i.vehicle] ?? 3;
 const bySite = computed(() => {
@@ -106,11 +107,9 @@ const bySite = computed(() => {
     its = [...its].sort((a, b) => vehicleRank(a) - vehicleRank(b));
     // Each source with the datasets it serves here, since its steps can depend on them.
     const hows = [...new Set(its.map((i) => i.how))].map((h) => ({ ...HOW[h], items: its.filter((i) => i.how === h) }));
-    const region = its.some((i) => i.region === 'india') ? 0 : 1;
-    const vehicle = Math.min(...its.map(vehicleRank));
-    return { site, items: its, page: hows[0].page, terms: hows[0].terms, hows, bookmarklet: bookmarkletFor(site, its), region, vehicle };
+    return { site, items: its, page: hows[0].page, terms: hows[0].terms, hows, bookmarklet: bookmarkletFor(site, its) };
   });
-  return groups.sort((a, b) => a.region - b.region || a.vehicle - b.vehicle || a.site.localeCompare(b.site));
+  return groups.sort((a, b) => siteRank(a.site) - siteRank(b.site) || a.site.localeCompare(b.site));
 });
 
 const anyBookmark = computed(() => bySite.value.some((g) => g.bookmarklet));
