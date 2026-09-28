@@ -180,6 +180,10 @@ async function isharesInception(url) {
   } catch { return null; }
 }
 const yahoo = (t) => `https://finance.yahoo.com/quote/${t}/history/`;
+// Nasdaq's own index-history export, direct and unauthenticated (confirmed live 2026-09-28, a real .xlsx). `since`
+// is the index's own "All" start date; the end date is always today, so this URL only ever needs regenerating
+// when the script itself is re-run (the guide.js UI builds its own current end date the same way for other sources).
+const nasdaqExport = (symbol, since) => `https://indexes.nasdaq.com/Index/ExportHistory/${symbol}?startDate=${since}T00:00:00.000&endDate=${new Date().toISOString().slice(0, 10)}T00:00:00.000&timeOfDay=EOD`;
 const ishUk = (id, slug) => `https://www.ishares.com/uk/individual/en/products/${id}/${slug}`;
 const ishUs = (id, slug) => `https://www.ishares.com/us/products/${id}/${slug}`;
 const ishCh = (id, slug) => `https://www.ishares.com/ch/individual/en/products/${id}/${slug}`;
@@ -268,13 +272,21 @@ const INDICES = [
   // Start dates are the oldest rows NSE Indices returns for each Total Returns Index (measured by calling the same
   // endpoint the historical data page uses, on 2026-09-26).
   ...[['Nifty 50', '1999-06-30'], ['Nifty Next 50', '2002-11-08'], ['Nifty Midcap 150', '2005-04-01'], ['Nifty Smallcap 250', '2005-04-01']].map(([a, since]) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since })),
-  // US equity indexes, price only (no dividends), from Yahoo Finance: its date-range picker has a genuine "Max"
-  // button (not a param bypass, confirmed by clicking it on 2026-09-27) that gives the full history, further back than
-  // either S&P DJI's own site (10 years only) or Nasdaq's own calendar (also ~10 years) allow. No free total-return
-  // series exists for either on Yahoo: ^SP500TR only starts 1988 and needs its own row if added; ^XNDX (Nasdaq-100 TR)
-  // has no history at all, just today's value.
+  // S&P 500, price only (no dividends), from Yahoo Finance: its date-range picker has a genuine "Max" button (not
+  // a param bypass, confirmed by clicking it on 2026-09-27) that gives the full history, further back than S&P
+  // DJI's own site (10 years only) allows. No free total-return series exists for it on Yahoo: ^SP500TR only
+  // starts 1988, a real find but not pursued here (a straight swap would cost 60 years of the price-only series'
+  // own history; left as a possible future addition, not a replacement).
   { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 (^GSPC, price only)', how: 'yahoo', ccy: 'USD', since: '1927-12-30', src: 'yahoo', ret: 'Price only', links: [L('^GSPC on Yahoo Finance', 'https://finance.yahoo.com/quote/%5EGSPC/history/')] },
-  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 (^NDX, price only)', how: 'yahoo', ccy: 'USD', since: '1985-10-01', src: 'yahoo', ret: 'Price only', links: [L('^NDX on Yahoo Finance', 'https://finance.yahoo.com/quote/%5ENDX/history/')] },
+  // Nasdaq-100: Nasdaq's own index portal (indexes.nasdaq.com, a different site from the nasdaq.com consumer page,
+  // whose own calendar is ~10 years) has a real "All" range and a direct, no-login .xlsx export
+  // (Index/ExportHistory/<symbol>?startDate=...&endDate=...&timeOfDay=EOD), confirmed live 2026-09-28: both NDX
+  // (price, from 1985-01-31, matching Yahoo's depth) and XNDX (Total Return, genuinely from 1999-03-04 -- Yahoo's
+  // ^XNDX has no history at all, a wrong "no free total-return series exists" call made here on 2026-09-27 before
+  // this site was checked). NDX replaces the Yahoo-sourced price entry (same depth, a direct download instead of a
+  // bookmarklet); XNDX is new, and oldest-first still puts NDX ahead of it since 1985 predates 1999.
+  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 (NDX, price only)', how: 'nasdaqIndex', ccy: 'USD', since: '1985-01-31', src: 'nasdaq', ret: 'Price only', links: [L('NDX history', 'https://indexes.nasdaq.com/Index/History/NDX'), L('NDX download (Excel)', nasdaqExport('NDX', '1985-01-31'))] },
+  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', name: 'Nasdaq-100 Total Return (XNDX)', how: 'nasdaqIndex', ccy: 'USD', since: '1999-03-04', src: 'nasdaq', ret: 'Total return', links: [L('XNDX history', 'https://indexes.nasdaq.com/Index/History/XNDX'), L('XNDX download (Excel)', nasdaqExport('XNDX', '1999-03-04'))] },
   // Free full history on the index's own page (Performance tab, Cumulative performance, Full history, the download
   // icon), no account needed: confirmed for all three, monthly, starting 1998-12-31, on 2026-09-27. The page shows one
   // return variant with no toggle and no label, so the name says just "Index", not Price/Gross/Net Total Return.

@@ -97,6 +97,12 @@ export const HOW = {
     steps: ['Open the index page and its Performance tab.', 'Under Cumulative performance, choose Full history.', 'Press the download icon next to Compare. No account is needed.'],
     format: 'An Excel file with a date and the index level, monthly, as MSCI publishes it. Full history on the free page starts 1998-12-31; MSCI\'s own longer history is licensed. The page shows one return variant with no way to switch it, and it is not labelled Price, Gross or Net, so check the numbers before assuming which one it is.',
   },
+  nasdaqIndex: {
+    site: 'Nasdaq',
+    title: 'Nasdaq: index history',
+    steps: ['Open the index\'s History tab (indexes.nasdaq.com, not the nasdaq.com consumer page, whose own date range is much shorter).', 'Under Performance, press All.', 'Press Download. No account is needed.'],
+    format: 'An Excel file with a date and the index level daily, as Nasdaq publishes it, back to the index\'s own start.',
+  },
   mcxSpot: {
     site: 'MCX',
     title: 'MCX: Spot Market Price',
@@ -106,7 +112,7 @@ export const HOW = {
 };
 
 
-const DATE_SOURCE = { direct: 'Direct plans began on 1 Jan 2013', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices', yahoo: 'first row on Yahoo Finance', mcx: 'first row on MCX Spot Market Price' };
+const DATE_SOURCE = { direct: 'Direct plans began on 1 Jan 2013', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices', yahoo: 'first row on Yahoo Finance', mcx: 'first row on MCX Spot Market Price', nasdaq: 'first row on Nasdaq\'s own index history' };
 export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
 // Whole years of history up to today, rounded down; null when the start date is not known.
 export const yearsOf = (i) => (i.inception ? Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5))) : null);

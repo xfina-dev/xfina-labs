@@ -2621,17 +2621,41 @@
    "instruments": [
     {
      "id": "idx-nasdaq-100-ndx-price-only",
-     "name": "Nasdaq-100 (^NDX, price only)",
-     "inception": "1985-10-01",
-     "dateSource": "yahoo",
+     "name": "Nasdaq-100 (NDX, price only)",
+     "inception": "1985-01-31",
+     "dateSource": "nasdaq",
      "ccy": "USD",
      "returnType": "Price only",
-     "how": "yahoo",
+     "how": "nasdaqIndex",
      "kind": "Index",
      "links": [
       {
-       "label": "^NDX on Yahoo Finance",
-       "url": "https://finance.yahoo.com/quote/%5ENDX/history/"
+       "label": "NDX history",
+       "url": "https://indexes.nasdaq.com/Index/History/NDX"
+      },
+      {
+       "label": "NDX download (Excel)",
+       "url": "https://indexes.nasdaq.com/Index/ExportHistory/NDX?startDate=1985-01-31T00:00:00.000&endDate=2026-09-28T00:00:00.000&timeOfDay=EOD"
+      }
+     ]
+    },
+    {
+     "id": "idx-nasdaq-100-total-return-xndx",
+     "name": "Nasdaq-100 Total Return (XNDX)",
+     "inception": "1999-03-04",
+     "dateSource": "nasdaq",
+     "ccy": "USD",
+     "returnType": "Total return",
+     "how": "nasdaqIndex",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "XNDX history",
+       "url": "https://indexes.nasdaq.com/Index/History/XNDX"
+      },
+      {
+       "label": "XNDX download (Excel)",
+       "url": "https://indexes.nasdaq.com/Index/ExportHistory/XNDX?startDate=1999-03-04T00:00:00.000&endDate=2026-09-28T00:00:00.000&timeOfDay=EOD"
       }
      ]
     }
