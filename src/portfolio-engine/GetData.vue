@@ -278,15 +278,32 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <div class="h-px flex-1 bg-border" />
       </div>
       <!-- The bookmark, explained once for every site that has one -->
-      <p v-if="anyBookmark" class="text-sm text-muted-foreground">
-        Sites cap what one request returns (a year on NSE Indices, five years on AMFI), so a long history is many downloads.
-        Where a site has an <strong class="text-foreground">Xfina bookmark</strong>, it does those downloads for you on the site's own page, at a person's pace:
-        drag it to your bookmarks bar once, open the site, click it and press Start, keeping that tab in front until it says Done.
-        It remembers what it fetched, so the next run only gets what's new. Chrome and Edge save to one folder you pick; elsewhere, allow multiple downloads.
-        It runs only in your browser: Xfina never sees the data, and isn't affiliated with these sites.
-        Then use <strong class="text-foreground">Import Files</strong> in Portfolio Engine; it merges by date, newer replacing older.
-        <span v-if="dragHint" class="text-foreground">Drag the bookmark, don't click it here.</span>
-      </p>
+      <div v-if="anyBookmark" class="rounded-md border bg-muted/30 p-4 space-y-3 text-sm">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <div class="flex items-center gap-2 font-semibold"><Bookmark class="h-4 w-4" />Xfina bookmarklet</div>
+          <span class="text-muted-foreground">Sites cap each request (a year on NSE Indices, five on AMFI); it does the repeat downloads on the site's own page.</span>
+          <span v-if="dragHint" class="text-foreground">Drag it, don't click it here.</span>
+        </div>
+        <div class="grid gap-3 md:grid-cols-2">
+          <div>
+            <div class="font-medium text-muted-foreground text-xs mb-1">Use</div>
+            <ol class="list-decimal pl-5 space-y-0.5">
+              <li>Drag the site's Xfina button to your bookmarks bar, once.</li>
+              <li>Open the site, click the bookmark, press Start.</li>
+              <li>Keep that tab in front until it says Done.</li>
+              <li>Import the files in Portfolio Engine: it merges by date.</li>
+            </ol>
+          </div>
+          <div>
+            <div class="font-medium text-muted-foreground text-xs mb-1">Good to know</div>
+            <ul class="list-disc pl-5 space-y-0.5 text-muted-foreground">
+              <li>The next run fetches only what's new.</li>
+              <li>Chrome and Edge save to one folder you pick; elsewhere, allow multiple downloads.</li>
+              <li>Runs only in your browser. Xfina never sees the data and isn't affiliated with these sites.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <div class="space-y-8">
       <Card v-for="g in bySite" :key="g.site" class="bg-card border-border shadow-sm">
         <CardHeader class="flex flex-col gap-3 space-y-0 pb-4 sm:flex-row sm:items-start sm:justify-between">
