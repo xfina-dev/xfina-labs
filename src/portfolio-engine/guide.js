@@ -151,9 +151,11 @@ export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls &
 //     none of these trade a separate distributing unit class on NSE (there is no second symbol for one). Gold is
 //     excluded -- there is no income to distribute either way.
 //   - Non-India ETF: a UCITS/CH fund names its own share class ("... UCITS ETF (Acc)"); one with no such marker
-//     is the Distributing share class (the Acc alternative either doesn't exist or wasn't picked, IB01 being the
-//     one case here without an Acc option). A native US listing is Distributing by law -- a '40 Act RIC must pay
-//     out at least 90% of its net income every year to keep its pass-through tax status, not a per-fund choice.
+//     is the Distributing share class, the Acc alternative either doesn't exist or wasn't picked. IB01 looked
+//     like that case, but isn't: confirmed live on iShares' own page it's Accumulating too, it just doesn't put
+//     "(Acc)" in its own title the way its siblings do -- the name here now carries the marker so this check
+//     still works without a one-off exception. A native US listing is Distributing by law -- a '40 Act RIC must
+//     pay out at least 90% of its net income every year to keep its pass-through tax status, not a per-fund choice.
 //
 // An index has no share class, but the same Acc/Dist question has a direct analogue in its returnType: any
 // total-return variant (plain "Total return", or MSCI's "Net Total Return") reinvests the dividend into the

@@ -307,7 +307,12 @@ const ETFS = [
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf'), links: [L('SGOV price history', yahoo('SGOV'))] },
   { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'SPDR Bloomberg 1-3 Month T-Bill ETF', code: 'BIL', manual: '2007-05-30', links: [L('BIL price history', yahoo('BIL'))] },
   { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'us', name: 'iShares 20+ Year Treasury Bond ETF', code: 'TLT', page: ishUs(239454, 'ishares-20-year-treasury-bond-etf'), links: [L('TLT price history', yahoo('TLT'))] },
-  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'irish', name: 'iShares $ Treasury Bond 0-1yr UCITS ETF', code: 'IB01', page: ishUk(307243, 'ishares-usd-treasury-bond-01yr-ucits-etf'), extra: [L('IB01 price history', yahoo('IB01.L'))] },
+  // IB01 IS the Acc share class (ISIN IE00BGSF1X88) -- confirmed live 2026-09-28 on iShares' own page ("USD
+  // (Accumulating)"), and again by cross-referencing the same ISIN under its other exchange ticker, IBC1 (Xetra/
+  // gettex). It just doesn't put "(Acc)" in its own title the way CSPX/VUAA/CNDX/etc. do, so distFlag()'s
+  // name-text check alone would mislabel it Dist; the name here now carries the marker explicitly instead. There
+  // never was a real Ireland/India-accumulating gap for this asset, despite an earlier pass concluding there was.
+  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'irish', name: 'iShares $ Treasury Bond 0-1yr UCITS ETF (Acc)', code: 'IB01', page: ishUk(307243, 'ishares-usd-treasury-bond-01yr-ucits-etf'), extra: [L('IB01 price history', yahoo('IB01.L'))] },
   // DTLA, not IDTL: IDTL is the Distributing share class; India/Ireland rows use accumulating where one exists (confirmed on ishares.com, 2026-09-27).
   { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'irish', name: 'iShares $ Treasury Bond 20+yr UCITS ETF USD (Acc)', code: 'DTLA', page: ishUk(297191, 'ishares-treasury-bond-20-yr-ucits-etf-usd-acc-fund') },
   // Debt / Global

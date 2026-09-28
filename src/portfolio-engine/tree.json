@@ -2289,7 +2289,7 @@
    "instruments": [
     {
      "id": "etf-ib01",
-     "name": "iShares $ Treasury Bond 0-1yr UCITS ETF",
+     "name": "iShares $ Treasury Bond 0-1yr UCITS ETF (Acc)",
      "code": "IB01",
      "inception": "2019-02-20",
      "dateSource": "issuer",
