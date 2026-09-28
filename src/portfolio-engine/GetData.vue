@@ -309,7 +309,11 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <CardHeader class="flex flex-col gap-3 space-y-0 pb-4 sm:flex-row sm:items-start sm:justify-between">
           <div class="min-w-0 space-y-1.5">
             <CardTitle class="text-xl">{{ g.site }}</CardTitle>
-            <CardDescription>{{ g.items.length }} dataset{{ g.items.length > 1 ? 's' : '' }} to download here. Follow the steps, then import the files.</CardDescription>
+            <CardDescription>
+              {{ g.items.length }} dataset{{ g.items.length > 1 ? 's' : '' }} to download here. Follow the steps, then import the files.
+              <!-- On a single-page site the bookmark carries the selected datasets; Yahoo's works on whichever ticker page is open -->
+              <template v-if="g.bookmarklet && g.page"><br />Its Xfina bookmarklet is set up with {{ g.items.length - g.bookmarklet.skipped > 1 ? 'these datasets' : 'this dataset' }}: drag it again after changing the list.</template>
+            </CardDescription>
           </div>
           <!-- The bookmark (to drag), the site's one download page where it has one, and its terms of use -->
           <div class="flex flex-wrap items-center gap-2 sm:shrink-0">
@@ -362,7 +366,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <ol class="list-decimal pl-5 space-y-1">
                   <li v-for="(s, k) in txt(h.steps, h.items)" :key="k">{{ s }}</li>
                 </ol>
-                <p class="text-xs text-muted-foreground mt-1">You get: {{ txt(h.format, h.items) }}</p>
+                <p v-if="h.format" class="text-xs text-muted-foreground mt-1">You get: {{ txt(h.format, h.items) }}</p>
               </div>
             </div>
           </div>

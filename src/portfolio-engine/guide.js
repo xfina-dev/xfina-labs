@@ -72,10 +72,6 @@ export const HOW = {
         'Press Submit, then csv format above the table. Repeat for each year and import every file as it is.',
       ];
     },
-    format: (items) => [
-      ...(items.some((i) => !NSE_DEBT[i.name]) ? ['Equity: the index name, date, Total Returns Index and Net Total Return Index (a dash before 2000).'] : []),
-      ...(items.some((i) => NSE_DEBT[i.name]) ? ['Debt: the date and the index level (open, high, low, close), which NSE says is already total return for these indexes.'] : []),
-    ].join(' '),
   },
   amfi: {
     site: 'AMFI',
