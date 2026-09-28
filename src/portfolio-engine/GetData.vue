@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { ArrowLeft, ExternalLink, X, Check } from 'lucide-vue-next';
+import { ArrowLeft, ExternalLink, X, Check, Bookmark } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,9 +83,9 @@ onMounted(() => {
 });
 watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch { /* ignore */ } }, { deep: true });
 
-// The download list is grouped by website, so each site is visited once. A page link that every
-// dataset in the group shares (for example the NSE Indices historical data page) shows once at the
-// top; links specific to one dataset (a ticker's own page) stay on its row.
+// The download list is grouped by website, so each site is visited once. The site's one download page, where it
+// has one (HOW's `page`), shows once in the card header; links specific to one dataset (a ticker's own page) stay
+// on its row.
 //
 // Sites are ordered Indian entities first, then Global (a site is "Indian" if any of its items is
 // region 'india'; every source in practice serves one bucket only, never a mix), and within each,
@@ -101,23 +101,20 @@ const bySite = computed(() => {
   }
   const groups = [...m.entries()].map(([site, its]) => {
     its = [...its].sort((a, b) => vehicleRank(a) - vehicleRank(b));
-    const urls = new Map();
-    for (const i of its) for (const l of i.links) urls.set(l.url, { l, n: (urls.get(l.url)?.n || 0) + 1 });
-    const shared = its.length > 1 ? [...urls.values()].filter((u) => u.n === its.length).map((u) => u.l) : [];
-    const sharedUrls = new Set(shared.map((l) => l.url));
-    const hows = [...new Set(its.map((i) => i.how))].map((h) => HOW[h]);
+    // Each source with the datasets it serves here, since its steps can depend on them.
+    const hows = [...new Set(its.map((i) => i.how))].map((h) => ({ ...HOW[h], items: its.filter((i) => i.how === h) }));
     const region = its.some((i) => i.region === 'india') ? 0 : 1;
     const vehicle = Math.min(...its.map(vehicleRank));
-    return { site, items: its, shared, sharedUrls, hows, bookmarklet: bookmarkletFor(site, its), region, vehicle };
+    return { site, items: its, page: hows[0].page, terms: hows[0].terms, hows, bookmarklet: bookmarkletFor(site, its), region, vehicle };
   });
   return groups.sort((a, b) => a.region - b.region || a.vehicle - b.vehicle || a.site.localeCompare(b.site));
 });
 
+const anyBookmark = computed(() => bySite.value.some((g) => g.bookmarklet));
+// A HOW's steps or format: text, or a function of the datasets it serves.
+const txt = (v, items) => (typeof v === 'function' ? v(items) : v);
 // Clicking a bookmarklet link on this page would run it here, where it does nothing useful. It is for dragging.
 const dragHint = ref(false);
-// Manual or assisted, per website. Assisted exists only where a bookmarklet does.
-const modes = ref({});
-const mode = (site) => modes.value[site] || 'manual';
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 // min-w-0 so a long blurb (e.g. Switzerland's) truncates inside its grid column instead of forcing
 // the column, and the whole grid, wider than its container (a CSS Grid default: a child's intrinsic
@@ -279,25 +276,39 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Download Datasets</h2>
         <div class="h-px flex-1 bg-border" />
       </div>
+      <!-- The bookmark, explained once for every site that has one -->
+      <p v-if="anyBookmark" class="text-sm text-muted-foreground">
+        Sites cap what one request returns (a year on NSE Indices, five years on AMFI), so a long history is many downloads.
+        Where a site has an <strong class="text-foreground">Xfina bookmark</strong>, it does those downloads for you on the site's own page, at a person's pace:
+        drag it to your bookmarks bar once, open the site, click it and press Start, keeping that tab in front until it says Done.
+        It remembers what it fetched, so the next run only gets what's new. Chrome and Edge save to one folder you pick; elsewhere, allow multiple downloads.
+        It runs only in your browser: Xfina never sees the data, and isn't affiliated with these sites.
+        Then use <strong class="text-foreground">Import Files</strong> in Portfolio Engine; it merges by date, newer replacing older.
+        <span v-if="dragHint" class="text-foreground">Drag the bookmark, don't click it here.</span>
+      </p>
       <div class="space-y-8">
       <Card v-for="g in bySite" :key="g.site" class="bg-card border-border shadow-sm">
-        <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
+        <CardHeader class="flex flex-col gap-3 space-y-0 pb-4 sm:flex-row sm:items-start sm:justify-between">
           <div class="min-w-0 space-y-1.5">
             <CardTitle class="text-xl">{{ g.site }}</CardTitle>
-            <CardDescription>{{ g.items.length }} dataset{{ g.items.length > 1 ? 's' : '' }} to download here. Open the page, follow the steps, then import the files.</CardDescription>
+            <CardDescription>{{ g.items.length }} dataset{{ g.items.length > 1 ? 's' : '' }} to download here. Follow the steps, then import the files.</CardDescription>
           </div>
-          <!-- The site's terms of use, and its download page where one page serves every dataset -->
-          <div class="flex shrink-0 items-center gap-2">
-            <a v-if="g.hows[0].page" :href="g.hows[0].page" target="_blank" rel="noopener noreferrer" class="no-underline">
+          <!-- The bookmark (to drag), the site's one download page where it has one, and its terms of use -->
+          <div class="flex flex-wrap items-center gap-2 sm:shrink-0">
+            <a
+              v-if="g.bookmarklet" :href="g.bookmarklet.href" draggable="true" title="Drag to your bookmarks bar"
+              class="inline-flex items-center h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
+              @click.prevent="dragHint = true"
+            ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.label }}</a>
+            <a v-if="g.page" :href="g.page" target="_blank" rel="noopener noreferrer" class="no-underline">
               <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Downloads page</Button>
             </a>
-            <a v-if="g.hows[0].terms" :href="g.hows[0].terms" target="_blank" rel="noopener noreferrer" class="no-underline">
+            <a v-if="g.terms" :href="g.terms" target="_blank" rel="noopener noreferrer" class="no-underline">
               <Button variant="ghost" size="sm" class="text-muted-foreground"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Terms</Button>
             </a>
           </div>
         </CardHeader>
-        <CardContent class="space-y-6">
-          <!-- What to download: the same for both ways -->
+        <CardContent class="space-y-4">
           <div>
             <div class="font-medium text-muted-foreground text-xs mb-1">Datasets to download</div>
             <div class="overflow-x-auto rounded-md border">
@@ -312,7 +323,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="dateSourceNote(i)">{{ i.inception || '—' }}</td>
                     <td class="px-3 py-2 text-right">
                       <div class="flex items-center justify-end gap-1.5">
-                        <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
+                        <a v-for="l in i.links.filter((x) => x.url !== g.page)" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
                           <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
                         </a>
                         <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
@@ -324,87 +335,26 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </div>
 
-          <!-- Two ways to get them. Assisted appears only for sites that have a bookmarklet. -->
-          <div v-if="g.bookmarklet" class="flex gap-1 border-b" role="tablist">
-            <button
-              v-for="m in [['manual', 'Manual'], ['assisted', 'Assisted']]" :key="m[0]" type="button" role="tab" :aria-selected="mode(g.site) === m[0]"
-              class="h-10 px-3 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
-              :class="mode(g.site) === m[0] ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
-              @click="modes = { ...modes, [g.site]: m[0] }"
-            >{{ m[1] }}</button>
-          </div>
-
-          <!-- Manual: open the page and download by hand -->
-          <div v-if="!g.bookmarklet || mode(g.site) === 'manual'" class="space-y-6">
+          <!-- By hand: the walkthrough beside the steps for what is selected -->
+          <div class="grid gap-4 md:grid-cols-2 md:items-start">
             <GifPreview :slug="slug(g.site)" :title="g.site" />
-            <div class="space-y-4">
-              <div v-if="g.shared.length" class="flex flex-wrap gap-2">
-                <a v-for="l in g.shared" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
-                  <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
-                </a>
-              </div>
-              <div v-for="h in g.hows" :key="h.title" class="text-sm">
+            <div class="space-y-3 text-sm">
+              <div v-for="h in g.hows" :key="h.title">
                 <div class="font-medium text-muted-foreground text-xs mb-1">{{ g.hows.length > 1 ? h.title : 'Steps' }}</div>
                 <ol class="list-decimal pl-5 space-y-1">
-                  <li v-for="(s, k) in h.steps" :key="k">{{ s }}</li>
+                  <li v-for="(s, k) in txt(h.steps, h.items)" :key="k">{{ s }}</li>
                 </ol>
-                <p class="text-xs text-muted-foreground mt-1">You will get: {{ h.format }} Import it as it is.</p>
+                <p class="text-xs text-muted-foreground mt-1">You get: {{ txt(h.format, h.items) }}</p>
               </div>
             </div>
           </div>
 
-          <!-- Assisted: a bookmarklet, made once, that does the clicking on the site -->
-          <div v-else class="rounded-md border bg-muted/30 p-4 space-y-4">
-            <div class="flex items-center gap-2 font-semibold">One-click download <Tag>bookmarklet</Tag></div>
-
-            <ol class="list-decimal pl-5 space-y-2 text-sm">
-              <li>
-                Drag this button to your bookmarks bar. You only do this once.
-                <div class="mt-2">
-                  <a
-                    :href="g.bookmarklet.href" draggable="true" title="Drag me to your bookmarks bar"
-                    class="inline-flex items-center h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
-                    @click.prevent="dragHint = true"
-                  >{{ g.bookmarklet.label }}</a>
-                  <span v-if="dragHint" class="ml-2 text-xs text-muted-foreground">Drag it, don't click it here.</span>
-                  <div class="text-xs text-muted-foreground mt-1">It covers {{ g.bookmarklet.indexes.join(', ') }}.</div>
-                </div>
-              </li>
-              <li>
-                Open the site:
-                <a :href="g.bookmarklet.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline ml-1">
-                  <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.openLabel }}</Button>
-                </a>
-              </li>
-              <template v-if="g.bookmarklet.oneShot">
-                <li>
-                  Click the bookmark. A small panel opens on that ticker's page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new, starting the day after the newest date it already has. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the range before you press {{ g.bookmarklet.action }}.
-                </li>
-                <li>Press <strong>{{ g.bookmarklet.action }}</strong>. If the page is not already at that range, it moves there first and asks you to press {{ g.bookmarklet.action }} again once it has loaded.</li>
-                <li>It reads the table the page itself shows and saves it as one CSV file, exactly those values &mdash; no clicking through the page yourself. In Chrome or Edge it asks for a folder (make a new one, as Downloads and Desktop aren't allowed) and saves there; otherwise it's a normal browser download.</li>
-                <li>Repeat for each ticker &mdash; open its page, click the bookmark. Then use <strong>Import Files</strong> in Portfolio Engine and pick the files: it merges by date, and a newer file replaces older data for the same dates.</li>
-              </template>
-              <template v-else>
-                <li>
-                  Click the bookmark. A small panel opens on that page and <strong>Update</strong> is already chosen: the first time it brings in the full history, and every time after that only what's new, starting the day after the newest date it already has. Choose <strong>Full history</strong> to redo everything, or <strong>Custom</strong> for a range of your own. It shows the files it will download before you press Start.
-                </li>
-                <li>Press <strong>Start</strong> and <strong>keep that tab open and in front</strong> until it says Done. Browsers pause background tabs, so it can't run while you look at another tab.</li>
-                <li>It fills in the page's form and presses its <strong>{{ g.bookmarklet.action }}</strong> button for you, one file after another, with a pause of a few seconds each time, as a person would. That's the same download you'd do by hand, without the clicking.</li>
-                <li>In Chrome or Edge it asks for <strong>one folder</strong> (make a new one, as Downloads and Desktop aren't allowed) and saves every file there with no more prompts. In other browsers the files download as usual: the first three go out together so your browser asks to <strong>allow multiple downloads</strong>, so choose Allow; it waits about 15 seconds for that. Then use <strong>Import Files</strong> in Portfolio Engine and pick them: it merges the files by date, and a newer file replaces older data for the same dates.</li>
-              </template>
-            </ol>
-
-            <p class="text-xs text-muted-foreground">
-              The bookmark remembers where it left off in this browser, so clearing that site's data makes the next Update a full history.
-              This just saves you the clicking: {{ g.bookmarklet.oneShot ? 'the same page you would read by hand' : 'the same form and the same download button' }}, so {{ g.bookmarklet.oneShot ? 'a file takes one click instead of a manual copy-paste' : 'a few years of files take one click instead of many' }}. It runs only on that page, is meant for your own study, and Xfina never sees the data. Xfina isn't affiliated with {{ g.bookmarklet.site }}.
-              <template v-if="g.bookmarklet.caution">{{ g.bookmarklet.caution }} Read their
-                <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>.</template>
-              <template v-else>Their
-                <a :href="g.bookmarklet.termsUrl" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2">terms of use</a>
-                apply here as they do when downloading by hand.</template>
-              <template v-if="g.bookmarklet.skipped"> {{ g.bookmarklet.skipped }} other {{ g.bookmarklet.skipped > 1 ? 'datasets here are' : 'dataset here is' }} not covered, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} from the site.</template>
-            </p>
-          </div>
+          <!-- What is particular to this site's bookmark -->
+          <p v-if="g.bookmarklet && (g.bookmarklet.oneShot || g.bookmarklet.skipped || g.bookmarklet.caution)" class="text-xs text-muted-foreground">
+            <template v-if="g.bookmarklet.oneShot">This bookmark saves one ticker per click: open a ticker's page from its row, click the bookmark, then {{ g.bookmarklet.action }}. </template>
+            <template v-if="g.bookmarklet.skipped">It doesn't cover {{ g.bookmarklet.skipped }} of these, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} by hand. </template>
+            {{ g.bookmarklet.caution }}
+          </p>
         </CardContent>
       </Card>
       </div>

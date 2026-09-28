@@ -41,23 +41,41 @@ export const LISTINGS = [
   { id: 'india', title: 'India', blurb: 'Indian ETFs on foreign indices, in INR' },
 ];
 
+// NSE's debt indexes are not under Total returns Index Values. The site serves them under Historical Index Data
+// (Fixed Income), keyed by the catalogue's name for the index: [the page's index name, its group there, a label].
+// Checked live: the 10 yr one is the plain G-Sec index, not the "(CLEAN PRICE)" one next to it.
+export const NSE_DEBT = {
+  'Nifty 10 yr Benchmark G-Sec Index': ['NIFTY 10 YR BENCHMARK G-SEC', 'Government Securities', 'Nifty 10 yr Benchmark G-Sec'],
+  'NSE short-duration debt index (Liquid or 1D Rate)': ['NIFTY 1D RATE INDEX', 'Money Market', 'Nifty 1D Rate Index'],
+};
+const names = (xs) => xs.join(', ').replace(/, ([^,]*)$/, ' and $1');
+
 // How a source is downloaded and what you get. `site` is the website: the download list groups by it,
 // so a user visits each site once. `terms` is the site's terms of use; `page` is its one download page, where
-// there is a single page for every dataset (otherwise each dataset carries its own link). Steps are short on purpose.
+// there is a single page for every dataset (otherwise each dataset carries its own link). `steps` and `format`
+// are text, or a function of the datasets selected for that source when what to pick depends on them.
+// Steps are short on purpose.
 export const HOW = {
   nseTri: {
     site: 'NSE Indices',
     page: 'https://www.niftyindices.com/reports/historical-data',
     terms: 'https://www.niftyindices.com/terms-of-use',
     title: 'NSE Indices: Total Returns Index',
-    steps: [
-      'Open the Historical Data page. The report list at the top starts on Historical Index Data, which is the price series. Open it and choose Total returns Index Values (for a fixed income index, stay on Historical Index Data: NSE says all its fixed income indices except the G-Sec clean price one are already total return).',
-      'Pick the Index Type, then the Sub-Index, then the index itself.',
-      'Set From to the start date and To to the end of that financial year (31 March). A range past the financial year does nothing: no error, and no data is fetched.',
-      'Press Submit, then press csv format above the table and save the file when your browser asks.',
-      'Repeat for each following financial year, and import every file as it is.',
-    ],
-    format: 'NSE\'s own CSV: the index name, the date, the Total Returns Index and the Net Total Return Index (the Net Total Return Index shows a dash before 2000). The page returns one financial year at a time, so a long history is one file per year.',
+    // Equity total return is its own report; debt is on the default one (walked through live on the site).
+    steps: (items) => {
+      const eq = items.filter((i) => !NSE_DEBT[i.name]);
+      const debt = items.filter((i) => NSE_DEBT[i.name]);
+      return [
+        ...(eq.length ? [`${names(eq.map((i) => i.asset))}: open the report list at the top (it starts on Historical Index Data, the price series) and choose Total returns Index Values. Then Equity, Broad Market Indices, and the index.`] : []),
+        ...debt.map((i) => `${NSE_DEBT[i.name][2]}: stay on Historical Index Data. Then Fixed Income, ${NSE_DEBT[i.name][1]}, and ${NSE_DEBT[i.name][0]}.`),
+        'Set From and To. The page allows one year per request (a longer range fetches nothing, with no error), so go one financial year, April to March, at a time.',
+        'Press Submit, then csv format above the table. Repeat for each year and import every file as it is.',
+      ];
+    },
+    format: (items) => [
+      ...(items.some((i) => !NSE_DEBT[i.name]) ? ['Equity: the index name, date, Total Returns Index and Net Total Return Index (a dash before 2000).'] : []),
+      ...(items.some((i) => NSE_DEBT[i.name]) ? ['Debt: the date and the index level (open, high, low, close), which NSE says is already total return for these indexes.'] : []),
+    ].join(' '),
   },
   amfi: {
     site: 'AMFI',

@@ -8,17 +8,11 @@ import amfiNav from './bookmarklets/amfi-nav.js?raw';
 import yahooFinance from './bookmarklets/yahoo-finance.js?raw';
 import mcxSpot from './bookmarklets/mcx-spot.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
-import { nodes } from './guide.js';
+import { nodes, NSE_DEBT } from './guide.js';
 
 // The equity indexes the NSE Indices page lists under Total Returns (Broad Market).
 const NSE_SUPPORTED = ['Nifty 50', 'Nifty Next 50', 'Nifty Midcap 150', 'Nifty Smallcap 250'];
 
-// Debt indexes are not under Total Returns. The site serves them under Historical Index Data (Fixed Income), keyed by
-// the catalogue's name for the index: [the page's index name, its group there, a label].
-const NSE_DEBT = {
-  'Nifty 10 yr Benchmark G-Sec Index': ['NIFTY 10 YR BENCHMARK G-SEC', 'Government Securities', 'Nifty 10 yr Benchmark G-Sec'],
-  'NSE short-duration debt index (Liquid or 1D Rate)': ['NIFTY 1D RATE INDEX', 'Money Market', 'Nifty 1D Rate Index'],
-};
 // When the catalogue has no start date for a debt index, ask from here; earlier years just come back empty.
 const DEBT_FROM = '2010-01-01';
 
