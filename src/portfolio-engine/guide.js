@@ -47,8 +47,14 @@ export const HOW = {
   nseTri: {
     site: 'NSE Indices',
     title: 'NSE Indices: Total Returns Index',
-    steps: ['Open the Historical Data page.', 'Pick the index, then the Total Returns Index series (not the price series).', 'Set the widest date range the site allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
-    format: 'NSE\'s own CSV: the index name, the date, the Total Returns Index and the Net Total Return Index. The page exports at most a year at a time, so a long history is several files.',
+    steps: [
+      'Open the Historical Data page. The report list at the top starts on Historical Index Data, which is the price series. Open it and choose Total returns Index Values (for a fixed income index, stay on Historical Index Data: NSE says all its fixed income indices except the G-Sec clean price one are already total return).',
+      'Pick the Index Type, then the Sub-Index, then the index itself.',
+      'Set From to the start date and To to the end of that financial year (31 March). A range past the financial year does nothing: no error, and no data is fetched.',
+      'Press Submit, then press csv format above the table.',
+      'Repeat for each following financial year, and import every file as it is.',
+    ],
+    format: 'NSE\'s own CSV: the index name, the date, the Total Returns Index and the Net Total Return Index (the Net Total Return Index shows a dash before 2000). The page returns one financial year at a time, so a long history is one file per year.',
   },
   amfi: {
     site: 'AMFI',
