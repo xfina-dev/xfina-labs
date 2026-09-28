@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink, X, Check, Bookmark } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
@@ -113,8 +114,9 @@ const bySite = computed(() => {
 const anyBookmark = computed(() => bySite.value.some((g) => g.bookmarklet));
 // A HOW's steps or format: text, or a function of the datasets it serves.
 const txt = (v, items) => (typeof v === 'function' ? v(items) : v);
-// Clicking a bookmarklet link on this page would run it here, where it does nothing useful. It is for dragging.
-const dragHint = ref(false);
+// Clicking a bookmarklet link on this page would run it here, where it does nothing useful. It is for dragging,
+// so a click opens a dialog saying so, with the same button to drag from there.
+const dragFor = ref(null);
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 // min-w-0 so a long blurb (e.g. Switzerland's) truncates inside its grid column instead of forcing
 // the column, and the whole grid, wider than its container (a CSS Grid default: a child's intrinsic
@@ -282,7 +284,6 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
           <div class="flex items-center gap-2 font-semibold"><Bookmark class="h-4 w-4" />Xfina bookmarklet</div>
           <span class="text-muted-foreground">Sites cap each request (a year on NSE Indices, five on AMFI); it does the repeat downloads on the site's own page.</span>
-          <span v-if="dragHint" class="text-foreground">Drag it, don't click it here.</span>
         </div>
         <div class="grid gap-3 md:grid-cols-2">
           <div>
@@ -320,7 +321,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <a
               v-if="g.bookmarklet" :href="g.bookmarklet.href" draggable="true" title="Drag to your bookmarks bar"
               class="inline-flex items-center h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
-              @click.prevent="dragHint = true"
+              @click.prevent="dragFor = g.bookmarklet"
             ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.label }}</a>
             <a v-if="g.page" :href="g.page" target="_blank" rel="noopener noreferrer" class="no-underline">
               <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Downloads page</Button>
@@ -381,5 +382,29 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
       </Card>
       </div>
     </section>
+
+    <!-- A click on an Xfina button: it is meant to be dragged, not clicked here -->
+    <Dialog :open="!!dragFor" @update:open="(v) => { if (!v) dragFor = null; }">
+      <DialogContent v-if="dragFor" class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Drag it to your bookmarks bar</DialogTitle>
+          <DialogDescription>This button is a bookmarklet. It only works on the {{ dragFor.site }} site, so clicking it here does nothing.</DialogDescription>
+        </DialogHeader>
+        <ol class="list-decimal pl-5 space-y-3 text-sm">
+          <li>Show the bookmarks bar if it's hidden: <strong>⌘ Shift B</strong> on a Mac, <strong>Ctrl Shift B</strong> on Windows or Linux.</li>
+          <li>
+            Drag this onto the bar:
+            <div class="mt-2">
+              <a
+                :href="dragFor.href" draggable="true" title="Drag to your bookmarks bar"
+                class="inline-flex items-center h-8 px-3 rounded-md border border-primary bg-primary/5 text-sm font-medium cursor-grab no-underline"
+                @click.prevent
+              ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ dragFor.label }}</a>
+            </div>
+          </li>
+          <li>Open {{ dragFor.site }}, then click the bookmark there.</li>
+        </ol>
+      </DialogContent>
+    </Dialog>
   </AppShell>
 </template>
