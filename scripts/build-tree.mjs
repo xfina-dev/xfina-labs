@@ -123,10 +123,18 @@ const NSE_ETF = {
   MID150BEES: ['Nippon India ETF Nifty Midcap 150', '2019-02-01', 'amfi'],
   GOLDBEES: ['Nippon India ETF Gold BeES', '2007-03-08', 'manual'],
   QGOLDHALF: ['Quantum Gold ETF', '2008-02-27', 'amfi'],
-  LIQUIDBEES: ['Nippon India ETF Liquid BeES', '2003-07-08', 'manual'],
+  // No LIQUIDBEES: it keeps a constant ~Rs 1000 unit price and pays returns as bonus units credited to the demat
+  // account (confirmed live 2026-09-28), so its NSE market price alone shows ~0% return over 20+ years -- a real
+  // trap for anyone taking "Market price" at face value. The reformed "Nifty 1D Rate" ETFs below have a genuinely
+  // growing NAV (confirmed for LIQUID1: "All payouts... reinvested... at the then prevailing NAV") and cover the
+  // same asset (overnight/liquid cash) without it.
   LIQUID1: ['Kotak Nifty 1D Rate Liquid ETF', '2023-01-31', 'amfi'],
+  LIQUIDCASE: ['Zerodha Nifty 1D Rate Liquid ETF', '2024-01-23', 'amfi'],
+  LIQUIDBETF: ['Bajaj Finserv Nifty 1D Rate Liquid ETF', '2024-06-03', 'amfi'],
   LICNETFGSC: ['LIC MF Nifty 8-13 yr G-Sec ETF', '2014-12-26', 'amfi'],
+  SETF10GILT: ['SBI Nifty 10 yr Benchmark G-Sec ETF', '2016-06-16', 'amfi'],
   LTGILTBEES: ['Nippon India ETF Nifty 8-13 yr G-Sec Long Term Gilt', '2016-07-07', 'amfi'],
+  LTGILTCASE: ['Zerodha Nifty 8-13 Yr G-Sec ETF', '2025-08-20', 'amfi'],
 };
 // Which NSE ETFs belong to which asset, by the underlying NSE prints for each.
 const NSE_ASSETS = [
@@ -135,7 +143,7 @@ const NSE_ASSETS = [
   { cls: 'equity', asset: 'Nifty Midcap 150', re: /midcap ?150/i, no: /momentum|quality|bse|alpha|low vol/i },
   { cls: 'equity', asset: 'Nifty Smallcap 250', re: /smallcap ?250/i, no: /momentum|quality|bse|alpha|low vol/i },
   { cls: 'gold', asset: 'Gold', re: /^gold$/i },
-  { cls: 'debt', asset: 'Short duration', re: /nifty ?1d rate/i, also: ['LIQUIDBEES'] },
+  { cls: 'debt', asset: 'Short duration', re: /nifty ?1d rate/i },
   { cls: 'debt', asset: 'Long duration', re: /8-13|10 yr/i, no: /5 yr|hybrid|momentum/i },
 ];
 async function indiaEtfs() {
