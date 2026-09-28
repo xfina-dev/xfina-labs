@@ -18,8 +18,8 @@ const SECTIONS = [
 <template>
   <AppShell tool="/portfolio-engine/">
     <template #tagline>
-      Multi-asset portfolio engine with bring-your-own data.<br />
-      Everything runs in your browser; nothing is uploaded to any server.
+      See how asset classes performed over the years, and how the mix you choose and the way you rebalance can improve risk-adjusted returns.<br />
+      Bring your own data: everything runs in your browser, and nothing is uploaded to any server.
     </template>
 
     <template v-for="(s, i) in SECTIONS" :key="s.id">
