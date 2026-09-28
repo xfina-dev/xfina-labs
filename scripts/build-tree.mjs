@@ -78,9 +78,12 @@ async function measure(cands) {
     const firstNav = iso(j.data.at(-1).date), last = iso(j.data[0].date);
     if (TODAY - day(last) > STALE_DAYS) return null;
     // Direct plans only exist from 2013-01-01. AMFI sometimes carries an older plan's NAVs under the Direct code, so a
-    // Direct plan never starts before that.
+    // Direct plan never starts before that -- but the underlying fund's true first NAV is kept too (trueFirst), so
+    // oldestFirst can still rank same-clamped-date Direct funds by which one's fund is actually older, instead of
+    // falling back to alphabetical order (checked live 2026-09-28: without this, three Direct liquid funds all shown
+    // as "2013-01-01" were picked as Aditya Birla < Axis < Bandhan -- alphabetical, not oldest).
     const clamped = /direct/i.test(c.schemeName) && firstNav < DIRECT_START;
-    return { c, meta: j.meta, first: clamped ? DIRECT_START : firstNav, clamped, last, n: j.data.length };
+    return { c, meta: j.meta, first: clamped ? DIRECT_START : firstNav, trueFirst: firstNav, clamped, last, n: j.data.length };
   });
   return rows.filter(Boolean);
 }
@@ -97,8 +100,11 @@ function toInstrument(r, vehicle) {
 function oldestFirst(rows, vehicle) {
   // One row per fund: the same fund appears as Regular and Direct, and the older plan has the longer history.
   const best = new Map();
-  for (const r of rows) { const k = baseKey(r.c.schemeName); const cur = best.get(k); if (!cur || r.first < cur.first) best.set(k, r); }
-  return [...best.values()].sort((a, b) => a.first.localeCompare(b.first) || a.c.schemeName.localeCompare(b.c.schemeName)).slice(0, KEEP).map((r) => toInstrument(r, vehicle));
+  for (const r of rows) { const k = baseKey(r.c.schemeName); const cur = best.get(k); if (!cur || r.trueFirst < cur.trueFirst) best.set(k, r); }
+  // Sort by the displayed (possibly clamped) date first, then by the fund's true underlying date -- so among
+  // several Direct funds all clamped to the same 2013-01-01 start, the one whose fund is actually older wins the
+  // KEEP cut, not whichever scheme name sorts first alphabetically.
+  return [...best.values()].sort((a, b) => a.first.localeCompare(b.first) || a.trueFirst.localeCompare(b.trueFirst) || a.c.schemeName.localeCompare(b.c.schemeName)).slice(0, KEEP).map((r) => toInstrument(r, vehicle));
 }
 
 // ---------------------------------------------------------------- India ETFs, from NSE
@@ -293,7 +299,6 @@ const node = (cls, region, vehicle, listing, asset) => {
   if (!nodes.has(key)) nodes.set(key, { class: cls, region, vehicle, ...(listing ? { listing } : {}), asset, instruments: [] });
   return nodes.get(key);
 };
-let seq = 0;
 
 console.log('Reading the AMFI scheme list from mfapi.in ...');
 const schemes = await loadSchemes();
@@ -375,9 +380,14 @@ for (const f of FOREIGN) {
   });
 }
 
+// A stable, content-derived id (matching etf-<code> and mf<schemeCode>): a sequential idx-<n> would silently
+// reassign every index's id on the next run whose order or count changed, breaking anyone's saved selection
+// (picked ids are kept in the browser's own storage across regenerations). Found live 2026-09-28: re-running
+// this script did exactly that for the four indices added by hand this session.
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 for (const i of INDICES) {
   const n = node(i.cls, i.region, 'index', null, i.asset);
-  n.instruments.push({ id: `idx-${++seq}`, name: i.name, inception: i.since || null, dateSource: i.since ? (i.src || 'nse') : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
+  n.instruments.push({ id: `idx-${slug(i.name)}`, name: i.name, inception: i.since || null, dateSource: i.since ? (i.src || 'nse') : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
 }
 
 // Oldest first; instruments without a known date go last. Keep the top KEEP.

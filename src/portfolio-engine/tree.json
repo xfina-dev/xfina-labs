@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-26",
+ "generatedAt": "2026-09-28",
  "keep": 3,
  "nodes": [
   {
@@ -631,14 +631,14 @@
    "asset": "Gold",
    "instruments": [
     {
-     "id": "mf119132",
-     "name": "HDFC Gold ETF Fund of Fund - Direct Plan - Growth Option",
-     "code": "119132",
+     "id": "mf115132",
+     "name": "Quantum Gold ETF FOF - Direct Plan - Growth Option",
+     "code": "115132",
      "plan": "Direct",
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
-     "observations": 3382,
-     "dateSource": "amfi",
+     "observations": 3778,
+     "dateSource": "direct",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -651,14 +651,14 @@
      ]
     },
     {
-     "id": "mf115132",
-     "name": "Quantum Gold ETF FOF - Direct Plan - Growth Option",
-     "code": "115132",
+     "id": "mf119132",
+     "name": "HDFC Gold ETF Fund of Fund - Direct Plan - Growth Option",
+     "code": "119132",
      "plan": "Direct",
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
-     "observations": 3778,
-     "dateSource": "direct",
+     "observations": 3382,
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -704,8 +704,8 @@
      "name": "BARODA BNP PARIBAS LIQUID FUND - Growth Option",
      "code": "101408",
      "inception": "2006-04-01",
-     "lastNav": "2026-09-25",
-     "observations": 6293,
+     "lastNav": "2026-09-27",
+     "observations": 6294,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -724,8 +724,8 @@
      "code": "102012",
      "plan": "Regular",
      "inception": "2006-04-01",
-     "lastNav": "2026-09-26",
-     "observations": 6993,
+     "lastNav": "2026-09-27",
+     "observations": 6994,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -744,8 +744,8 @@
      "code": "100047",
      "plan": "Regular",
      "inception": "2006-04-02",
-     "lastNav": "2026-09-25",
-     "observations": 6433,
+     "lastNav": "2026-09-27",
+     "observations": 6434,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -768,14 +768,14 @@
    "asset": "Short duration",
    "instruments": [
     {
-     "id": "mf119568",
-     "name": "Aditya Birla Sun Life Liquid Fund - Direct Plan - GROWTH",
-     "code": "119568",
+     "id": "mf103734",
+     "name": "Quantum Liquid Fund - Direct Plan - Growth Option",
+     "code": "103734",
      "plan": "Direct",
      "inception": "2013-01-01",
-     "lastNav": "2026-09-25",
-     "observations": 4376,
-     "dateSource": "amfi",
+     "lastNav": "2026-09-27",
+     "observations": 6064,
+     "dateSource": "direct",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -793,8 +793,8 @@
      "code": "119091",
      "plan": "Direct",
      "inception": "2013-01-01",
-     "lastNav": "2026-09-25",
-     "observations": 4240,
+     "lastNav": "2026-09-27",
+     "observations": 4242,
      "dateSource": "direct",
      "ccy": "INR",
      "returnType": "NAV",
@@ -808,14 +808,14 @@
      ]
     },
     {
-     "id": "mf103734",
-     "name": "Quantum Liquid Fund - Direct Plan - Growth Option",
-     "code": "103734",
+     "id": "mf119568",
+     "name": "Aditya Birla Sun Life Liquid Fund - Direct Plan - GROWTH",
+     "code": "119568",
      "plan": "Direct",
      "inception": "2013-01-01",
-     "lastNav": "2026-09-26",
-     "observations": 6063,
-     "dateSource": "direct",
+     "lastNav": "2026-09-27",
+     "observations": 4377,
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -1888,6 +1888,10 @@
       {
        "label": "SWDA fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/251882/ishares-msci-world-ucits-etf-acc-fund"
+      },
+      {
+       "label": "IWDA price history",
+       "url": "https://finance.yahoo.com/quote/IWDA.L/history/"
       }
      ],
      "asset": "MSCI World"
@@ -1968,7 +1972,7 @@
      "name": "iShares MSCI Emerging Markets ETF",
      "code": "EEM",
      "inception": "2003-04-07",
-     "dateSource": "manual",
+     "dateSource": "issuer",
      "ccy": "USD",
      "returnType": "NAV",
      "how": "ishares",
@@ -2301,6 +2305,10 @@
       {
        "label": "IB01 fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/307243/ishares-usd-treasury-bond-01yr-ucits-etf"
+      },
+      {
+       "label": "IB01 price history",
+       "url": "https://finance.yahoo.com/quote/IB01.L/history/"
       }
      ],
      "asset": "Short duration"
@@ -2331,7 +2339,7 @@
       },
       {
        "label": "DTLA fund page",
-       "url": "https://www.ishares.com/uk/individual/en/products/297191/ishares-treasury-bond-20%20yr-ucits-etf-usd-acc-fund"
+       "url": "https://www.ishares.com/uk/individual/en/products/297191/ishares-treasury-bond-20-yr-ucits-etf-usd-acc-fund"
       }
      ],
      "asset": "Long duration"
@@ -2492,7 +2500,7 @@
    "asset": "Nifty 50",
    "instruments": [
     {
-     "id": "idx-1",
+     "id": "idx-nifty-50-tri",
      "name": "Nifty 50 TRI",
      "inception": "1999-06-30",
      "dateSource": "nse",
@@ -2516,7 +2524,7 @@
    "asset": "Nifty Next 50",
    "instruments": [
     {
-     "id": "idx-2",
+     "id": "idx-nifty-next-50-tri",
      "name": "Nifty Next 50 TRI",
      "inception": "2002-11-08",
      "dateSource": "nse",
@@ -2540,7 +2548,7 @@
    "asset": "Nifty Midcap 150",
    "instruments": [
     {
-     "id": "idx-3",
+     "id": "idx-nifty-midcap-150-tri",
      "name": "Nifty Midcap 150 TRI",
      "inception": "2005-04-01",
      "dateSource": "nse",
@@ -2564,7 +2572,7 @@
    "asset": "Nifty Smallcap 250",
    "instruments": [
     {
-     "id": "idx-4",
+     "id": "idx-nifty-smallcap-250-tri",
      "name": "Nifty Smallcap 250 TRI",
      "inception": "2005-04-01",
      "dateSource": "nse",
@@ -2583,12 +2591,60 @@
   },
   {
    "class": "equity",
+   "region": "us",
+   "vehicle": "index",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "idx-s-p-500-gspc-price-only",
+     "name": "S&P 500 (^GSPC, price only)",
+     "inception": "1927-12-30",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "yahoo",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "^GSPC on Yahoo Finance",
+       "url": "https://finance.yahoo.com/quote/%5EGSPC/history/"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "index",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "idx-nasdaq-100-ndx-price-only",
+     "name": "Nasdaq-100 (^NDX, price only)",
+     "inception": "1985-10-01",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "yahoo",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "^NDX on Yahoo Finance",
+       "url": "https://finance.yahoo.com/quote/%5ENDX/history/"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
    "region": "global",
    "vehicle": "index",
    "asset": "MSCI ACWI",
    "instruments": [
     {
-     "id": "idx-7",
+     "id": "idx-msci-acwi-index",
      "name": "MSCI ACWI Index",
      "inception": "1998-12-31",
      "dateSource": "publisher",
@@ -2612,7 +2668,7 @@
    "asset": "MSCI World",
    "instruments": [
     {
-     "id": "idx-8",
+     "id": "idx-msci-world-index",
      "name": "MSCI World Index",
      "inception": "1998-12-31",
      "dateSource": "publisher",
@@ -2636,7 +2692,7 @@
    "asset": "MSCI Emerging Markets",
    "instruments": [
     {
-     "id": "idx-9",
+     "id": "idx-msci-emerging-markets-index",
      "name": "MSCI Emerging Markets Index",
      "inception": "1998-12-31",
      "dateSource": "publisher",
@@ -2654,13 +2710,37 @@
    ]
   },
   {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "idx-mcx-spot-market-price-gold-ahmedabad",
+     "name": "MCX Spot Market Price: Gold (Ahmedabad)",
+     "inception": "2005-06-06",
+     "dateSource": "mcx",
+     "ccy": "INR",
+     "returnType": "Spot price",
+     "how": "mcxSpot",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "MCX Spot Market Price",
+       "url": "https://www.mcxindia.com/market-data/spot-market-price"
+      }
+     ]
+    }
+   ]
+  },
+  {
    "class": "debt",
    "region": "india",
    "vehicle": "index",
    "asset": "Short duration",
    "instruments": [
     {
-     "id": "idx-12",
+     "id": "idx-nse-short-duration-debt-index-liquid-or-1d-rate",
      "name": "NSE short-duration debt index (Liquid or 1D Rate)",
      "inception": "2011-01-03",
      "dateSource": "nse",
@@ -2684,7 +2764,7 @@
    "asset": "Long duration",
    "instruments": [
     {
-     "id": "idx-13",
+     "id": "idx-nifty-10-yr-benchmark-g-sec-index",
      "name": "Nifty 10 yr Benchmark G-Sec Index",
      "inception": "2011-01-03",
      "dateSource": "nse",
@@ -2698,81 +2778,6 @@
        "url": "https://www.niftyindices.com/reports/historical-data"
       }
      ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "us",
-   "vehicle": "index",
-   "asset": "S&P 500",
-   "instruments": [
-    {
-     "id": "idx-y-gspc",
-     "name": "S&P 500 (^GSPC, price only)",
-     "inception": "1927-12-30",
-     "dateSource": "yahoo",
-     "ccy": "USD",
-     "returnType": "Price only",
-     "how": "yahoo",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "^GSPC on Yahoo Finance",
-       "url": "https://finance.yahoo.com/quote/%5EGSPC/history/"
-      }
-     ],
-     "asset": "S&P 500"
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "us",
-   "vehicle": "index",
-   "asset": "Nasdaq 100",
-   "instruments": [
-    {
-     "id": "idx-y-ndx",
-     "name": "Nasdaq-100 (^NDX, price only)",
-     "inception": "1985-10-01",
-     "dateSource": "yahoo",
-     "ccy": "USD",
-     "returnType": "Price only",
-     "how": "yahoo",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "^NDX on Yahoo Finance",
-       "url": "https://finance.yahoo.com/quote/%5ENDX/history/"
-      }
-     ],
-     "asset": "Nasdaq 100"
-    }
-   ]
-  },
-  {
-   "class": "gold",
-   "region": "india",
-   "vehicle": "index",
-   "asset": "Gold",
-   "instruments": [
-    {
-     "id": "idx-mcx-gold-spot",
-     "name": "MCX Spot Market Price: Gold (Ahmedabad)",
-     "inception": "2005-06-06",
-     "dateSource": "mcx",
-     "ccy": "INR",
-     "returnType": "Spot price",
-     "how": "mcxSpot",
-     "kind": "Index",
-     "links": [
-      {
-       "label": "MCX Spot Market Price",
-       "url": "https://www.mcxindia.com/market-data/spot-market-price"
-      }
-     ],
-     "asset": "Gold"
     }
    ]
   }
