@@ -1301,10 +1301,10 @@
     },
     {
      "id": "nse-hdfcgold",
-     "name": "HDFCGOLD",
+     "name": "HDFC Gold ETF",
      "code": "HDFCGOLD",
-     "inception": null,
-     "dateSource": null,
+     "inception": "2010-08-16",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "Market price",
      "how": "nseEtf",

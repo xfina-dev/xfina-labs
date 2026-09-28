@@ -136,6 +136,7 @@ const NSE_ETF = {
   SMALL250: ['Mirae Asset Nifty Smallcap 250 ETF', '2025-11-10', 'amfi'],
   GOLDBEES: ['Nippon India ETF Gold BeES', '2007-03-08', 'manual'],
   QGOLDHALF: ['Quantum Gold ETF', '2008-02-27', 'amfi'],
+  HDFCGOLD: ['HDFC Gold ETF', '2010-08-16', 'amfi'],
   // No LIQUIDBEES: it keeps a constant ~Rs 1000 unit price and pays returns as bonus units credited to the demat
   // account (confirmed live 2026-09-28), so its NSE market price alone shows ~0% return over 20+ years -- a real
   // trap for anyone taking "Market price" at face value. The reformed "Nifty 1D Rate" ETFs below have a genuinely

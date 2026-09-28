@@ -140,13 +140,20 @@ export const groupsFor = (cls, region, vehicle, listing) => nodes.filter((n) => 
 // Indexes are simply listed: there is no listing or asset to choose, every index for the region is shown.
 export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls && n.region === region && n.vehicle === 'index').flatMap(withNode);
 
-// Accumulating vs distributing, shown only where it is a real, made choice: an ETF holding an income-bearing
-// asset (equity, bonds -- not gold, which yields nothing to distribute). A UCITS/CH fund names its own
-// share class ("... UCITS ETF (Acc)"); one with no such marker is the Distributing share class (the Acc
-// alternative either doesn't exist or wasn't picked, IB01 being the one case here without an Acc option).
-// A native US listing is Distributing by law -- a '40 Act RIC must pay out at least 90% of its net income
-// every year to keep its pass-through tax status, not a per-fund choice. India (domestic listing, or the
-// India-listed feeder ETFs on foreign indices) uses neither UCITS term, so it is left out here.
+// Accumulating vs distributing, shown wherever it is a real, checkable fact -- India included: India doesn't use
+// the UCITS words, but the same substance question (does income get paid out, or stay in the fund) has a real
+// answer there too, not just a terminology gap.
+//   - MF: every fund in this catalogue is the Growth (or old-naming "Cumulative") option -- IDCW/dividend options
+//     are filtered out at the source (build-tree.mjs's NOT_GROWTH exclusion) -- so it is always Acc, confirmed
+//     structurally by that filter rather than checked fund by fund.
+//   - Domestic (or India-listed feeder) ETFs: confirmed live 2026-09-28 for LICNETFGSC ("capitalises gains", pays
+//     no dividend) and for the Nifty 1D Rate ETFs (Kotak: "all payouts... reinvested... at the prevailing NAV");
+//     none of these trade a separate distributing unit class on NSE (there is no second symbol for one). Gold is
+//     excluded -- there is no income to distribute either way.
+//   - Non-India ETF: a UCITS/CH fund names its own share class ("... UCITS ETF (Acc)"); one with no such marker
+//     is the Distributing share class (the Acc alternative either doesn't exist or wasn't picked, IB01 being the
+//     one case here without an Acc option). A native US listing is Distributing by law -- a '40 Act RIC must pay
+//     out at least 90% of its net income every year to keep its pass-through tax status, not a per-fund choice.
 //
 // An index has no share class, but the same Acc/Dist question has a direct analogue in its returnType: any
 // total-return variant (plain "Total return", or MSCI's "Net Total Return") reinvests the dividend into the
@@ -154,7 +161,9 @@ export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls &
 // just not paid to anyone). MCX's spot price is left blank rather than guessed (no return concept at all).
 export function distFlag(i) {
   if (i.kind === 'Index') return /total return/i.test(i.returnType || '') ? 'Acc' : i.returnType === 'Price only' ? 'Dist' : null;
-  if (i.kind !== 'ETF' || i.asset === 'Gold' || i.region === 'india' || i.listing === 'india') return null;
+  if (i.kind === 'MF') return 'Acc';
+  if (i.kind !== 'ETF' || i.asset === 'Gold') return null;
+  if (i.region === 'india' || i.listing === 'india') return 'Acc';
   if (/\(Acc\)/i.test(i.name)) return 'Acc';
   if (/\(Dist\)/i.test(i.name)) return 'Dist';
   return 'Dist';
