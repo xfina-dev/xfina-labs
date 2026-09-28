@@ -212,7 +212,8 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                     <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
                   </td>
                   <td class="px-3 py-2 text-right">
-                    <Button :variant="has(i.id) ? 'default' : 'outline'" size="sm" class="w-28 justify-center" @click="toggle(i.id)">
+                    <!-- Added looks like a selected filter tile above: a primary border on a faint primary tint -->
+                    <Button variant="outline" size="sm" class="w-28 justify-center" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="toggle(i.id)">
                       <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
                     </Button>
                   </td>
