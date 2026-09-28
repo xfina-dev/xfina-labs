@@ -30,13 +30,13 @@
      ]
     },
     {
-     "id": "mf101314",
-     "name": "Aditya Birla Sun Life Nifty 50 Index Fund - Regular Plan - GROWTH",
-     "code": "101314",
+     "id": "mf100822",
+     "name": "UTI Nifty 50 Index Fund - Regular Plan - Growth",
+     "code": "100822",
      "plan": "Regular",
      "inception": "2006-04-03",
      "lastNav": "2026-09-25",
-     "observations": 5043,
+     "observations": 5037,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -50,9 +50,9 @@
      ]
     },
     {
-     "id": "mf100484",
-     "name": "Franklin India NSE Nifty 50 Index Fund - Regular Plan - Growth",
-     "code": "100484",
+     "id": "mf101525",
+     "name": "HDFC Nifty 50 Index Fund - Regular Plan - Growth Option",
+     "code": "101525",
      "plan": "Regular",
      "inception": "2006-04-03",
      "lastNav": "2026-09-25",
@@ -79,9 +79,9 @@
    "asset": "Nifty 50",
    "instruments": [
     {
-     "id": "mf118581",
-     "name": "Franklin India NSE Nifty 50 Index Fund - Direct Plan - Growth",
-     "code": "118581",
+     "id": "mf119063",
+     "name": "HDFC Nifty 50 Index Fund - Direct Plan - Growth Option",
+     "code": "119063",
      "plan": "Direct",
      "inception": "2013-01-01",
      "lastNav": "2026-09-25",
@@ -119,13 +119,13 @@
      ]
     },
     {
-     "id": "mf119648",
-     "name": "Aditya Birla Sun Life Nifty 50 Index Fund - Direct Plan - GROWTH",
-     "code": "119648",
+     "id": "mf120716",
+     "name": "UTI Nifty 50 Index Fund - Direct Plan - Growth",
+     "code": "120716",
      "plan": "Direct",
      "inception": "2013-01-02",
      "lastNav": "2026-09-25",
-     "observations": 3379,
+     "observations": 3380,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -700,25 +700,6 @@
    "asset": "Short duration",
    "instruments": [
     {
-     "id": "mf101408",
-     "name": "BARODA BNP PARIBAS LIQUID FUND - Growth Option",
-     "code": "101408",
-     "inception": "2006-04-01",
-     "lastNav": "2026-09-27",
-     "observations": 6294,
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "NAV",
-     "how": "amfi",
-     "kind": "MF",
-     "links": [
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
      "id": "mf102012",
      "name": "UTI - Liquid Fund - Regular Plan - Growth",
      "code": "102012",
@@ -739,13 +720,32 @@
      ]
     },
     {
-     "id": "mf100047",
-     "name": "Aditya Birla Sun Life Liquid Fund - Regular Plan - GROWTH",
-     "code": "100047",
+     "id": "mf101408",
+     "name": "BARODA BNP PARIBAS LIQUID FUND - Growth Option",
+     "code": "101408",
+     "inception": "2006-04-01",
+     "lastNav": "2026-09-27",
+     "observations": 6294,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf100868",
+     "name": "HDFC Liquid Fund - Regular Plan - Growth Option",
+     "code": "100868",
      "plan": "Regular",
      "inception": "2006-04-02",
      "lastNav": "2026-09-27",
-     "observations": 6434,
+     "observations": 6313,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -768,26 +768,6 @@
    "asset": "Short duration",
    "instruments": [
     {
-     "id": "mf119415",
-     "name": "BARODA BNP PARIBAS LIQUID FUND - Direct Plan - Growth Option",
-     "code": "119415",
-     "plan": "Direct",
-     "inception": "2013-01-01",
-     "lastNav": "2026-09-27",
-     "observations": 4086,
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "NAV",
-     "how": "amfi",
-     "kind": "MF",
-     "links": [
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
      "id": "mf120304",
      "name": "UTI - Liquid Fund - Direct Plan - Growth",
      "code": "120304",
@@ -808,14 +788,34 @@
      ]
     },
     {
-     "id": "mf119568",
-     "name": "Aditya Birla Sun Life Liquid Fund - Direct Plan - GROWTH",
-     "code": "119568",
+     "id": "mf119415",
+     "name": "BARODA BNP PARIBAS LIQUID FUND - Direct Plan - Growth Option",
+     "code": "119415",
      "plan": "Direct",
      "inception": "2013-01-01",
      "lastNav": "2026-09-27",
-     "observations": 4377,
+     "observations": 4086,
      "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119091",
+     "name": "HDFC Liquid Fund - Direct Plan - Growth Option",
+     "code": "119091",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-27",
+     "observations": 4242,
+     "dateSource": "direct",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -877,13 +877,13 @@
      ]
     },
     {
-     "id": "mf100058",
-     "name": "Aditya Birla Sun Life Gilt Fund - Regular Plan - GROWTH",
-     "code": "100058",
+     "id": "mf101083",
+     "name": "HDFC Gilt Fund - Regular Plan - Growth Option",
+     "code": "101083",
      "plan": "Regular",
      "inception": "2006-04-03",
      "lastNav": "2026-09-25",
-     "observations": 4957,
+     "observations": 4961,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -905,6 +905,26 @@
    "listing": "direct",
    "asset": "Long duration",
    "instruments": [
+    {
+     "id": "mf119116",
+     "name": "HDFC Gilt Fund - Direct Plan - Growth Option",
+     "code": "119116",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3318,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
     {
      "id": "mf120590",
      "name": "ICICI Prudential Gilt Fund - Direct Plan - Growth",
@@ -933,26 +953,6 @@
      "inception": "2013-01-02",
      "lastNav": "2026-09-25",
      "observations": 3315,
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "NAV",
-     "how": "amfi",
-     "kind": "MF",
-     "links": [
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf119605",
-     "name": "Aditya Birla Sun Life Gilt Fund - Direct Plan - GROWTH",
-     "code": "119605",
-     "plan": "Direct",
-     "inception": "2013-01-02",
-     "lastNav": "2026-09-25",
-     "observations": 3317,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",

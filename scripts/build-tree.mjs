@@ -53,6 +53,26 @@ const FOF = /fof|fund of fund|savings fund/i;
 // 149910 are the Direct plans (higher NAV of their pair); this also corrects Navi, whose 149910 was previously
 // shown as Regular when it is actually the Direct one.
 const FORCE_DIRECT = new Set([145552, 149910]);
+// Several Regular-plan groups share an exact date tie, not just a close one: AMFI's own NAV archive has a hard
+// floor around 2006-04-02/03 for nearly every AMC's index/liquid/gilt fund, whatever the fund's real launch date
+// (checked directly against mfapi.in with KEEP temporarily raised to see past the usual top-3 cut, 2026-09-28).
+// Whoever's scheme name sorts first alphabetically was winning that tie by default, which has nothing to do with
+// which fund anyone would actually want to compare. Broken here by AUM instead -- a snapshot from indmoney.com's
+// comparison tables (2026-09-27/28, cross-checked against a second fetch for the closest pair), in crores, for
+// just the scheme codes actually tied in a leaf. There is no free, scriptable scheme-wise AUM feed to check this
+// on every future run; if a re-run's picks land on a fund not listed here, it likely isn't tied on date with
+// anything, so this table simply won't apply -- no silent effect outside the ties it was measured for.
+const AUM_CR = {
+  // Nifty 50 Regular, tied 2006-04-03: UTI, HDFC, Aditya Birla Sun Life, Tata, Franklin, LIC (ICICI is a day
+  // earlier and unaffected).
+  100822: 29485, 101525: 23784, 101314: 1488, 101659: 1707, 100484: 715, 101201: 366,
+  // Short duration (Liquid) Regular, tied 2006-04-01: UTI, Baroda BNP Paribas -- then tied 2006-04-02: HDFC,
+  // Aditya Birla Sun Life, ICICI Prudential, Kotak, DSP, JM.
+  102012: 29218, 101408: 13194, 100868: 71323, 100047: 69830, 103340: 62798, 100835: 49073, 103347: 27920, 100234: 1743,
+  // Long duration (Gilt) Regular, tied 2006-04-02: ICICI Prudential, Kotak -- then tied 2006-04-03: HDFC, Aditya
+  // Birla Sun Life, DSP, Baroda BNP Paribas, Franklin, Canara Robeco.
+  100369: 7950, 100265: 2108, 101083: 2017, 100058: 1238, 100084: 1213, 101187: 575, 100493: 147, 100597: 121,
+};
 const isEtf = (n) => /\betf\b|bees|exchange traded/i.test(n) && !FOF.test(n);
 
 const INDIA = [
@@ -376,7 +396,7 @@ async function fromSchemes(def, region, cls, { etfs: withEtfs = true } = {}) {
   const bestOf = (rows) => { const m = new Map(); for (const r of rows) { const k = baseKey(r.c.schemeName); const cur = m.get(k); if (!cur || r.trueFirst < cur.trueFirst) m.set(k, r); } return m; };
   const regBest = bestOf(regRows);
   const dirBest = bestOf(dirRows);
-  const topKeys = [...regBest.entries()].sort(([, a], [, b]) => a.first.localeCompare(b.first) || a.trueFirst.localeCompare(b.trueFirst) || a.c.schemeName.localeCompare(b.c.schemeName)).slice(0, KEEP).map(([k]) => k);
+  const topKeys = [...regBest.entries()].sort(([, a], [, b]) => a.first.localeCompare(b.first) || a.trueFirst.localeCompare(b.trueFirst) || (AUM_CR[b.c.schemeCode] || 0) - (AUM_CR[a.c.schemeCode] || 0) || a.c.schemeName.localeCompare(b.c.schemeName)).slice(0, KEEP).map(([k]) => k);
   node(cls, region, 'mf', 'regular', def.asset).instruments.push(...topKeys.map((k) => regBest.get(k)).filter(Boolean).map((r) => toInstrument(r, 'mf')));
   node(cls, region, 'mf', 'direct', def.asset).instruments.push(...topKeys.map((k) => dirBest.get(k)).filter(Boolean).map((r) => toInstrument(r, 'mf')));
   console.log(`  ${cls}/${region}/${def.asset}: ${etfs.length} ETF candidates → ${me.length} live, ${mfs.length} fund candidates → ${mm.length} live`);
