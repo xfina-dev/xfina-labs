@@ -260,7 +260,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <td class="py-2 pr-3 font-medium"><Tag :title="regionTitle(r.region)">{{ REGION_CODE[r.region] || r.region }}</Tag> {{ r.asset }}</td>
                 <td v-for="v in VEHICLES" :key="v.id" class="py-2 pr-3">
                   <div v-for="i in r.cells[v.id]" :key="i.id" class="flex items-start justify-between gap-1">
-                    <span class="min-w-0">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag> <span class="text-xs text-muted-foreground">{{ HOW[i.how].site }}</span></span>
+                    <span class="min-w-0">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name && HOW[i.how].site !== 'AMFI'">{{ i.code }}</Tag> <span class="text-xs text-muted-foreground">{{ HOW[i.how].site }}</span></span>
                     <button type="button" class="shrink-0 text-muted-foreground hover:text-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></button>
                   </div>
                 </td>
