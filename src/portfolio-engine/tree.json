@@ -99,13 +99,13 @@
      ]
     },
     {
-     "id": "mf119063",
-     "name": "HDFC Nifty 50 Index Fund - Direct Plan - Growth Option",
-     "code": "119063",
+     "id": "mf120620",
+     "name": "ICICI Prudential Nifty 50 Index Fund - Direct Plan - Cumulative",
+     "code": "120620",
      "plan": "Direct",
-     "inception": "2013-01-01",
+     "inception": "2013-01-02",
      "lastNav": "2026-09-25",
-     "observations": 3381,
+     "observations": 3380,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -631,53 +631,53 @@
    "asset": "Gold",
    "instruments": [
     {
-     "id": "mf115132",
-     "name": "Quantum Gold ETF FOF - Direct Plan - Growth Option",
-     "code": "115132",
-     "plan": "Direct",
-     "inception": "2011-05-25",
-     "lastNav": "2026-09-25",
-     "observations": 3778,
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "NAV",
-     "how": "amfi",
-     "kind": "MF",
-     "links": [
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf119132",
-     "name": "HDFC Gold ETF Fund of Fund - Direct Plan - Growth Option",
-     "code": "119132",
-     "plan": "Direct",
-     "inception": "2013-01-01",
-     "lastNav": "2026-09-25",
-     "observations": 3382,
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "NAV",
-     "how": "amfi",
-     "kind": "MF",
-     "links": [
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf120546",
-     "name": "Aditya Birla Sun Life Gold Fund - Direct Plan - GROWTH",
-     "code": "120546",
+     "id": "mf118663",
+     "name": "Nippon India Gold Savings Fund - Direct Plan - Growth Option",
+     "code": "118663",
      "plan": "Direct",
      "inception": "2013-01-02",
      "lastNav": "2026-09-25",
-     "observations": 3369,
+     "observations": 3380,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119781",
+     "name": "Kotak Gold Fund - Direct Plan - Growth",
+     "code": "119781",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3331,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119788",
+     "name": "SBI GOLD FUND - Direct Plan - Growth",
+     "code": "119788",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3329,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -768,13 +768,13 @@
    "asset": "Short duration",
    "instruments": [
     {
-     "id": "mf103734",
-     "name": "Quantum Liquid Fund - Direct Plan - Growth Option",
-     "code": "103734",
+     "id": "mf119415",
+     "name": "BARODA BNP PARIBAS LIQUID FUND - Direct Plan - Growth Option",
+     "code": "119415",
      "plan": "Direct",
-     "inception": "2006-04-09",
+     "inception": "2013-01-01",
      "lastNav": "2026-09-27",
-     "observations": 6064,
+     "observations": 4086,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -788,14 +788,14 @@
      ]
     },
     {
-     "id": "mf119091",
-     "name": "HDFC Liquid Fund - Direct Plan - Growth Option",
-     "code": "119091",
+     "id": "mf120304",
+     "name": "UTI - Liquid Fund - Direct Plan - Growth",
+     "code": "120304",
      "plan": "Direct",
      "inception": "2013-01-01",
      "lastNav": "2026-09-27",
-     "observations": 4242,
-     "dateSource": "direct",
+     "observations": 4529,
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -906,11 +906,11 @@
    "asset": "Long duration",
    "instruments": [
     {
-     "id": "mf118498",
-     "name": "Franklin India Gilt Fund - Direct Plan - Growth",
-     "code": "118498",
+     "id": "mf120590",
+     "name": "ICICI Prudential Gilt Fund - Direct Plan - Growth",
+     "code": "120590",
      "plan": "Direct",
-     "inception": "2013-01-01",
+     "inception": "2013-01-02",
      "lastNav": "2026-09-25",
      "observations": 3316,
      "dateSource": "amfi",
@@ -926,13 +926,13 @@
      ]
     },
     {
-     "id": "mf119116",
-     "name": "HDFC Gilt Fund - Direct Plan - Growth Option",
-     "code": "119116",
+     "id": "mf119759",
+     "name": "Kotak Gilt Fund - Direct Plan - Growth",
+     "code": "119759",
      "plan": "Direct",
-     "inception": "2013-01-01",
+     "inception": "2013-01-02",
      "lastNav": "2026-09-25",
-     "observations": 3318,
+     "observations": 3315,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
@@ -1569,9 +1569,9 @@
      ]
     },
     {
-     "id": "mf149910",
+     "id": "mf149911",
      "name": "Navi NASDAQ100 US Specific Equity Passive FOF",
-     "code": "149910",
+     "code": "149911",
      "inception": "2022-03-25",
      "lastNav": "2026-09-25",
      "observations": 1071,
@@ -1597,6 +1597,26 @@
    "asset": "Nasdaq 100",
    "instruments": [
     {
+     "id": "mf145552",
+     "name": "Motilal Oswal Nasdaq 100 Fund of Fund",
+     "code": "145552",
+     "plan": "Direct",
+     "inception": "2018-12-03",
+     "lastNav": "2026-09-25",
+     "observations": 1927,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
      "id": "mf149219",
      "name": "ICICI Prudential NASDAQ 100 Index Fund - Direct Plan - Growth",
      "code": "149219",
@@ -1617,33 +1637,13 @@
      ]
     },
     {
-     "id": "mf149961",
-     "name": "Invesco India - Invesco EQQQ Nasdaq-100 ETF Fund of Fund - Direct Plan - Growth",
-     "code": "149961",
+     "id": "mf149910",
+     "name": "Navi NASDAQ100 US Specific Equity Passive FOF",
+     "code": "149910",
      "plan": "Direct",
-     "inception": "2022-04-25",
+     "inception": "2022-03-25",
      "lastNav": "2026-09-25",
-     "observations": 992,
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "NAV",
-     "how": "amfi",
-     "kind": "MF",
-     "links": [
-      {
-       "label": "AMFI NAV history",
-       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
-      }
-     ]
-    },
-    {
-     "id": "mf150751",
-     "name": "Axis NASDAQ 100 US Specific Equity Passive FOF - Direct Plan - Growth Option",
-     "code": "150751",
-     "plan": "Direct",
-     "inception": "2022-11-04",
-     "lastNav": "2026-09-25",
-     "observations": 940,
+     "observations": 1071,
      "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",

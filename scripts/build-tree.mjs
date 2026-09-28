@@ -45,6 +45,14 @@ async function getJson(url, tries = 3) {
 const NOISE = /equal|value|arbitrage|momentum|quality|alpha|low vol|shariah|bond|sdl|g-?sec|cpse|top\s*(10|20|50)|leverag|\bnext\b|multi|smart|dividend|esg|sector|bank|it\b|pharma|fmcg|auto|midcap 50\b/i;
 const NOT_GROWTH = /idcw|dividend|payout|bonus|withdrawal/i;
 const FOF = /fof|fund of fund|savings fund/i;
+// A handful of scheme pairs whose own AMFI name never says "Regular"/"Direct" at all -- both plans share one
+// literal scheme name -- so the usual /direct/i.test(schemeName) can't tell them apart by text. Found live
+// 2026-09-28 while checking that Nasdaq 100's Direct picks are the same funds as Regular's: Motilal Oswal
+// Nasdaq 100 FoF (145551/145552) and Navi NASDAQ100 FoF (149910/149911). Told apart by comparing NAV on the
+// same day for the same launch date -- Direct's lower fee compounds to a higher NAV -- confirmed 145552 and
+// 149910 are the Direct plans (higher NAV of their pair); this also corrects Navi, whose 149910 was previously
+// shown as Regular when it is actually the Direct one.
+const FORCE_DIRECT = new Set([145552, 149910]);
 const isEtf = (n) => /\betf\b|bees|exchange traded/i.test(n) && !FOF.test(n);
 
 const INDIA = [
@@ -98,7 +106,7 @@ const DIRECT_START = '2013-01-01';
 function toInstrument(r, vehicle) {
   const name = r.c.schemeName.replace(/\s+/g, ' ').trim();
   return {
-    id: `mf${r.c.schemeCode}`, name, code: String(r.c.schemeCode), plan: planOf(name) || undefined,
+    id: `mf${r.c.schemeCode}`, name, code: String(r.c.schemeCode), plan: (FORCE_DIRECT.has(r.c.schemeCode) ? 'Direct' : planOf(name)) || undefined,
     inception: r.first, lastNav: r.last, observations: r.n, dateSource: r.clamped ? 'direct' : 'amfi',
     ccy: 'INR', returnType: 'NAV', how: 'amfi', kind: vehicle === 'etf' ? 'ETF' : 'MF',
     links: [L('AMFI NAV history', AMFI)],
@@ -353,10 +361,24 @@ async function fromSchemes(def, region, cls, { etfs: withEtfs = true } = {}) {
   const [me, mm] = [withEtfs ? await measure(cap(etfs)) : [], await measure(cap(mfs))];
   if (withEtfs) node(cls, region, 'etf', null, def.asset).instruments.push(...oldestFirst(me, 'etf'));
   // Regular and Direct plans are kept apart: Regular carries the longer history (Direct plans only exist
-  // from 2013-01-01), Direct costs less. The guide lets the user choose between them.
-  const isDirect = (r) => /direct/i.test(r.c.schemeName);
-  node(cls, region, 'mf', 'regular', def.asset).instruments.push(...oldestFirst(mm.filter((r) => !isDirect(r)), 'mf'));
-  node(cls, region, 'mf', 'direct', def.asset).instruments.push(...oldestFirst(mm.filter(isDirect), 'mf'));
+  // from 2013-01-01, Quantum excepted), Direct costs less. The guide lets the user choose between them.
+  //
+  // Direct picks the same KEEP funds Regular did (matched by baseKey), not its own independent top KEEP --
+  // otherwise someone wanting to compare Direct vs Regular for "the oldest funds" can land on two different
+  // fund lists. Confirmed live 2026-09-28: India/Equity/Nifty 50 Direct was Franklin, HDFC, Aditya Birla --
+  // not ICICI, despite ICICI being Regular's #1 (2006) -- because nearly every AMC's Direct plan is clamped to
+  // within a day of 2013-01-01, so the tie-break fell to alphabetical order (Aditya Birla < ICICI) and HDFC's
+  // Direct plan won a slot ICICI's Regular-oldest fund never got a matching shot at. Regular still ranks by
+  // its own age (the fund's real age, Quantum aside); Direct is derived from that ranking, not its own.
+  const isDirect = (r) => FORCE_DIRECT.has(r.c.schemeCode) || /direct/i.test(r.c.schemeName);
+  const regRows = mm.filter((r) => !isDirect(r));
+  const dirRows = mm.filter(isDirect);
+  const bestOf = (rows) => { const m = new Map(); for (const r of rows) { const k = baseKey(r.c.schemeName); const cur = m.get(k); if (!cur || r.trueFirst < cur.trueFirst) m.set(k, r); } return m; };
+  const regBest = bestOf(regRows);
+  const dirBest = bestOf(dirRows);
+  const topKeys = [...regBest.entries()].sort(([, a], [, b]) => a.first.localeCompare(b.first) || a.trueFirst.localeCompare(b.trueFirst) || a.c.schemeName.localeCompare(b.c.schemeName)).slice(0, KEEP).map(([k]) => k);
+  node(cls, region, 'mf', 'regular', def.asset).instruments.push(...topKeys.map((k) => regBest.get(k)).filter(Boolean).map((r) => toInstrument(r, 'mf')));
+  node(cls, region, 'mf', 'direct', def.asset).instruments.push(...topKeys.map((k) => dirBest.get(k)).filter(Boolean).map((r) => toInstrument(r, 'mf')));
   console.log(`  ${cls}/${region}/${def.asset}: ${etfs.length} ETF candidates → ${me.length} live, ${mfs.length} fund candidates → ${mm.length} live`);
 }
 // Indian ETFs come from NSE (below), so from AMFI only the mutual funds are taken here.
