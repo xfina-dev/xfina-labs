@@ -289,20 +289,27 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <!-- What to download: the same for both ways -->
           <div>
             <div class="font-medium text-muted-foreground text-xs mb-1">Datasets to download</div>
-            <ul class="divide-y rounded-md border">
-              <li v-for="i in g.items" :key="i.id" class="flex flex-wrap items-center justify-between gap-2 p-2.5">
-                <div class="min-w-0 text-sm">
-                  <span class="font-medium">{{ clip(i.name) }}</span> <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag> <Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag>
-                  <div class="text-xs text-muted-foreground">{{ i.ccy }} · {{ i.returnType }}</div>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
-                    <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
-                  </a>
-                  <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
-                </div>
-              </li>
-            </ul>
+            <div class="overflow-x-auto rounded-md border">
+              <table class="w-full min-w-[640px] text-sm">
+                <tbody>
+                  <tr v-for="i in g.items" :key="i.id" class="border-t">
+                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
+                    <td class="px-3 py-2 min-w-0 font-medium" :title="i.name">{{ clip(i.name) }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
+                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
+                    <td class="px-3 py-2 text-right">
+                      <div class="flex items-center justify-end gap-1.5">
+                        <a v-for="l in i.links.filter((x) => !g.sharedUrls.has(x.url))" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
+                          <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
+                        </a>
+                        <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Two ways to get them. Assisted appears only for sites that have a bookmarklet. -->
