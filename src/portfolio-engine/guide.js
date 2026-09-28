@@ -42,10 +42,13 @@ export const LISTINGS = [
 ];
 
 // How a source is downloaded and what you get. `site` is the website: the download list groups by it,
-// so a user visits each site once. Steps are short on purpose.
+// so a user visits each site once. `terms` is the site's terms of use; `page` is its one download page, where
+// there is a single page for every dataset (otherwise each dataset carries its own link). Steps are short on purpose.
 export const HOW = {
   nseTri: {
     site: 'NSE Indices',
+    page: 'https://www.niftyindices.com/reports/historical-data',
+    terms: 'https://www.niftyindices.com/terms-of-use',
     title: 'NSE Indices: Total Returns Index',
     steps: [
       'Open the Historical Data page. The report list at the top starts on Historical Index Data, which is the price series. Open it and choose Total returns Index Values (for a fixed income index, stay on Historical Index Data: NSE says all its fixed income indices except the G-Sec clean price one are already total return).',
@@ -58,18 +61,23 @@ export const HOW = {
   },
   amfi: {
     site: 'AMFI',
+    page: 'https://www.amfiindia.com/net-asset-value/nav-history',
+    terms: 'https://www.amfiindia.com/terms-of-use',
     title: 'AMFI: NAV history',
     steps: ['Open NAV History and choose Historical NAV for a period.', 'Pick the fund house, then the scheme (the plan and option named here).', 'Set From and To. The page allows at most 5 years at a time, so a long history is several downloads.', 'Press Go, then download the Excel file and import every part as it is.'],
     format: 'AMFI\'s own Excel: the net asset value, repurchase and sale price and the NAV date, one row per day. Nothing here comes from mfapi.in or any other republisher.',
   },
   nseEtf: {
     site: 'NSE',
+    page: 'https://www.nseindia.com/report-detail/eq_security',
+    terms: 'https://www.nseindia.com/nse-terms-of-use',
     title: 'NSE: ETF price history',
     steps: ['Open the NSE historical price report.', 'Choose Security-wise price and volume data, then enter the ETF\'s symbol and the EQ series.', 'Set the widest date range the report allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
     format: 'NSE\'s price and volume table, with a row per trading day. It is the exchange price, not NAV.',
   },
   yahoo: {
     site: 'Yahoo Finance',
+    terms: 'https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html',
     title: 'Yahoo Finance: price history (by hand, no download)',
     steps: [
       'Open the history page for the ticker.',
@@ -81,36 +89,43 @@ export const HOW = {
   },
   ishares: {
     site: 'iShares',
+    terms: 'https://www.blackrock.com/corporate/compliance/terms-and-conditions',
     title: 'iShares: NAV history',
     steps: ['Open the fund page.', 'Press its "Data Download" link.', 'Open the Historical (US funds) or Historical NAVs (UCITS funds) sheet. It is the full daily history from launch.'],
     format: 'An Excel/XML file with a date and the NAV per share, as iShares publishes it. An accumulating fund\'s NAV already includes income.',
   },
   ssga: {
     site: 'SSGA',
+    terms: 'https://www.ssga.com/us/en/intermediary/etfs/footer/terms-and-conditions',
     title: 'State Street: NAV history',
     steps: ['Open the fund page.', 'Press "Most Recent NAV / NAV History".', 'The download is the full daily NAV history from launch.'],
     format: 'An Excel file with a date, the NAV, shares outstanding and total net assets, as State Street publishes it.',
   },
   spdrgold: {
     site: 'SPDR Gold Shares',
+    terms: 'https://www.spdrgoldshares.com/terms-and-conditions/',
     title: 'SPDR Gold Shares: historical data',
     steps: ['Open the Historical Data page.', 'Download. It is the full daily history from launch.'],
     format: 'An Excel file with a date, the closing price, the NAV per share and ounces of gold per share, as State Street publishes it.',
   },
   msci: {
     site: 'MSCI',
+    terms: 'https://www.msci.com/legal/terms-of-use',
     title: 'MSCI: index levels',
     steps: ['Open the index page and its Performance tab.', 'Under Cumulative performance, choose Full history.', 'Press the download icon next to Compare. No account is needed.'],
     format: 'An Excel file with a date and the index level, monthly, as MSCI publishes it: Net Total Return, USD (the page itself never labels this; found in its own chart\'s network request, variant=NETR). Full history on the free page starts 1998-12-31; MSCI\'s own longer history, and other variants (Price, Gross), are licensed.',
   },
   nasdaqIndex: {
     site: 'Nasdaq',
+    terms: 'https://www.nasdaq.com/legal',
     title: 'Nasdaq: index history',
     steps: ['Open the index\'s History tab (indexes.nasdaq.com, not the nasdaq.com consumer page, whose own date range is much shorter).', 'Under Performance, press All.', 'Press Download. No account is needed.'],
     format: 'An Excel file with a date and the index level daily, as Nasdaq publishes it, back to the index\'s own start.',
   },
   mcxSpot: {
     site: 'MCX',
+    page: 'https://www.mcxindia.com/market-data/spot-market-price',
+    terms: 'https://www.mcxindia.com/terms-and-conditions-of-usage-for-website',
     title: 'MCX: Spot Market Price',
     steps: ['Open Spot Market Price and its Archives tab.', 'Set Commodity to GOLD and Location to AHMEDABAD (the only location MCX polls gold at; other cities return nothing).', 'Set the widest date range the site allows (there is no cap: one query returns the full history).', 'Press Show, then press the page\'s own Excel export button.'],
     format: 'Commodity, unit, location, spot price in INR per 10 grams, an up/down mark, and a date and time, as MCX publishes it, wrapped as an .xls file. Prices are polled several times a day, not once (and MCX\'s own Session tag for which poll is inconsistent before recent years), so every reading is kept; pick one reading per day (for example the latest) on import.',

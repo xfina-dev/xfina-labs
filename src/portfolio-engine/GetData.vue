@@ -281,9 +281,20 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
       </div>
       <div class="space-y-8">
       <Card v-for="g in bySite" :key="g.site" class="bg-card border-border shadow-sm">
-        <CardHeader class="pb-4">
-          <CardTitle class="text-xl">{{ g.site }}</CardTitle>
-          <CardDescription>{{ g.items.length }} to download here. Open the page, follow the steps, then import the files.</CardDescription>
+        <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
+          <div class="min-w-0 space-y-1.5">
+            <CardTitle class="text-xl">{{ g.site }}</CardTitle>
+            <CardDescription>{{ g.items.length }} dataset{{ g.items.length > 1 ? 's' : '' }} to download here. Open the page, follow the steps, then import the files.</CardDescription>
+          </div>
+          <!-- The site's terms of use, and its download page where one page serves every dataset -->
+          <div class="flex shrink-0 items-center gap-2">
+            <a v-if="g.hows[0].page" :href="g.hows[0].page" target="_blank" rel="noopener noreferrer" class="no-underline">
+              <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Downloads page</Button>
+            </a>
+            <a v-if="g.hows[0].terms" :href="g.hows[0].terms" target="_blank" rel="noopener noreferrer" class="no-underline">
+              <Button variant="ghost" size="sm" class="text-muted-foreground"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Terms</Button>
+            </a>
+          </div>
         </CardHeader>
         <CardContent class="space-y-6">
           <!-- What to download: the same for both ways -->
@@ -294,7 +305,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <tbody>
                   <tr v-for="i in g.items" :key="i.id" class="border-t">
                     <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
-                    <td class="px-3 py-2 min-w-0 font-medium" :title="i.name">{{ clip(i.name) }}</td>
+                    <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="i.name">{{ clip(i.name) }}</td>
                     <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
