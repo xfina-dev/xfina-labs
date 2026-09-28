@@ -334,7 +334,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <div class="flex flex-wrap items-center gap-2 sm:shrink-0">
             <a
               v-if="g.bookmarklet" :href="g.bookmarklet.href" draggable="true" title="Drag to your bookmarks bar"
-              class="inline-flex items-center h-8 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium cursor-grab no-underline"
+              class="inline-flex items-center h-8 px-3 rounded-md border border-primary bg-primary/5 hover:bg-primary/10 text-sm font-medium cursor-grab no-underline"
               @click.prevent="dragFor = g.bookmarklet"
             ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.label }}</a>
             <a v-if="g.page" :href="g.page" target="_blank" rel="noopener noreferrer" class="no-underline">
@@ -411,7 +411,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="mt-2">
               <a
                 :href="dragFor.href" draggable="true" title="Drag to your bookmarks bar"
-                class="inline-flex items-center h-8 px-3 rounded-md border border-primary bg-primary/5 text-sm font-medium cursor-grab no-underline"
+                class="inline-flex items-center h-8 px-3 rounded-md border border-primary bg-primary/5 hover:bg-primary/10 text-sm font-medium cursor-grab no-underline"
                 @click.prevent
               ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ dragFor.label }}</a>
             </div>
