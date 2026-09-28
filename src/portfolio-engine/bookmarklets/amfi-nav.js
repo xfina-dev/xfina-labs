@@ -186,13 +186,17 @@
     await pause(400);
     await wait(function () { return opts().length > 1; }, 15000);
   };
+  // Some funds' AMFI option text drops the option word entirely for one plan when there's nothing to
+  // disambiguate ("HDFC Nifty 50 Index Fund - Direct Plan", no "Growth" at all, confirmed live 2026-09-28) while
+  // its Regular sibling keeps it ("HDFC Nifty 50 Index Fund - Growth Plan"). An exact option match is preferred
+  // when one exists; only a base+plan match with no option word of its own is accepted as a fallback, so a
+  // same-base option AMFI does label (e.g. an IDCW variant) is never picked by mistake for a Growth request.
   var best = function (name) {
     var b = baseOf(name);
     var f = flags(name);
-    var hit = opts().filter(function (o) {
-      var g = flags(o.textContent);
-      return baseOf(o.textContent) === b && g[0] === f[0] && (!f[1] || g[1] === f[1]);
-    });
+    var cands = opts().filter(function (o) { return baseOf(o.textContent) === b && flags(o.textContent)[0] === f[0]; });
+    var exact = cands.filter(function (o) { return !f[1] || flags(o.textContent)[1] === f[1]; });
+    var hit = exact.length ? exact : cands.filter(function (o) { return !flags(o.textContent)[1]; });
     hit.sort(function (x, y) { return x.textContent.length - y.textContent.length; });
     return hit[0];
   };
