@@ -82,7 +82,14 @@ async function measure(cands) {
     // oldestFirst can still rank same-clamped-date Direct funds by which one's fund is actually older, instead of
     // falling back to alphabetical order (checked live 2026-09-28: without this, three Direct liquid funds all shown
     // as "2013-01-01" were picked as Aditya Birla < Axis < Bandhan -- alphabetical, not oldest).
-    const clamped = /direct/i.test(c.schemeName) && firstNav < DIRECT_START;
+    //
+    // Quantum Mutual Fund is the one real exception to the clamp itself, not just its ranking: it was founded in
+    // December 2005 specifically as a direct-to-investor fund house, zero distributor commission from day one --
+    // confirmed live 2026-09-28, "India's first direct-to-investor mutual fund," years before SEBI's 2013 mandate
+    // created "Direct Plan" as a concept everyone else uses. So its pre-2013 NAVs under the Direct code are a real
+    // series an investor could actually have bought at, not an artifact of AMFI's 2013 data backfill the way it is
+    // for every other AMC. Its Direct plans are exempt from the clamp; the true date is kept as dateSource 'amfi'.
+    const clamped = /direct/i.test(c.schemeName) && firstNav < DIRECT_START && !/^quantum\b/i.test(c.schemeName);
     return { c, meta: j.meta, first: clamped ? DIRECT_START : firstNav, trueFirst: firstNav, clamped, last, n: j.data.length };
   });
   return rows.filter(Boolean);
@@ -120,7 +127,13 @@ const NSE_ETF = {
   MOM50: ['Motilal Oswal Nifty 50 ETF', '2010-07-30', 'amfi'],
   JUNIORBEES: ['Nippon India ETF Nifty Next 50 Junior BeES', '2003-02-21', 'manual'],
   NEXT50IETF: ['ICICI Prudential Nifty Next 50 ETF', '2018-08-24', 'amfi'],
+  SETFNN50: ['SBI Nifty Next 50 ETF', '2015-03-25', 'amfi'],
   MID150BEES: ['Nippon India ETF Nifty Midcap 150', '2019-02-01', 'amfi'],
+  MIDCAPIETF: ['ICICI Prudential Nifty Midcap 150 ETF', '2020-01-27', 'amfi'],
+  MIDCAPETF: ['Mirae Asset Nifty Midcap 150 ETF', '2022-03-10', 'amfi'],
+  HDFCSML250: ['HDFC Nifty Smallcap 250 ETF', '2023-02-15', 'amfi'],
+  MOSMALL250: ['Motilal Oswal Nifty Smallcap 250 ETF', '2024-03-21', 'amfi'],
+  SMALL250: ['Mirae Asset Nifty Smallcap 250 ETF', '2025-11-10', 'amfi'],
   GOLDBEES: ['Nippon India ETF Gold BeES', '2007-03-08', 'manual'],
   QGOLDHALF: ['Quantum Gold ETF', '2008-02-27', 'amfi'],
   // No LIQUIDBEES: it keeps a constant ~Rs 1000 unit price and pays returns as bonus units credited to the demat

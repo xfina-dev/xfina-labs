@@ -635,10 +635,10 @@
      "name": "Quantum Gold ETF FOF - Direct Plan - Growth Option",
      "code": "115132",
      "plan": "Direct",
-     "inception": "2013-01-01",
+     "inception": "2011-05-25",
      "lastNav": "2026-09-25",
      "observations": 3778,
-     "dateSource": "direct",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -772,10 +772,10 @@
      "name": "Quantum Liquid Fund - Direct Plan - Growth Option",
      "code": "103734",
      "plan": "Direct",
-     "inception": "2013-01-01",
+     "inception": "2006-04-09",
      "lastNav": "2026-09-27",
      "observations": 6064,
-     "dateSource": "direct",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "NAV",
      "how": "amfi",
@@ -1066,6 +1066,27 @@
      ]
     },
     {
+     "id": "nse-setfnn50",
+     "name": "SBI Nifty Next 50 ETF",
+     "code": "SETFNN50",
+     "inception": "2015-03-25",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "SETFNN50 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=SETFNN50"
+      }
+     ]
+    },
+    {
      "id": "nse-next50ietf",
      "name": "ICICI Prudential Nifty Next 50 ETF",
      "code": "NEXT50IETF",
@@ -1083,27 +1104,6 @@
       {
        "label": "NEXT50IETF on NSE",
        "url": "https://www.nseindia.com/get-quotes/equity?symbol=NEXT50IETF"
-      }
-     ]
-    },
-    {
-     "id": "nse-setfnn50",
-     "name": "SETFNN50",
-     "code": "SETFNN50",
-     "inception": null,
-     "dateSource": null,
-     "ccy": "INR",
-     "returnType": "Market price",
-     "how": "nseEtf",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NSE historical price data",
-       "url": "https://www.nseindia.com/report-detail/eq_security"
-      },
-      {
-       "label": "SETFNN50 on NSE",
-       "url": "https://www.nseindia.com/get-quotes/equity?symbol=SETFNN50"
       }
      ]
     }
@@ -1137,32 +1137,11 @@
      ]
     },
     {
-     "id": "nse-midcapetf",
-     "name": "MIDCAPETF",
-     "code": "MIDCAPETF",
-     "inception": null,
-     "dateSource": null,
-     "ccy": "INR",
-     "returnType": "Market price",
-     "how": "nseEtf",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NSE historical price data",
-       "url": "https://www.nseindia.com/report-detail/eq_security"
-      },
-      {
-       "label": "MIDCAPETF on NSE",
-       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MIDCAPETF"
-      }
-     ]
-    },
-    {
      "id": "nse-midcapietf",
-     "name": "MIDCAPIETF",
+     "name": "ICICI Prudential Nifty Midcap 150 ETF",
      "code": "MIDCAPIETF",
-     "inception": null,
-     "dateSource": null,
+     "inception": "2020-01-27",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "Market price",
      "how": "nseEtf",
@@ -1177,6 +1156,27 @@
        "url": "https://www.nseindia.com/get-quotes/equity?symbol=MIDCAPIETF"
       }
      ]
+    },
+    {
+     "id": "nse-midcapetf",
+     "name": "Mirae Asset Nifty Midcap 150 ETF",
+     "code": "MIDCAPETF",
+     "inception": "2022-03-10",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MIDCAPETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MIDCAPETF"
+      }
+     ]
     }
    ]
   },
@@ -1188,10 +1188,10 @@
    "instruments": [
     {
      "id": "nse-hdfcsml250",
-     "name": "HDFCSML250",
+     "name": "HDFC Nifty Smallcap 250 ETF",
      "code": "HDFCSML250",
-     "inception": null,
-     "dateSource": null,
+     "inception": "2023-02-15",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "Market price",
      "how": "nseEtf",
@@ -1209,10 +1209,10 @@
     },
     {
      "id": "nse-mosmall250",
-     "name": "MOSMALL250",
+     "name": "Motilal Oswal Nifty Smallcap 250 ETF",
      "code": "MOSMALL250",
-     "inception": null,
-     "dateSource": null,
+     "inception": "2024-03-21",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "Market price",
      "how": "nseEtf",
@@ -1230,10 +1230,10 @@
     },
     {
      "id": "nse-small250",
-     "name": "SMALL250",
+     "name": "Mirae Asset Nifty Smallcap 250 ETF",
      "code": "SMALL250",
-     "inception": null,
-     "dateSource": null,
+     "inception": "2025-11-10",
+     "dateSource": "amfi",
      "ccy": "INR",
      "returnType": "Market price",
      "how": "nseEtf",
