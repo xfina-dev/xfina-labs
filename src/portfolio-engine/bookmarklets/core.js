@@ -13,6 +13,8 @@
   - Windows. A range is cut into blocks of up to `years` financial years (April to March). Every block ends on
     31 March except the last, which ends on the range's end; a range within one block is a single file.
     years 0 means one file for any range.
+  - Showing the work. Each field is outlined in green for a moment before it is changed (!important, as some sites
+    turn outlines off everywhere, NSE among them).
   - Pacing. Two short pauses per file, 6 to 9 seconds in all, as a person would take. A spinner shows while
     waiting; nothing else moves.
   - Folder. Where the browser allows it (Chrome, Edge), Start asks for a folder once per panel and every file is
@@ -170,10 +172,10 @@ var xfinaPanel = function (A) {
       if (typeof el === 'string') el = document.querySelector(el);
       if (!el) throw new Error('couldn\'t find ' + (what || 'a part of the page') + ' on the page, which may have changed');
       el.scrollIntoView({ block: 'center' });
-      var o = el.style.outline;
-      el.style.outline = '3px solid #4ade80';
-      await c.pause(600);
-      el.style.outline = o;
+      var o = [el.style.getPropertyValue('outline'), el.style.getPropertyPriority('outline'), el.style.getPropertyValue('outline-offset'), el.style.getPropertyPriority('outline-offset')];
+      el.style.setProperty('outline', '3px solid #4ade80', 'important');
+      el.style.setProperty('outline-offset', '2px', 'important');
+      try { await c.pause(600); } finally { el.style.setProperty('outline', o[0], o[1]); el.style.setProperty('outline-offset', o[2], o[3]); }
       return el;
     },
     tap: function (el) { ['mousedown', 'mouseup', 'click'].forEach(function (t) { el.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })); }); },
