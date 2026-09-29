@@ -30,6 +30,14 @@
   var dmy = function (d) { return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + d.getFullYear(); };
   var parseShown = function (s) { var p = s.trim().split(' '); return new Date(+p[2], MON.indexOf(p[1]), +p[0]); };
   var set = function (el, v) { el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); };
+  var has = function (id, v) { var el = q(id); return !!el && [].some.call(el.options, function (o) { return o.value === v; }); };
+  // The lists are SumoSelect boxes over invisible selects: the box is what gets outlined, and picking through Sumo
+  // updates what the box shows and runs the page's own change handler (the location list reloads per commodity).
+  var pick = async function (c, id, v, what) {
+    var el = q(id);
+    await c.look(el && el.closest('.SumoSelect') || el, what);
+    if (el.sumo) el.sumo.selectItem(v); else set(el, v);
+  };
   var xlsShown = function () { var e = q('btnArchiveXLS'); return e && e.offsetParent !== null; };
   var xlsEmpty = function () { var t = document.querySelector('#Archive-tabledata tbody'); return t && /data not available/i.test(t.textContent); };
   var reqs = function () { return performance.getEntriesByType('resource').filter(function (e) { return e.name.indexOf('GetSpotMarketArchive') > 0; }).length; };
@@ -52,10 +60,11 @@
     prepare: async function (it, c) {
       var arch = Array.prototype.filter.call(document.querySelectorAll('button.toggle-button'), function (b) { return b.getAttribute('data-content') === 'Archive'; })[0];
       if (arch && arch.className.indexOf('active') < 0) { (await c.look(arch, 'the Archives tab')).click(); await c.pause(400); }
-      set(await c.look('#Archive-Commodity', 'the commodity list'), it.code);
-      set(await c.look('#Archive-Location', 'the location list'), it.loc);
-      var ses = q('ddlSelectSeesion');
-      if (ses) set(ses, '0');
+      if (!has('Archive-Commodity', it.code)) c.skip('commodity not listed on MCX');
+      await pick(c, 'Archive-Commodity', it.code, 'the commodity list');
+      if (!(await c.wait(function () { return has('Archive-Location', it.loc); }, 10000))) c.skip('location not listed on MCX');
+      await pick(c, 'Archive-Location', it.loc, 'the location list');
+      if (q('ddlSelectSeesion')) await pick(c, 'ddlSelectSeesion', '0', 'the Session list (ALL)');
     },
     fetch: async function (it, w, c) {
       set(await c.look('#ArchivefromDate', 'the From date'), dmy(w[0]));
