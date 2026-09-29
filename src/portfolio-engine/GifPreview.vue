@@ -14,8 +14,10 @@ const missing = ref(false);
 
 <template>
   <figure class="relative">
-    <div class="aspect-video w-full overflow-hidden rounded-md border bg-muted/40 grid place-items-center">
-      <img v-if="!missing" :src="src" :alt="`Walkthrough: ${title}`" class="h-full w-full object-contain" @error="missing = true" />
+    <!-- The image is positioned to fill the 16:9 box and contained in it, so a GIF of another shape is letterboxed,
+         never cropped (a grid-centred img grew past the box and lost its bottom edge, where the captions are). -->
+    <div class="relative aspect-video w-full overflow-hidden rounded-md border bg-muted/40 grid place-items-center">
+      <img v-if="!missing" :src="src" :alt="`Walkthrough: ${title}`" class="absolute inset-0 h-full w-full object-contain" @error="missing = true" />
       <div v-else class="text-center text-xs text-muted-foreground p-4">
         GIF walkthrough goes here<br /><span class="font-mono">{{ src }}</span>
       </div>
@@ -29,8 +31,8 @@ const missing = ref(false);
           <DialogTitle>{{ title }}</DialogTitle>
           <DialogDescription>Walkthrough</DialogDescription>
         </DialogHeader>
-        <div class="aspect-video w-full overflow-hidden rounded-md border bg-muted/40 grid place-items-center">
-          <img v-if="!missing" :src="src" :alt="`Walkthrough: ${title}`" class="h-full w-full object-contain" />
+        <div class="relative aspect-video w-full overflow-hidden rounded-md border bg-muted/40 grid place-items-center">
+          <img v-if="!missing" :src="src" :alt="`Walkthrough: ${title}`" class="absolute inset-0 h-full w-full object-contain" />
           <div v-else class="text-center text-sm text-muted-foreground p-4">GIF walkthrough goes here<br /><span class="font-mono">{{ src }}</span></div>
         </div>
       </DialogContent>
