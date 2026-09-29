@@ -90,7 +90,7 @@ export const HOW = {
     pageLabel: 'Security-wise Archives (Equities)',
     terms: 'https://www.nseindia.com/nse-terms-of-use',
     title: 'NSE: ETF price history',
-    steps: ['Open Security-wise Archives (Equities).', 'Choose Security-wise price and volume data, then enter the ETF\'s symbol and the EQ series.', 'Set the widest date range the report allows. If it caps the range, download in parts.', 'Download the file and import every part as it is.'],
+    steps: ['Open Security-wise Archives (Equities).', 'Choose Security-wise price and volume data, then enter the ETF\'s symbol and the EQ series.', 'Set From and To at most 5 years apart (a longer range fetches nothing, with no error), so a long history is several downloads.', 'Download the file and import every part as it is.'],
     format: 'NSE\'s price and volume table, with a row per trading day. It is the exchange price, not NAV.',
   },
   yahoo: {

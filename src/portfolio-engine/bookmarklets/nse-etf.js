@@ -6,7 +6,8 @@
   picks it, picks the EQ series, chooses Custom dates, presses GO and, once the table has shown, presses the page's
   own "Download (.csv)". The files are NSE's own, named by NSE (for example
   01-04-2025-TO-31-03-2026-NIFTYBEES-EQ-N.csv): price and volume with deliverable position per trading day.
-  The page takes at most a year per request, so a longer range is one file per financial year.
+  The page takes up to 5 years per request (checked live: 5 years returns every trading day in one CSV; a longer
+  range fetches nothing, with no error), so a longer range is one file per 5 financial years.
 
   NSE's Terms of Use restrict automated data collection. This only saves the clicking on the same page and the same
   button, one file at a time, at a human pace, but the reader should know what the terms say and decide for themselves.
@@ -41,7 +42,7 @@
     wrongSite: 'open nseindia.com (Market Data, Historical Reports, Security-wise Archives) and click this bookmark again.',
     wrongPage: 'open the Security-wise Archives page on nseindia.com (nseindia.com/report-detail/eq_security) and click this bookmark again.',
     ready: function () { return typeof $ === 'function' && $.fn && $.fn.datepicker && document.getElementById('hsa-symbol') && document.querySelector('.filterbtn'); },
-    years: 1,
+    years: 5,
     items: JSON.parse('__SYMBOLS__').map(function (x) { return { id: x[0], code: x[0], name: x[1], from: x[2] }; }),
     prepare: async function (it, c) {
       var sym = await c.look('#hsa-symbol', 'the symbol box');

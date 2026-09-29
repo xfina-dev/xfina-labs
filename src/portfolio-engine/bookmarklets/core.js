@@ -9,8 +9,8 @@
     resumes from the last saved file.
   - Modes. Update (default) fetches only what is new since that date; a dataset never fetched gets its full
     history. Full history redoes everything from each dataset's start. Custom takes a start and an end date.
-  - Windows. A range longer than the page allows is split into financial years (April to March), `years` at a
-    time; the ends are partial. years 0 means one file for any range.
+  - Windows. A range that fits in `years` years is one file; a longer one is split into financial years (April to
+    March), `years` at a time, the ends partial. years 0 means one file for any range.
   - Pacing. Two short pauses per file, 6 to 9 seconds in all, as a person would take. A spinner shows while
     waiting; nothing else moves.
   - Folder. Where the browser allows it (Chrome, Edge), Start asks for a folder once per panel and every file is
@@ -40,7 +40,6 @@ var xfinaPanel = function (A) {
   var old = document.getElementById('xfina-bm');
   if (old) { if (old.xfinaClose) old.xfinaClose(); else old.remove(); }
 
-  var DAY = 864e5;
   var FAST = 3;
   var WAIT = 15;
   var MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
@@ -70,7 +69,7 @@ var xfinaPanel = function (A) {
   };
   var wins = function (f, t) {
     if (f > t) return [];
-    if (!A.years || (A.years === 1 && Math.round((t - f) / DAY) <= 365)) return [[f, t]];
+    if (!A.years || day(new Date(f.getFullYear() + A.years, f.getMonth(), f.getDate()), -1) >= t) return [[f, t]];
     return fy(f, t, A.years);
   };
 
@@ -112,12 +111,12 @@ var xfinaPanel = function (A) {
     '#xfina-bm button.on{border-color:#fafafa;background:#fafafa1a}#xfina-bm button.pri{background:#fafafa;color:#0a0a0b;border-color:#fafafa;font-weight:600}' +
     '#xfina-bm button:disabled{opacity:.45;cursor:default}#xfina-bm .dt{display:none;gap:6px;align-items:center;margin:6px 0 2px;color:#a1a1aa;font-size:12px}' +
     '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark;font:inherit}' +
-    '#xfina-bm .rs{border-top:1px solid #27272a;border-bottom:1px solid #27272a;margin:8px 0;padding:4px 0}' +
-    '#xfina-bm .r{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;padding:3px 0;white-space:nowrap}' +
-    '#xfina-bm .r .m{overflow:hidden;text-overflow:ellipsis}#xfina-bm .r b{font-weight:600}' +
+    '#xfina-bm .rs{display:grid;grid-template-columns:14px auto 1fr auto;column-gap:10px;row-gap:6px;align-items:center;border-top:1px solid #27272a;border-bottom:1px solid #27272a;margin:8px 0;padding:8px 0;white-space:nowrap}' +
+    '#xfina-bm .r{display:contents}#xfina-bm .r b{font-weight:600}#xfina-bm .r .n{text-align:right}' +
+    '#xfina-bm .hd .st{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}' +
     '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm .ok{color:#4ade80}#xfina-bm .bad{color:#f59e0b}' +
     '#xfina-bm .ft{display:flex;align-items:flex-end;gap:8px}#xfina-bm .ft .s{flex:1;font-size:12px;color:#a1a1aa}#xfina-bm .ft .s b{color:#fafafa}#xfina-bm u{cursor:pointer}</style>' +
-    '<div class="hd"><span>Xfina · ' + esc(A.title) + '</span><span id="xw" class="sp" style="display:none"></span><span class="x" id="xx" title="Close">✕</span></div>' +
+    '<div class="hd"><span>Xfina · ' + esc(A.title) + '</span><span id="xw" class="st"></span><span class="x" id="xx" title="Close">✕</span></div>' +
     '<div class="md">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (m) { return '<button id="xm' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div>' +
     '<div class="dt" id="xc">From <input type="date" id="xf"> to <input type="date" id="xt"></div>' +
     '<div class="rs" id="xr"></div>' +
@@ -211,12 +210,13 @@ var xfinaPanel = function (A) {
       var icon = r.st === 'work' ? '<span class="sp"></span>' : r.st === 'done' ? '<span class="ok">✓</span>' : r.st === 'fail' ? '<span class="bad">!</span>' : !all ? '<span class="g">✓</span>' : '';
       var range = all ? short(r.f) + ' → ' + short(r.t) : mode === 'U' ? 'up to date' : 'nothing in range';
       var right = !all ? '' : r.st === 'done' ? files : (r.st === 'work' || r.st === 'fail' || r.k) ? r.k + '/' + all : files;
-      return '<div class="r" title="' + esc(r.x.name) + '"><span>' + icon + '</span><span class="m"><b>' + esc(r.x.code) + '</b> <span class="g">' + range + '</span></span><span class="g">' + right + '</span></div>';
+      var tip = ' title="' + esc(r.x.name) + '"';
+      return '<div class="r"><span>' + icon + '</span><b' + tip + '>' + esc(r.x.code) + '</b><span class="g"' + tip + '>' + range + '</span><span class="g n">' + right + '</span></div>';
     }).join('');
     ['U', 'F', 'C'].forEach(function (m) { var b = q('xm' + m); b.className = mode === m ? 'on' : ''; b.disabled = busy; });
     q('xc').style.display = mode === 'C' ? 'flex' : 'none';
     q('xf').disabled = q('xt').disabled = busy;
-    q('xw').style.display = busy ? 'inline-block' : 'none';
+    q('xw').innerHTML = busy ? '<span class="sp"></span>' : { done: '<span class="ok">✓ Done</span>', failed: '<span class="bad">! Failed</span>', cancelled: '<span class="g">Cancelled</span>' }[st] || '';
     var bs = {
       ready: [['close', 'Close'], ['start', n ? 'Start' : mode === 'U' ? 'Up to date' : 'Nothing in range', !n]],
       folder: [['cancel', 'Cancel']],
@@ -281,14 +281,14 @@ var xfinaPanel = function (A) {
       }
       st = 'done';
       render();
-      say('Done: ' + saved + (saved === 1 ? ' file' : ' files') + ' saved ' + (dir ? 'to the folder <b>' + esc(dir.name) + '</b>' : 'by your browser') + '. Import them in Portfolio Engine.');
+      say(saved + (saved === 1 ? ' file' : ' files') + ' saved ' + (dir ? 'in the folder <b>' + esc(dir.name) + '</b>' : 'to your browser\'s downloads') + '. Import them in Portfolio Engine.');
     } catch (err) {
       undo();
       if (err === STOP) {
         if (r) r.st = '';
         st = 'cancelled';
         render();
-        say('Cancelled. ' + saved + (saved === 1 ? ' file' : ' files') + ' saved. Resume carries on from there' + (dir ? ', in the same folder.' : '.'));
+        say(saved + (saved === 1 ? ' file' : ' files') + ' saved. Resume carries on from there' + (dir ? ', in the same folder.' : '.'));
       } else {
         if (r) r.st = 'fail';
         st = 'failed';
