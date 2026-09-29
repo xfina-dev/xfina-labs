@@ -51,6 +51,8 @@
   var flags = function (n) { var w = words(n); return [/\bdirect\b/.test(w) ? 'd' : 'r', /\b(idcw|dividend)\b/.test(w) ? 'i' : /\b(growth|cumulative)\b/.test(w) ? 'g' : '']; };
   var opts = function () { return Array.prototype.slice.call(document.querySelectorAll('[role=option]')); };
   var combos = function () { return document.querySelectorAll('input[role=combobox]'); };
+  // What gets outlined: the radio's input is invisible (opacity 0), so its label; a box's whole outlined field.
+  var shown = function (el) { return el && (el.closest('label, .MuiInputBase-root') || el); };
   var open = async function (inp, c) {
     var b = inp.parentElement.querySelector('button[aria-label=Open]');
     if (b) c.tap(b);
@@ -91,15 +93,18 @@
     years: 5,
     items: JSON.parse('__SCHEMES__').map(function (x) { return { id: x[0], code: x[1], name: x[1], from: x[2] }; }),
     prepare: async function (it, c) {
-      var radio = await c.look('input[type=radio][value=historical-nav-for-a-period]', 'the Historical NAV for a period option');
+      var radio = document.querySelector('input[type=radio][value=historical-nav-for-a-period]');
+      await c.look(shown(radio), 'the Historical NAV for a period option');
       if (!radio.checked) { radio.click(); await c.pause(1200); amc = ''; }
-      var c1 = await c.look(combos()[0], 'the fund house box');
+      await c.look(shown(combos()[0]), 'the fund house box');
+      var c1 = combos()[0];
       await open(c1, c);
       var ao = amcFor(it.id);
       if (!ao) { await shut(c1, c); c.skip('fund house not found on AMFI'); }
       var an = ao.textContent.trim();
       if (an !== amc) { c.tap(ao); amc = an; await c.pause(1500); } else await shut(c1, c);
-      var c2 = await c.look(combos()[1], 'the scheme box');
+      await c.look(shown(combos()[1]), 'the scheme box');
+      var c2 = combos()[1];
       await open(c2, c);
       var so = best(it.id);
       if (!so) { await shut(c2, c); c.skip('scheme not found on AMFI'); }
@@ -109,8 +114,10 @@
     },
     fetch: async function (it, w, c) {
       var ds = document.querySelectorAll('input[type=date]');
-      put(await c.look(ds[0], 'the From date'), w[0]);
-      put(await c.look(ds[1], 'the To date'), w[1]);
+      await c.look(shown(ds[0]), 'the From date');
+      put(ds[0], w[0]);
+      await c.look(shown(ds[1]), 'the To date');
+      put(ds[1], w[1]);
       await c.nap();
       var go = Array.prototype.filter.call(document.querySelectorAll('button'), function (b) { return b.textContent.trim() === 'Go'; })[0];
       (await c.look(go, 'the Go button')).click();
