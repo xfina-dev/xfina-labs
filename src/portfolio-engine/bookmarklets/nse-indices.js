@@ -37,6 +37,8 @@
     var f = el.datepicker('option', 'onSelect');
     if (f) f.call(el[0]);
   };
+  // The date inputs are invisible (opacity 0) under the page's own date display, so that box is what gets outlined.
+  var shown = function (sel) { var el = document.querySelector(sel); return el && el.closest('.dateHolder') || el; };
   var rows = function () { return document.querySelectorAll(cur.rows); };
   var first = function () { var r = rows(); return r.length > 1 ? r[1].textContent : ''; };
   var newest = function () {
@@ -80,9 +82,9 @@
     },
     fetch: async function (it, w, c) {
       var before = first();
-      await c.look(cur.from, 'the From date');
+      await c.look(shown(cur.from), 'the From date');
       put(cur.from, w[0]);
-      await c.look(cur.to, 'the To date');
+      await c.look(shown(cur.to), 'the To date');
       put(cur.to, w[1]);
       await c.nap();
       c.alerts();
