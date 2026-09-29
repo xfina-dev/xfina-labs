@@ -109,19 +109,19 @@ var xfinaPanel = function (A) {
     '#xfina-bm *{box-sizing:border-box}#xfina-bm .hd{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:move;user-select:none}' +
     '#xfina-bm .hd .x{margin-left:auto;cursor:pointer;color:#a1a1aa;font-weight:400;padding:0 2px}' +
     '#xfina-bm .sp{width:13px;height:13px;border:2px solid #3f3f46;border-top-color:#fafafa;border-radius:50%;animation:xfspin .8s linear infinite;display:inline-block}' +
-    '@keyframes xfspin{to{transform:rotate(360deg)}}#xfina-bm .md{display:flex;gap:4px;margin:10px 0 4px}' +
+    '@keyframes xfspin{to{transform:rotate(360deg)}}#xfina-bm .md{display:flex;align-items:center;gap:4px;margin:10px 0 4px}' +
     '#xfina-bm button{height:28px;padding:0 10px;border:1px solid #3f3f46;border-radius:6px;background:transparent;color:#fafafa;cursor:pointer;font:inherit}' +
     '#xfina-bm button.on{border-color:#fafafa;background:#fafafa1a}#xfina-bm button.pri{background:#fafafa;color:#0a0a0b;border-color:#fafafa;font-weight:600}' +
-    '#xfina-bm button:disabled{opacity:.45;cursor:default}#xfina-bm .dt{display:none;gap:6px;align-items:center;margin:6px 0 2px;color:#a1a1aa;font-size:12px}' +
-    '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark;font:inherit}' +
+    '#xfina-bm button:disabled{opacity:.45;cursor:default}#xfina-bm .dt{display:none;gap:4px;align-items:center;margin-left:auto;color:#a1a1aa;font-size:12px}' +
+    '#xfina-bm input[type=date]{height:28px;width:122px;padding:0 4px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark;font:inherit;font-size:12px}' +
     '#xfina-bm .rs{display:grid;grid-template-columns:14px minmax(0,1fr) auto auto;column-gap:10px;row-gap:6px;align-items:center;border-top:1px solid #27272a;border-bottom:1px solid #27272a;margin:8px 0;padding:8px 0;white-space:nowrap}' +
     '#xfina-bm .r{display:contents}#xfina-bm .r b{font-weight:600}#xfina-bm .r .n{text-align:right}#xfina-bm .r .nm{overflow:hidden;text-overflow:ellipsis}' +
     '#xfina-bm .hd .st{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}' +
     '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm .ok{color:#4ade80}#xfina-bm .bad{color:#f59e0b}' +
     '#xfina-bm .ft{display:flex;align-items:flex-end;gap:8px}#xfina-bm .ft .s{flex:1;font-size:12px;color:#a1a1aa}#xfina-bm .ft .s b{color:#fafafa}#xfina-bm u{cursor:pointer}</style>' +
     '<div class="hd"><span>Xfina · ' + esc(A.title) + '</span><span id="xw" class="st"></span><span class="x" id="xx" title="Close">✕</span></div>' +
-    '<div class="md">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (m) { return '<button id="xm' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div>' +
-    '<div class="dt" id="xc">From <input type="date" id="xf"> to <input type="date" id="xt"></div>' +
+    '<div class="md">' + [['U', 'Update'], ['F', 'Full history'], ['C', 'Custom']].map(function (m) { return '<button id="xm' + m[0] + '">' + m[1] + '</button>'; }).join('') +
+    '<span class="dt" id="xc"><input type="date" id="xf" title="From">–<input type="date" id="xt" title="To"></span></div>' +
     '<div class="rs" id="xr"></div>' +
     '<div class="ft"><div class="s" id="xs"></div><div id="xb" style="display:flex;gap:6px"></div></div>';
   document.body.appendChild(box);
