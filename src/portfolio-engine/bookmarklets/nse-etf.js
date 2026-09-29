@@ -38,9 +38,8 @@
   xfinaPanel({
     title: 'NSE ETFs',
     key: 'xfina.nseEtf.v1',
-    host: 'nseindia.com',
-    wrongSite: 'open nseindia.com (Market Data, Historical Reports, Security-wise Archives) and click this bookmark again.',
-    wrongPage: 'open the Security-wise Archives page on nseindia.com (nseindia.com/report-detail/eq_security) and click this bookmark again.',
+    url: 'https://www.nseindia.com/report-detail/eq_security',
+    page: 'Security-wise Archives (Equities)',
     ready: function () { return typeof $ === 'function' && $.fn && $.fn.datepicker && document.getElementById('hsa-symbol') && document.querySelector('.filterbtn'); },
     years: 5,
     items: JSON.parse('__SYMBOLS__').map(function (x) { return { id: x[0], code: x[0], name: x[1], from: x[2] }; }),

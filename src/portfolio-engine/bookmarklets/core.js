@@ -22,22 +22,24 @@
   States: ready (Start) → folder (asking) → run (Cancel) → stopping → cancelled or failed (Resume) or done.
   Rows: planned, working (spinner, k/n), done ✓, up to date, failed !.
 
-  Adapter: { title, key, host, wrongSite, wrongPage, ready(), years, items: [{ id, code, name, from }],
+  Anywhere but its page (another site, another page, or the address without www, whose browser storage is
+  separate), a click says so and opens the page, and the next click, once it has loaded, opens the panel.
+
+  Adapter: { title, key, url (the page, www address), page (its heading), ready(), years, items: [{ id, code, name, from }],
   prepare(item, c) optional, fetch(item, [from, to], c) → newest Date on the page, or null for an empty window }.
   The adapter saves a file by calling c.grab(clickTheDownload, fallbackName). It stops being usable if it throws;
   its Error message is shown as is, so it should read as a sentence ("... not in the page's symbol list").
   Written to be minified: statements end in semicolons, no line comments inside, no comment markers in strings.
 */
 var xfinaPanel = function (A) {
-  var HOST = A.host;
-  var host = location.hostname;
-  if (host.replace(/^www\./, '') !== HOST) { alert('Xfina: ' + A.wrongSite); return; }
-  if (host === HOST) {
-    alert('Xfina: your browser keeps its memory separately for each address of this site, so this moves to the www address. Click the bookmark again once it has loaded.');
-    location.replace(location.href.replace('//' + HOST, '//www.' + HOST));
+  var U = new URL(A.url);
+  var path = function (p) { return p.replace(/\/+$/, ''); };
+  if (location.hostname !== U.hostname || path(location.pathname) !== path(U.pathname)) {
+    alert('Xfina: this opens ' + A.page + ' on ' + U.hostname.replace(/^www\./, '') + '. Click the Xfina bookmark again once it has loaded.');
+    location.href = A.url;
     return;
   }
-  if (!A.ready()) { alert('Xfina: ' + A.wrongPage); return; }
+  if (!A.ready()) { alert('Xfina: ' + A.page + ' hasn\'t finished loading. Click the Xfina bookmark again in a moment.'); return; }
   var old = document.getElementById('xfina-bm');
   if (old) { if (old.xfinaClose) old.xfinaClose(); else old.remove(); }
 
