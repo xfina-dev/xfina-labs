@@ -9,9 +9,8 @@
     resumes from the last saved file.
   - Modes. Update (default) fetches only what is new since that date; a dataset never fetched gets its full
     history. Full history redoes everything from each dataset's start. Custom takes a start and an end date.
-  - Windows. Every file ends on 31 March except the last: the financial year the range ends in (April to March)
-    is a file of its own, ending on the range's end, and the years before it go up to `years` per file, each file
-    ending on a 31 March. So a finished year's file never changes, and Update only adds to the current year.
+  - Windows. A range is cut into blocks of up to `years` financial years (April to March). Every block ends on
+    31 March except the last, which ends on the range's end; a range within one block is a single file.
     years 0 means one file for any range.
   - Pacing. Two short pauses per file, 6 to 9 seconds in all, as a person would take. A spinner shows while
     waiting; nothing else moves.
@@ -71,9 +70,7 @@ var xfinaPanel = function (A) {
   };
   var wins = function (f, t) {
     if (f > t) return [];
-    if (!A.years) return [[f, t]];
-    var b = new Date(t.getMonth() >= 3 ? t.getFullYear() : t.getFullYear() - 1, 3, 1);
-    return f < b ? fy(f, day(b, -1), A.years).concat([[b, t]]) : [[f, t]];
+    return A.years ? fy(f, t, A.years) : [[f, t]];
   };
 
   var mode = 'U';
