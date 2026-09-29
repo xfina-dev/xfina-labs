@@ -50,7 +50,7 @@ var xfinaPanel = function (A) {
   var day = function (d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); };
   var parse = function (s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); };
   var iso = function (d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
-  var short = function (d) { return MON[d.getMonth()] + ' ' + d.getFullYear(); };
+  var short = function (d) { return d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear(); };
   var esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
   var pause = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   var today = day(new Date(), 0);
@@ -210,7 +210,7 @@ var xfinaPanel = function (A) {
       var all = r.w.length;
       var files = all + (all === 1 ? ' file' : ' files');
       var icon = r.st === 'work' ? '<span class="sp"></span>' : r.st === 'done' ? '<span class="ok">✓</span>' : r.st === 'fail' ? '<span class="bad">!</span>' : !all ? '<span class="g">✓</span>' : '';
-      var range = all ? short(r.f) + ' → ' + short(r.t) : mode === 'U' ? 'up to date' : 'nothing in range';
+      var range = all ? short(r.f) + '\u2009–\u2009' + short(r.t) : mode === 'U' ? 'up to date' : 'nothing in range';
       var right = !all ? '' : r.st === 'done' ? files : (r.st === 'work' || r.st === 'fail' || r.k) ? r.k + '/' + all : files;
       var tip = ' title="' + esc(r.x.name) + '"';
       return '<div class="r"><span>' + icon + '</span><b' + tip + '>' + esc(r.x.code) + '</b><span class="g"' + tip + '>' + range + '</span><span class="g n">' + right + '</span></div>';
