@@ -7,6 +7,7 @@ import nseEtf from './bookmarklets/nse-etf.js?raw';
 import amfiNav from './bookmarklets/amfi-nav.js?raw';
 import yahooFinance from './bookmarklets/yahoo-finance.js?raw';
 import mcxSpot from './bookmarklets/mcx-spot.js?raw';
+import core from './bookmarklets/core.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
 import { nodes, NSE_DEBT, HOW } from './guide.js';
 
@@ -22,6 +23,10 @@ const DEBT_FROM = '2010-01-01';
 const MCX_PRODUCTS = {
   'idx-mcx-spot-market-price-gold-ahmedabad': ['GOLD', 'AHMEDABAD'],
 };
+
+// A site file built on the shared panel (core.js) carries XFINA_CORE; where the core goes. A function replacement,
+// so `$` in the core is not read as a replacement pattern.
+const withCore = (src) => src.replace('XFINA_CORE;', () => core);
 
 // A single-page site's own download page, named as the card names it (HOW's page and pageLabel).
 const open = (how) => ({ openUrl: how.page, openLabel: `Open ${how.pageLabel}` });
@@ -63,7 +68,7 @@ const BUILDERS = {
       ...open(HOW.nseEtf),
       termsUrl: 'https://www.nseindia.com/nse-terms-of-use',
       label: 'Xfina · NSE ETFs',
-      href: bookmarkletHref(nseEtf, { SYMBOLS: symbols }),
+      href: bookmarkletHref(withCore(nseEtf), { SYMBOLS: symbols }),
       indexes: etfs.map((i) => i.code),
       action: 'Download (.csv)',
       caution: 'NSE\'s terms of use restrict automated data collection. This bookmark only does the clicking you would do on that page, one file at a time and at a human pace, but the terms say what they say, so the decision to use it is yours.',
