@@ -305,7 +305,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             <div class="font-medium text-muted-foreground text-xs mb-1">Use</div>
             <ol class="list-decimal pl-5 space-y-0.5">
               <li>Drag the site's Xfina button to your bookmarks bar, once.</li>
-              <li>Click it: it opens the site's page. Click it again there and press Start.</li>
+              <li>Open the site's page (the Open button on its card), click the bookmark there and press Start. A new, empty tab can't run bookmarks.</li>
               <li>Keep that tab in front until it says Done.</li>
               <li>Import the files in Portfolio Engine: it merges by date.</li>
             </ol>
