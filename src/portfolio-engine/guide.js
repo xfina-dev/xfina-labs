@@ -96,12 +96,13 @@ export const HOW = {
   yahoo: {
     site: 'Yahoo Finance',
     terms: 'https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html',
-    title: 'Yahoo Finance: price history (by hand, no download)',
+    title: 'Yahoo Finance: price history (copy the table; there is no download button)',
     steps: [
-      'Open the history page for the ticker.',
-      'Open the date-range picker and set the start as early as it goes (back past the fund\'s launch is fine) and the end to today. Yahoo removed its Download button, so there is no file to fetch.',
-      'Set the frequency to Monthly, so the table is a manageable size to work with.',
-      'Select the table (click the first row, then shift-click the last) and copy it. Paste into a spreadsheet and save as CSV, or type the rows in by hand for a short run.',
+      'Open the history page for the ticker. Yahoo removed its Download button, so the table on this page is the data.',
+      'In the date-range picker, set the start as early as it goes (back past the fund\'s launch is fine) and the end to today, and keep the frequency Daily.',
+      'Select the whole table, header row included, and copy it.',
+      'Paste it at A1 of a new Google Sheet (or Excel), then download it as CSV (in Sheets: File › Download › Comma-separated values).',
+      'Name the file after the ticker, for example VOO.csv, and import it. Keep the header in the first row; don\'t add a title above it.',
     ],
     format: 'Date, Open, High, Low, Close, Adj Close and Volume, as shown on the page. Adj Close includes dividends. This is exchange price, not the fund\'s own NAV; used only where no issuer or exchange NAV history is available.',
   },
