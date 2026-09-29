@@ -9,8 +9,10 @@
     resumes from the last saved file.
   - Modes. Update (default) fetches only what is new since that date; a dataset never fetched gets its full
     history. Full history redoes everything from each dataset's start. Custom takes a start and an end date.
-  - Windows. A range that fits in `years` years is one file; a longer one is split into financial years (April to
-    March), `years` at a time, the ends partial. years 0 means one file for any range.
+  - Windows. Every file ends on 31 March except the last: the financial year the range ends in (April to March)
+    is a file of its own, ending on the range's end, and the years before it go up to `years` per file, each file
+    ending on a 31 March. So a finished year's file never changes, and Update only adds to the current year.
+    years 0 means one file for any range.
   - Pacing. Two short pauses per file, 6 to 9 seconds in all, as a person would take. A spinner shows while
     waiting; nothing else moves.
   - Folder. Where the browser allows it (Chrome, Edge), Start asks for a folder once per panel and every file is
@@ -69,8 +71,9 @@ var xfinaPanel = function (A) {
   };
   var wins = function (f, t) {
     if (f > t) return [];
-    if (!A.years || day(new Date(f.getFullYear() + A.years, f.getMonth(), f.getDate()), -1) >= t) return [[f, t]];
-    return fy(f, t, A.years);
+    if (!A.years) return [[f, t]];
+    var b = new Date(t.getMonth() >= 3 ? t.getFullYear() : t.getFullYear() - 1, 3, 1);
+    return f < b ? fy(f, day(b, -1), A.years).concat([[b, t]]) : [[f, t]];
   };
 
   var mode = 'U';
