@@ -49,7 +49,7 @@
       sym.value = it.code;
       sym.dispatchEvent(new Event('input', { bubbles: true }));
       var sug = await c.wait(function () { return document.querySelector('.tt-suggestion'); }, 8000);
-      if (!sug) throw new Error('not in the page\'s symbol list');
+      if (!sug) c.skip('not in the page\'s symbol list');
       c.tap(sug);
       await c.pause(1200);
       var ser = await c.look('#hsa_Series_filter', 'the series list');

@@ -22,22 +22,31 @@
     download happens as usual, and after the first three the panel waits for the browser's "allow multiple
     downloads" prompt.
 
+  - The chosen mode and custom dates are kept for the tab (session storage), so a panel reopened after its page
+    reloads, as Yahoo's must to change range, starts where it was.
+  - The site's own alert() boxes are caught while a run is going, for the adapter to read (c.alerts() takes them, c.peek() counts them).
+
   States: ready (Start) → folder (asking) → run (Cancel) → stopping → cancelled or failed (Resume) or done.
-  Rows: planned, working (spinner, k/n), done ✓, up to date, failed !.
+  Rows: planned, working (spinner, k/n), done ✓, up to date, skipped – (with why), failed !.
 
   Anywhere but its page (another site, another page, or the address without www, whose browser storage is
   separate), a click says so and opens the page, and the next click, once it has loaded, opens the panel.
 
-  Adapter: { title, key, url (the page, www address), page (its heading), ready(), years, items: [{ id, code, name, from }],
-  prepare(item, c) optional, fetch(item, [from, to], c) → newest Date on the page, or null for an empty window }.
-  The adapter saves a file by calling c.grab(clickTheDownload, fallbackName). It stops being usable if it throws;
-  its Error message is shown as is, so it should read as a sentence ("... not in the page's symbol list").
+  Adapter: { title, key, url (the page, www address), page (its heading), here() optional (is this the page, when
+  it isn't one fixed address), ready(), years, items: [{ id, code, name, from (null: from the earliest there is) }],
+  prepare(item, c) optional, fetch(item, [from, to], c) → newest Date on the page, or null for an empty window,
+  check(item, [from, to]) optional → an address to load first (then `moving` is the alert), asked before the folder
+  so a page that has to reload to change range never asks for the folder twice }.
+  To save, the adapter calls c.grab(clickTheDownload, fallbackName, prefix) for a file the page downloads, or
+  c.save(name, data) for one it builds; c.folder() says whether files go to a chosen folder. c.skip(why) passes
+  over one dataset and carries on; c.move(url, why) reloads the page elsewhere and ends the run (reopen to go on).
+  Any other throw fails the run; its Error message is shown as is, so it should read as a sentence.
   Written to be minified: statements end in semicolons, no line comments inside, no comment markers in strings.
 */
 var xfinaPanel = function (A) {
   var U = new URL(A.url);
   var path = function (p) { return p.replace(/\/+$/, ''); };
-  if (location.hostname !== U.hostname || path(location.pathname) !== path(U.pathname)) {
+  if (A.here ? !A.here() : location.hostname !== U.hostname || path(location.pathname) !== path(U.pathname)) {
     alert('Xfina: this opens ' + A.page + ' on ' + U.hostname.replace(/^www\./, '') + '. Click the Xfina bookmark again once it has loaded.');
     location.href = A.url;
     return;
@@ -86,10 +95,13 @@ var xfinaPanel = function (A) {
   var dir = null;
   var stop = 0;
   var saved = 0;
-  var skip = 0;
+  var hurry = 0;
+  var UI = A.key + '.ui';
+  try { var u = JSON.parse(sessionStorage.getItem(UI) || 'null'); if (u) { mode = u.m; cf = u.f; ct = u.t; } } catch (e) { }
+  var remember = function () { try { sessionStorage.setItem(UI, JSON.stringify({ m: mode, f: cf, t: ct })); } catch (e) { } };
   var plan = function () {
     return A.items.map(function (x) {
-      var s = parse(x.from);
+      var s = x.from ? parse(x.from) : new Date(1900, 0, 1);
       var l = mem[x.id] ? parse(mem[x.id]) : null;
       var f = s;
       var t = today;
@@ -99,10 +111,10 @@ var xfinaPanel = function (A) {
         if (f < s) f = s;
         if (t > today) t = today;
       } else if (mode === 'U' && l) f = day(l, 1);
-      return { x: x, f: f, t: t, w: mode === 'U' && l && f >= t ? [] : wins(f, t), k: 0, st: '' };
+      return { x: x, s: s, f: f, t: t, w: mode === 'U' && l && f >= t ? [] : wins(f, t), k: 0, st: '' };
     });
   };
-  var left = function () { return run.reduce(function (n, r) { return n + r.w.length - r.k; }, 0); };
+  var left = function () { return run.reduce(function (n, r) { return n + (r.st === 'skip' ? 0 : r.w.length - r.k); }, 0); };
 
   var box = document.createElement('div');
   box.id = 'xfina-bm';
@@ -142,18 +154,39 @@ var xfinaPanel = function (A) {
   var armed = 0;
   var cap = null;
   var blob = null;
+  var realAlert = window.alert;
+  var alerts = [];
   var arm = function () {
+    window.alert = function (m) { alerts.push(String(m)); };
+    if (!dir) return;
     HTMLAnchorElement.prototype.click = function () {
       if (armed && this.hasAttribute('download')) { cap = { href: this.href, name: this.getAttribute('download') }; return; }
       return nativeClick.apply(this, arguments);
     };
     URL.createObjectURL = function (b) { if (armed) blob = b; return makeUrl.call(URL, b); };
   };
-  var undo = function () { HTMLAnchorElement.prototype.click = nativeClick; URL.createObjectURL = makeUrl; armed = 0; };
+  var undo = function () { HTMLAnchorElement.prototype.click = nativeClick; URL.createObjectURL = makeUrl; window.alert = realAlert; armed = 0; };
+  var write = async function (name, data) {
+    name = String(name).replace(/[\\/:*?"<>|]/g, '-');
+    if (dir) {
+      var fh = await dir.getFileHandle(name, { create: true });
+      var ws = await fh.createWritable();
+      await ws.write(data);
+      await ws.close();
+      return;
+    }
+    var a = document.createElement('a');
+    var href = makeUrl.call(URL, data instanceof Blob ? data : new Blob([data]));
+    a.href = href;
+    a.download = name;
+    nativeClick.call(a);
+    setTimeout(function () { URL.revokeObjectURL(href); }, 5000);
+  };
   var close = function () { stop = 1; undo(); box.remove(); };
   box.xfinaClose = close;
 
   var STOP = {};
+  var MOVE = {};
   var c = {
     today: today,
     pause: async function (ms) { await pause(ms); if (stop) throw STOP; },
@@ -179,7 +212,13 @@ var xfinaPanel = function (A) {
       return el;
     },
     tap: function (el) { ['mousedown', 'mouseup', 'click'].forEach(function (t) { el.dispatchEvent(new MouseEvent(t, { bubbles: true, cancelable: true, view: window })); }); },
-    grab: async function (click, name) {
+    folder: function () { return !!dir; },
+    alerts: function () { var a = alerts; alerts = []; return a; },
+    peek: function () { return alerts.length; },
+    skip: function (why) { var e = new Error(why); e.skip = 1; throw e; },
+    move: function (url, why) { remember(); undo(); realAlert('Xfina: ' + why); location.href = url; throw MOVE; },
+    save: function (name, data) { return write(name, data); },
+    grab: async function (click, name, pre) {
       cap = null;
       blob = null;
       armed = !!dir;
@@ -197,10 +236,7 @@ var xfinaPanel = function (A) {
         if (cd) fname = cd[1];
         data = await rsp.blob();
       }
-      var fh = await dir.getFileHandle(String(fname || name).replace(/[\\/:*?"<>|]/g, '-'), { create: true });
-      var ws = await fh.createWritable();
-      await ws.write(data);
-      await ws.close();
+      await write((pre ? pre.replace(/[^A-Za-z0-9 .()_-]+/g, ' ').replace(/\s+/g, ' ').trim() + ' ' : '') + (fname || name), data);
     }
   };
 
@@ -212,9 +248,9 @@ var xfinaPanel = function (A) {
     q('xr').innerHTML = run.map(function (r) {
       var all = r.w.length;
       var files = all + (all === 1 ? ' file' : ' files');
-      var icon = r.st === 'work' ? '<span class="sp"></span>' : r.st === 'done' ? '<span class="ok">✓</span>' : r.st === 'fail' ? '<span class="bad">!</span>' : !all ? '<span class="g">✓</span>' : '';
-      var range = all ? short(r.f) + '\u2009–\u2009' + short(r.t) : mode === 'U' ? 'up to date' : 'nothing in range';
-      var right = !all ? '' : r.st === 'done' ? files : (r.st === 'work' || r.st === 'fail' || r.k) ? r.k + '/' + all : files;
+      var icon = r.st === 'work' ? '<span class="sp"></span>' : r.st === 'done' ? '<span class="ok">✓</span>' : r.st === 'fail' ? '<span class="bad">!</span>' : r.st === 'skip' ? '<span class="g">–</span>' : !all ? '<span class="g">✓</span>' : '';
+      var range = r.st === 'skip' ? esc(r.note) : all ? (r.x.from || r.f > r.s ? short(r.f) : 'earliest') + '\u2009–\u2009' + short(r.t) : mode === 'U' ? 'up to date' : 'nothing in range';
+      var right = !all || r.st === 'skip' ? '' : r.st === 'done' ? files : (r.st === 'work' || r.st === 'fail' || r.k) ? r.k + '/' + all : files;
       var tip = ' title="' + esc(r.x.name) + '"';
       var nm = '<b>' + esc(r.x.code) + '</b>' + (r.x.name && r.x.name !== r.x.code ? ' <span class="g">' + esc(r.x.name) + '</span>' : '');
       return '<div class="r"><span>' + icon + '</span><span class="nm"' + tip + '>' + nm + '</span><span class="g n">' + range + '</span><span class="g n">' + right + '</span></div>';
@@ -239,6 +275,14 @@ var xfinaPanel = function (A) {
 
   var go = async function () {
     stop = 0;
+    var p0 = run.filter(function (x) { return x.st !== 'skip' && x.k < x.w.length; })[0];
+    var to = A.check && p0 && A.check(p0.x, p0.w[p0.k]);
+    if (to) {
+      remember();
+      alert('Xfina: ' + A.moving);
+      location.href = to;
+      return;
+    }
     if (!dir && window.showDirectoryPicker) {
       st = 'folder';
       render();
@@ -252,44 +296,53 @@ var xfinaPanel = function (A) {
       }
     }
     st = 'run';
-    if (dir) arm();
+    arm();
     render();
     say('Keep this tab in front until it says Done.');
     var r = null;
     try {
-      var todo = run.filter(function (x) { return x.k < x.w.length; });
+      var todo = run.filter(function (x) { return x.st !== 'skip' && x.k < x.w.length; });
       for (var i = 0; i < todo.length; i++) {
         r = todo[i];
         r.st = 'work';
         render();
-        if (A.prepare) await A.prepare(r.x, c);
-        while (r.k < r.w.length) {
-          var e = await A.fetch(r.x, r.w[r.k], c);
-          if (e) {
-            saved++;
-            var ei = iso(e);
-            if (!mem[r.x.id] || ei > mem[r.x.id]) { mem[r.x.id] = ei; keep(); }
-          }
-          r.k++;
-          render();
-          say('Keep this tab in front until it says Done.');
-          if (!dir && saved === FAST && left()) {
-            skip = 0;
-            for (var s = WAIT; s > 0 && !skip; s--) {
-              say('Your browser may ask to <b>allow multiple downloads</b>: choose Allow. Carrying on in ' + s + 's. <u id="xu">Continue now</u>');
-              q('xu').onclick = function () { skip = 1; };
-              await c.pause(1000);
+        try {
+          if (A.prepare) await A.prepare(r.x, c);
+          while (r.k < r.w.length) {
+            var e = await A.fetch(r.x, r.w[r.k], c);
+            if (e) {
+              saved++;
+              var ei = iso(e);
+              if (!mem[r.x.id] || ei > mem[r.x.id]) { mem[r.x.id] = ei; keep(); }
+            }
+            r.k++;
+            render();
+            say('Keep this tab in front until it says Done.');
+            if (!dir && saved === FAST && left()) {
+              hurry = 0;
+              for (var s = WAIT; s > 0 && !hurry; s--) {
+                say('Your browser may ask to <b>allow multiple downloads</b>: choose Allow. Carrying on in ' + s + 's. <u id="xu">Continue now</u>');
+                q('xu').onclick = function () { hurry = 1; };
+                await c.pause(1000);
+              }
             }
           }
+          r.st = 'done';
+        } catch (e1) {
+          if (!(e1 && e1.skip)) throw e1;
+          r.st = 'skip';
+          r.note = e1.message;
+          render();
         }
-        r.st = 'done';
         r = null;
       }
+      var passed = run.filter(function (x) { return x.st === 'skip'; }).length;
       st = 'done';
       render();
-      say(saved + (saved === 1 ? ' file' : ' files') + ' saved ' + (dir ? 'in the folder <b>' + esc(dir.name) + '</b>' : 'to your browser\'s downloads') + '. Import them in Portfolio Engine.');
+      say(saved + (saved === 1 ? ' file' : ' files') + ' saved ' + (dir ? 'in the folder <b>' + esc(dir.name) + '</b>' : 'to your browser\'s downloads') + '. ' + (passed ? passed + ' skipped, as its row says. ' : '') + (saved ? 'Import ' + (saved === 1 ? 'it' : 'them') + ' in Portfolio Engine.' : ''));
     } catch (err) {
       undo();
+      if (err === MOVE) return;
       if (err === STOP) {
         if (r) r.st = '';
         st = 'cancelled';
@@ -312,8 +365,10 @@ var xfinaPanel = function (A) {
     cancel: function () { stop = 1; if (st === 'run') { st = 'stopping'; render(); } }
   };
   q('xx').onclick = close;
-  ['U', 'F', 'C'].forEach(function (m) { q('xm' + m).onclick = function () { mode = m; st = 'ready'; render(); }; });
-  q('xf').oninput = function () { cf = this.value; st = 'ready'; render(); };
-  q('xt').oninput = function () { ct = this.value; st = 'ready'; render(); };
+  ['U', 'F', 'C'].forEach(function (m) { q('xm' + m).onclick = function () { mode = m; st = 'ready'; remember(); render(); }; });
+  q('xf').value = cf;
+  q('xt').value = ct;
+  q('xf').oninput = function () { cf = this.value; st = 'ready'; remember(); render(); };
+  q('xt').oninput = function () { ct = this.value; st = 'ready'; remember(); render(); };
   render();
 };

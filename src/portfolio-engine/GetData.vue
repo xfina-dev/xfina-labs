@@ -387,7 +387,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
 
           <!-- What is particular to this site's bookmark -->
           <p v-if="g.bookmarklet && (g.bookmarklet.oneShot || g.bookmarklet.skipped || g.bookmarklet.caution)" class="text-xs text-muted-foreground">
-            <template v-if="g.bookmarklet.oneShot">This bookmark saves one ticker per click: open a ticker's page from its row, click the bookmark, then {{ g.bookmarklet.action }}. </template>
+            <template v-if="g.bookmarklet.oneShot">This bookmark saves one ticker per click: open a ticker's page from its row, click the bookmark and press Start. If the page isn't at that range yet, it reloads there first; click the bookmark again and press Start. </template>
             <template v-if="g.bookmarklet.skipped">It doesn't cover {{ g.bookmarklet.skipped }} of these, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} by hand. </template>
             {{ g.bookmarklet.caution }}
           </p>
