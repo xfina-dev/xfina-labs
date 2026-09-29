@@ -104,7 +104,7 @@ var xfinaPanel = function (A) {
   var box = document.createElement('div');
   box.id = 'xfina-bm';
   box.innerHTML =
-    '<style>#xfina-bm{position:fixed;top:16px;right:16px;z-index:2147483647;width:380px;max-height:90vh;overflow:auto;background:#0a0a0b;color:#fafafa;font:13px/1.45 system-ui,sans-serif;text-align:left;border:1px solid #3f3f46;border-radius:10px;padding:12px 14px;box-shadow:0 8px 30px #0008}' +
+    '<style>#xfina-bm{position:fixed;top:16px;right:16px;z-index:2147483647;width:540px;max-width:calc(100vw - 32px);max-height:90vh;overflow:auto;background:#0a0a0b;color:#fafafa;font:13px/1.45 system-ui,sans-serif;text-align:left;border:1px solid #3f3f46;border-radius:10px;padding:12px 14px;box-shadow:0 8px 30px #0008}' +
     '#xfina-bm *{box-sizing:border-box}#xfina-bm .hd{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:move;user-select:none}' +
     '#xfina-bm .hd .x{margin-left:auto;cursor:pointer;color:#a1a1aa;font-weight:400;padding:0 2px}' +
     '#xfina-bm .sp{width:13px;height:13px;border:2px solid #3f3f46;border-top-color:#fafafa;border-radius:50%;animation:xfspin .8s linear infinite;display:inline-block}' +
@@ -113,8 +113,8 @@ var xfinaPanel = function (A) {
     '#xfina-bm button.on{border-color:#fafafa;background:#fafafa1a}#xfina-bm button.pri{background:#fafafa;color:#0a0a0b;border-color:#fafafa;font-weight:600}' +
     '#xfina-bm button:disabled{opacity:.45;cursor:default}#xfina-bm .dt{display:none;gap:6px;align-items:center;margin:6px 0 2px;color:#a1a1aa;font-size:12px}' +
     '#xfina-bm input[type=date]{height:26px;border:1px solid #3f3f46;border-radius:6px;background:#0a0a0b;color:#fafafa;color-scheme:dark;font:inherit}' +
-    '#xfina-bm .rs{display:grid;grid-template-columns:14px auto 1fr auto;column-gap:10px;row-gap:6px;align-items:center;border-top:1px solid #27272a;border-bottom:1px solid #27272a;margin:8px 0;padding:8px 0;white-space:nowrap}' +
-    '#xfina-bm .r{display:contents}#xfina-bm .r b{font-weight:600}#xfina-bm .r .n{text-align:right}' +
+    '#xfina-bm .rs{display:grid;grid-template-columns:14px minmax(0,1fr) auto auto;column-gap:10px;row-gap:6px;align-items:center;border-top:1px solid #27272a;border-bottom:1px solid #27272a;margin:8px 0;padding:8px 0;white-space:nowrap}' +
+    '#xfina-bm .r{display:contents}#xfina-bm .r b{font-weight:600}#xfina-bm .r .n{text-align:right}#xfina-bm .r .nm{overflow:hidden;text-overflow:ellipsis}' +
     '#xfina-bm .hd .st{font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}' +
     '#xfina-bm .g{color:#a1a1aa;font-size:12px}#xfina-bm .ok{color:#4ade80}#xfina-bm .bad{color:#f59e0b}' +
     '#xfina-bm .ft{display:flex;align-items:flex-end;gap:8px}#xfina-bm .ft .s{flex:1;font-size:12px;color:#a1a1aa}#xfina-bm .ft .s b{color:#fafafa}#xfina-bm u{cursor:pointer}</style>' +
@@ -213,7 +213,8 @@ var xfinaPanel = function (A) {
       var range = all ? short(r.f) + '\u2009–\u2009' + short(r.t) : mode === 'U' ? 'up to date' : 'nothing in range';
       var right = !all ? '' : r.st === 'done' ? files : (r.st === 'work' || r.st === 'fail' || r.k) ? r.k + '/' + all : files;
       var tip = ' title="' + esc(r.x.name) + '"';
-      return '<div class="r"><span>' + icon + '</span><b' + tip + '>' + esc(r.x.code) + '</b><span class="g"' + tip + '>' + range + '</span><span class="g n">' + right + '</span></div>';
+      var nm = '<b>' + esc(r.x.code) + '</b>' + (r.x.name && r.x.name !== r.x.code ? ' <span class="g">' + esc(r.x.name) + '</span>' : '');
+      return '<div class="r"><span>' + icon + '</span><span class="nm"' + tip + '>' + nm + '</span><span class="g n">' + range + '</span><span class="g n">' + right + '</span></div>';
     }).join('');
     ['U', 'F', 'C'].forEach(function (m) { var b = q('xm' + m); b.className = mode === m ? 'on' : ''; b.disabled = busy; });
     q('xc').style.display = mode === 'C' ? 'flex' : 'none';
