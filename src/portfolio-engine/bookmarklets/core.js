@@ -8,7 +8,8 @@
     browser storage under the adapter's key. Updated after every saved file, so a cancelled or failed run
     resumes from the last saved file.
   - Modes. Update (default) fetches only what is new since that date; a dataset never fetched gets its full
-    history. Full history redoes everything from each dataset's start. Custom takes a start and an end date.
+    history. Fetched up to yesterday counts as up to date: today's data is rarely out yet, and the next day's
+    Update picks it up. Full history redoes everything from each dataset's start. Custom takes a start and an end date.
   - Windows. A range is cut into blocks of up to `years` financial years (April to March). Every block ends on
     31 March except the last, which ends on the range's end; a range within one block is a single file.
     years 0 means one file for any range.
@@ -96,7 +97,7 @@ var xfinaPanel = function (A) {
         if (f < s) f = s;
         if (t > today) t = today;
       } else if (mode === 'U' && l) f = day(l, 1);
-      return { x: x, f: f, t: t, w: wins(f, t), k: 0, st: '' };
+      return { x: x, f: f, t: t, w: mode === 'U' && l && f >= t ? [] : wins(f, t), k: 0, st: '' };
     });
   };
   var left = function () { return run.reduce(function (n, r) { return n + r.w.length - r.k; }, 0); };
