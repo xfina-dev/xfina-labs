@@ -371,9 +371,10 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </div>
 
-          <!-- By hand: the walkthrough beside the steps for what is selected -->
-          <div class="grid gap-4 md:grid-cols-2 md:items-start">
-            <GifPreview :slug="slug(g.site)" :title="g.site" />
+          <!-- By hand: the walkthrough beside the steps for what is selected. Only sites with a bookmarklet have one; a
+               direct download is a link and a click, so its steps stand alone at full width. -->
+          <div class="grid gap-4 md:items-start" :class="{ 'md:grid-cols-2': g.bookmarklet }">
+            <GifPreview v-if="g.bookmarklet" :slug="slug(g.site)" :title="g.site" />
             <div class="space-y-3 text-sm">
               <div v-for="h in g.hows" :key="h.title">
                 <div class="font-medium text-muted-foreground text-xs mb-1">{{ g.hows.length > 1 ? h.title : 'Steps' }}</div>
