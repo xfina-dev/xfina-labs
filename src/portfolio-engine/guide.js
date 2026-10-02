@@ -131,12 +131,14 @@ export const HOW = {
   // dividends, so WSJ's price-only file loses nothing for these.
   wsj: {
     site: 'WSJ',
+    page: 'https://www.wsj.com/market-data',
+    pageLabel: 'WSJ Markets',
     terms: 'https://www.wsj.com/policy/additional-terms-conditions',
     title: 'WSJ: historical prices',
     steps: [
-      'Open the fund\'s Historical Prices page on WSJ (the link on its row).',
-      'In the page\'s date picker set the start to the fund\'s launch (or earlier) and the end to today, then download the spreadsheet. The Download link on its row is that same request, already set to the full range.',
-      'WSJ names every file HistoricalPrices.csv: rename it after the ticker, for example SGLD.csv, and import it.',
+      'Open any WSJ page (Open WSJ Markets) and click the Xfina · WSJ bookmark. It saves each fund\'s full history, launch to today, named after the fund (for example SGLD_2009-08-19_to_2026-10-02.wsj.csv).',
+      'By hand instead: open the fund\'s Historical Prices page (the link on its row), set the date picker from the fund\'s launch to today and download the spreadsheet. The Download link on its row is that same request.',
+      'By hand, WSJ names every file HistoricalPrices.csv: rename it after the ticker, for example SGLD.csv, before importing.',
     ],
     format: 'Date, Open, High, Low, Close, Volume, newest first, dates as MM/DD/YY. Price only: no dividends (none of the gold funds taken from here pay any). Exchange holidays can appear as a row with volume 0 and the previous close, which the importer skips.',
   },

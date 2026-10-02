@@ -6,6 +6,7 @@ import nseIndices from './bookmarklets/nse-indices.js?raw';
 import nseEtf from './bookmarklets/nse-etf.js?raw';
 import amfiNav from './bookmarklets/amfi-nav.js?raw';
 import tiingo from './bookmarklets/tiingo.js?raw';
+import wsj from './bookmarklets/wsj.js?raw';
 import mcxSpot from './bookmarklets/mcx-spot.js?raw';
 import core from './bookmarklets/core.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
@@ -90,6 +91,25 @@ const BUILDERS = {
       indexes: funds.map((i) => i.code),
       action: 'Start',
       caution: 'Uses your own free Tiingo API token, asked for once and kept in your browser on tiingo.com only; Tiingo\'s free plan is for personal use.',
+      skipped: items.length - funds.length,
+    };
+  },
+  // WSJ: the non-US gold listings (and PHYS). Asks WSJ for the same spreadsheet each fund's Historical Prices page
+  // downloads, launch to today, and saves it under the fund's ticker (WSJ names every file HistoricalPrices.csv).
+  // WSJ's own path for each fund is read from its catalogue link.
+  WSJ: (items) => {
+    const path = (i) => i.links.map((l) => l.url.match(/wsj\.com\/market-data\/quotes\/(.+?)\/historical-prices/)).find(Boolean)?.[1];
+    const funds = items.filter((i) => i.how === 'wsj' && i.code && path(i));
+    if (!funds.length) return null;
+    return {
+      site: 'WSJ',
+      ...open(HOW.wsj),
+      termsUrl: HOW.wsj.terms,
+      label: 'Xfina · WSJ',
+      href: bookmarkletHref(withCore(wsj), { FUNDS: funds.map((i) => [path(i), i.code, i.name, i.inception]) }),
+      indexes: funds.map((i) => i.code),
+      action: 'Start',
+      caution: 'WSJ\'s terms of use apply. This bookmark only asks for the spreadsheet you would download from each fund\'s Historical Prices page, one file at a time and at a person\'s pace, and names it after the fund; the decision to use it is yours.',
       skipped: items.length - funds.length,
     };
   },
