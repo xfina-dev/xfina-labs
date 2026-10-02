@@ -162,7 +162,7 @@ export const HOW = {
     site: 'MSCI',
     terms: 'https://www.msci.com/legal/terms-of-use',
     title: 'MSCI: index levels',
-    steps: ['Open the index page and its Performance tab.', 'Under Cumulative performance, choose Full history.', 'Press the download icon next to Compare. No account is needed.'],
+    steps: ['Open the index page and its Performance tab.', 'Under Cumulative performance, choose Full history.', 'Press the download icon next to Compare. No account is needed. If the icon is greyed out, the chart is set to Daily (MSCI only allows daily downloads for the last four years): set Frequency back to Monthly in the ⋮ menu\'s Settings.'],
     format: 'An Excel file with a date and the index level, monthly, as MSCI publishes it: Net Total Return, USD (the page itself never labels this; found in its own chart\'s network request, variant=NETR). Full history on the free page starts 1998-12-31; MSCI\'s own longer history, and other variants (Price, Gross), are licensed.',
   },
   nasdaqIndex: {
