@@ -308,9 +308,9 @@ const ETFS = [
   // is outside the UCITS Directive, so it has no need for the debt-note workaround.
   // CSGOLD: confirmed 2026-09-27, NAV download link scraped live off the fund page, returns a real .xls (200 OK).
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'iShares Gold ETF (CH)', code: 'CSGOLD', page: ishCh(261149, 'ishares-gold-ch-fund') },
-  // ZGLDUS: the USD share class of the Swisscanto/ZKB Gold ETF, from 2009-01-15 (Yahoo's first row, 2026-09-27). No
+  // ZGLDUS: the USD share class of the Swisscanto/ZKB Gold ETF, launched 2009-01-15; WSJ's file starts 2009-01-16 (checked 2026-10-02). No
   // issuer download (swissfunddata.ch and Swisscanto checked) and SIX's own page gives ~5 months; WSJ lists it.
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'Swisscanto (CH) Gold ETF (USD)', code: 'ZGLDUS', manual: '2009-01-15', src: 'wsj', wsj: 'etf/CH/XSWX/ZGLDUS' },
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'Swisscanto (CH) Gold ETF (USD)', code: 'ZGLDUS', manual: '2009-01-16', manualSrc: 'wsj', src: 'wsj', wsj: 'etf/CH/XSWX/ZGLDUS' },
   // Canada: Ontario trusts holding physical gold directly as trust property (not debt securities). PHYS is the oldest
   // currently-tradeable USD one (iShares' CGL is CAD only, from 2011). KILO.U and VALT.U (younger, cheaper) are
   // dropped: neither has a free download, and PHYS covers the same metal from 2010.

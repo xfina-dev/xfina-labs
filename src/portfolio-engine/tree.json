@@ -2220,8 +2220,8 @@
      "id": "etf-zgldus",
      "name": "Swisscanto (CH) Gold ETF (USD)",
      "code": "ZGLDUS",
-     "inception": "2009-01-15",
-     "dateSource": "manual",
+     "inception": "2009-01-16",
+     "dateSource": "wsj",
      "ccy": "USD",
      "returnType": "Market price",
      "how": "wsj",
@@ -2233,7 +2233,7 @@
       },
       {
        "label": "ZGLDUS download (CSV)",
-       "url": "https://www.wsj.com/market-data/quotes/etf/CH/XSWX/ZGLDUS/historical-prices/download?MOD_VIEW=page&num_rows=6470&range_days=6470&startDate=01/15/2009&endDate=10/02/2026"
+       "url": "https://www.wsj.com/market-data/quotes/etf/CH/XSWX/ZGLDUS/historical-prices/download?MOD_VIEW=page&num_rows=6469&range_days=6469&startDate=01/16/2009&endDate=10/02/2026"
       }
      ],
      "asset": "Gold"
