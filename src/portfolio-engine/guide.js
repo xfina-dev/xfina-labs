@@ -293,6 +293,17 @@ export function returnsFor(i, how = i.how) {
   return { ok: false, label: 'Price only', why: 'This fund pays its income out, and this source has prices only, so the dividends are missing.' };
 }
 
+// What the number in the file is, for a dataset from a given source: the fund's own NAV (from the fund house or
+// the industry body), the price it traded at on an exchange, or an index level. The same ETF can be either: IVV from
+// iShares is its NAV, IVV from Tiingo its closing price. A mutual fund has no exchange price, so Tiingo's close is its NAV.
+const NAV_SOURCES = new Set(['amfi', 'ishares', 'spdrgold']);
+export function basisFor(i, how = i.how) {
+  if (how === 'custom') return { label: 'Your file', why: 'As published by wherever your file comes from.' };
+  if (i.kind === 'Index') return i.how === 'mcxSpot' ? { label: 'Spot price', why: 'MCX\'s spot gold price, polled several times a day.' } : { label: 'Index level', why: 'The index\'s own level, as its publisher states it.' };
+  if (NAV_SOURCES.has(how) || (how === 'tiingo' && i.kind === 'MF')) return { label: 'NAV', why: 'The fund\'s own net asset value per unit, from the fund house (or AMFI).' };
+  return { label: 'Market price', why: 'The price it traded at on the exchange, which can differ slightly from the fund\'s NAV.' };
+}
+
 export function findDataset(id) {
   for (const n of nodes) {
     const hit = n.instruments.find((i) => i.id === id);

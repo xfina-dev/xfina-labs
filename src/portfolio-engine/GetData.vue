@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
-import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, CUSTOM_FORMAT, sourcesOf, returnsFor, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
+import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, CUSTOM_FORMAT, sourcesOf, returnsFor, basisFor, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
@@ -255,12 +255,13 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
                   <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ clip(i.name) }}</td>
                   <td class="px-3 py-2 whitespace-nowrap">
-                    <Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested (or, for an index, included in the level)' : 'Distributing: income is paid out, not reinvested (or, for an index, excluded from the level)'">{{ distFlag(i) }}</Tag>
+                    <Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested (or, for an index, included in the level)' : 'Distributing: income is paid out, not reinvested (or, for an index, excluded from the level)'">{{ distFlag(i) }}</Tag>
                   </td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</td>
                   <!-- Total return or price only, for the chosen source (or the dataset's own, before one is picked) -->
                   <td class="px-3 py-2 whitespace-nowrap">
-                    <Tag :variant="returnsFor(i, sourceOf(i)).ok === true ? 'ok' : returnsFor(i, sourceOf(i)).ok === false ? 'warn' : 'soon'" :title="`${i.returnType}. ${returnsFor(i, sourceOf(i)).why}`">{{ returnsFor(i, sourceOf(i)).label }}</Tag>
+                    <Tag :variant="returnsFor(i, sourceOf(i)).ok === true ? 'ok' : returnsFor(i, sourceOf(i)).ok === false ? 'warn' : 'soon'" :title="returnsFor(i, sourceOf(i)).why">{{ returnsFor(i, sourceOf(i)).label }}</Tag>
                   </td>
                   <td class="px-3 py-2 whitespace-nowrap">
                     <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
@@ -401,9 +402,10 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <tr v-for="i in g.items" :key="i.id" class="border-t">
                     <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
                     <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="i.name">{{ clip(i.name) }}</td>
-                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
+                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
-                    <td class="px-3 py-2 whitespace-nowrap"><Tag :variant="returnsFor(i).ok === true ? 'ok' : returnsFor(i).ok === false ? 'warn' : 'soon'" :title="`${i.returnType}. ${returnsFor(i).why}`">{{ returnsFor(i).label }}</Tag></td>
+                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="basisFor(i).why">{{ basisFor(i).label }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap"><Tag :variant="returnsFor(i).ok === true ? 'ok' : returnsFor(i).ok === false ? 'warn' : 'soon'" :title="returnsFor(i).why">{{ returnsFor(i).label }}</Tag></td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="dateSourceNote(i)">{{ i.inception || '—' }}</td>
                     <td class="px-3 py-2 text-right">
                       <div class="flex items-center justify-end gap-1.5">
