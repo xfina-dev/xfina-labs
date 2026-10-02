@@ -253,8 +253,8 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               <tbody v-for="g in groups" :key="g.asset || 'indexes'">
                 <tr v-if="g.asset"><th colspan="8" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
                 <tr v-for="i in g.instruments" :key="i.id" class="border-t">
-                  <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
-                  <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ clip(i.name) }}</td>
+                  <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
+                  <td class="px-3 py-2 min-w-[14rem] font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ i.name }}</td>
                   <td class="px-3 py-2 whitespace-nowrap">
                     <Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested (or, for an index, included in the level)' : 'Distributing: income is paid out, not reinvested (or, for an index, excluded from the level)'">{{ distFlag(i) }}</Tag>
                   </td>
@@ -280,7 +280,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                         </SelectContent>
                       </Select>
                       <!-- What that source's number is: NAV, market price or an index level -->
-                      <span class="ml-2 w-24 text-left text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</span>
+                      <span class="ml-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</span>
                       <Button variant="outline" size="sm" class="w-28 justify-center" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
                         <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
                       </Button>
@@ -403,8 +403,8 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               <table class="w-full min-w-[640px] text-sm">
                 <tbody>
                   <tr v-for="i in g.items" :key="i.id" class="border-t">
-                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name">{{ i.code }}</Tag></td>
-                    <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="i.name">{{ clip(i.name) }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
+                    <td class="px-3 py-2 min-w-[14rem] font-medium">{{ i.name }}</td>
                     <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="basisFor(i).why">{{ basisFor(i).label }}</td>
