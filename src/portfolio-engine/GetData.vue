@@ -272,7 +272,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                          selected filter tile above: a primary border on a faint primary tint. -->
                     <div class="flex items-center justify-end gap-1.5">
                       <!-- One source only (India's own publishers): its name, where the dropdown would be -->
-                      <span v-if="sourcesOf(i).length === 1" class="w-44 px-3 text-left text-sm text-muted-foreground">{{ sourceLabel(sourceOf(i)) }}</span>
+                      <span v-if="sourcesOf(i).length === 1" class="text-sm text-muted-foreground">{{ sourceLabel(sourceOf(i)) }}</span>
                       <Select v-else :modelValue="sourceOf(i)" @update:modelValue="(v) => setSource(i, v)">
                         <SelectTrigger class="h-9 w-44 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
                         <SelectContent :body-lock="false">
