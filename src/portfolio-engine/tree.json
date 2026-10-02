@@ -2504,7 +2504,7 @@
      "name": "Vanguard Total World Bond ETF",
      "code": "BNDW",
      "inception": "2018-09-06",
-     "dateSource": "manual",
+     "dateSource": "tiingo",
      "ccy": "USD",
      "returnType": "Market price",
      "how": "tiingo",

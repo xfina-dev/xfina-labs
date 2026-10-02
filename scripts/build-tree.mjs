@@ -336,7 +336,7 @@ const ETFS = [
   // DTLA, not IDTL: IDTL is the Distributing share class; India/Ireland rows use accumulating where one exists (confirmed on ishares.com, 2026-09-27).
   { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'irish', name: 'iShares $ Treasury Bond 20+yr UCITS ETF USD (Acc)', code: 'DTLA', page: ishUk(297191, 'ishares-treasury-bond-20-yr-ucits-etf-usd-acc-fund') },
   // Debt / Global. BNDW is the only US-listed global aggregate bond fund (BNDX, IAGG and IGOV leave out US bonds).
-  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-06', src: 'tiingo' },
+  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-06', manualSrc: 'tiingo', src: 'tiingo' },
   // Ireland: iShares Core Global Aggregate Bond, both accumulating USD classes, confirmed 2026-10-02 in iShares' own
   // files. USD Hedged (Acc) from 2017-11-21 is BNDW's exposure (US bonds plus hedged non-US) with a longer history;
   // the unhedged USD (Acc) class only started 2024-05-08. The fund's Distributing class (AGGG) is left out.
