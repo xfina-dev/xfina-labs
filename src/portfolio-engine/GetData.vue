@@ -253,7 +253,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <div v-else class="overflow-x-auto rounded-md border">
             <table class="w-full min-w-[760px] text-sm">
               <tbody v-for="g in groups" :key="g.asset || 'indexes'">
-                <tr v-if="g.asset"><th colspan="8" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
+                <tr v-if="g.asset"><th colspan="9" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
                 <tr v-for="i in g.instruments" :key="i.id" class="border-t">
                   <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
                   <td class="px-2 py-2 min-w-[11rem] font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ i.name }}</td>
@@ -268,25 +268,25 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <td class="px-2 py-2 whitespace-nowrap">
                     <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
                   </td>
+                  <td class="px-2 py-2">
+                    <!-- The source, from the dataset's array (its own first, the default). Changing it on an added dataset
+                         switches it; before adding, it sets where Add takes it from. One source only (India's own
+                         publishers): its name, where the dropdown would be. -->
+                    <span v-if="sourcesOf(i).length === 1" class="text-sm text-muted-foreground">{{ sourceLabel(sourceOf(i)) }}</span>
+                    <Select v-else :modelValue="sourceOf(i)" @update:modelValue="(v) => setSource(i, v)">
+                      <SelectTrigger class="h-9 w-36 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
+                      <SelectContent :body-lock="false">
+                        <SelectGroup><SelectItem v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</SelectItem></SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <!-- What that source's number is: NAV, market price or an index level -->
+                  <td class="w-[6.5rem] px-2 py-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</td>
                   <td class="px-2 py-2 text-right">
-                    <!-- The source, from the dataset's array (its own first, the default), and Add. Changing the source of
-                         an added dataset switches it; before adding, it sets where Add takes it from. Added looks like a
-                         selected filter tile above: a primary border on a faint primary tint. -->
-                    <div class="flex items-center justify-end gap-1.5">
-                      <!-- One source only (India's own publishers): its name, where the dropdown would be -->
-                      <span v-if="sourcesOf(i).length === 1" class="text-sm text-muted-foreground">{{ sourceLabel(sourceOf(i)) }}</span>
-                      <Select v-else :modelValue="sourceOf(i)" @update:modelValue="(v) => setSource(i, v)">
-                        <SelectTrigger class="h-9 w-36 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
-                        <SelectContent :body-lock="false">
-                          <SelectGroup><SelectItem v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</SelectItem></SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <!-- What that source's number is: NAV, market price or an index level -->
-                      <span class="mx-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</span>
-                      <Button variant="outline" size="sm" class="w-[5.5rem] justify-center px-2" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
-                        <Check v-if="has(i.id)" class="h-3.5 w-3.5 mr-1" />{{ has(i.id) ? 'Added' : 'Add' }}
-                      </Button>
-                    </div>
+                    <!-- Added looks like a selected filter tile above: a primary border on a faint primary tint -->
+                    <Button variant="outline" size="sm" class="w-[5.5rem] justify-center px-2" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
+                      <Check v-if="has(i.id)" class="h-3.5 w-3.5 mr-1" />{{ has(i.id) ? 'Added' : 'Add' }}
+                    </Button>
                   </td>
                 </tr>
               </tbody>
