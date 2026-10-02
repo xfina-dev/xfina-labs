@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-28",
+ "generatedAt": "2026-10-02",
  "keep": 3,
  "nodes": [
   {
@@ -1661,6 +1661,109 @@
   {
    "class": "equity",
    "region": "us",
+   "vehicle": "mf",
+   "listing": "usfund",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "usmf-vfinx",
+     "name": "Vanguard 500 Index Fund Investor Shares",
+     "code": "VFINX",
+     "inception": "1980-03-27",
+     "dateSource": "tiingoDiv",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "VFINX on Tiingo",
+       "url": "https://www.tiingo.com/vfinx/overview"
+      }
+     ]
+    },
+    {
+     "id": "usmf-fxaix",
+     "name": "Fidelity 500 Index Fund",
+     "code": "FXAIX",
+     "inception": "1988-02-17",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "FXAIX on Tiingo",
+       "url": "https://www.tiingo.com/fxaix/overview"
+      }
+     ]
+    },
+    {
+     "id": "usmf-swppx",
+     "name": "Schwab S&P 500 Index Fund",
+     "code": "SWPPX",
+     "inception": "1997-05-19",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "SWPPX on Tiingo",
+       "url": "https://www.tiingo.com/swppx/overview"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "usfund",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "usmf-ryocx",
+     "name": "Rydex Nasdaq-100 Fund Investor Class",
+     "code": "RYOCX",
+     "inception": "1994-02-14",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "RYOCX on Tiingo",
+       "url": "https://www.tiingo.com/ryocx/overview"
+      }
+     ]
+    },
+    {
+     "id": "usmf-usnqx",
+     "name": "Victory Nasdaq-100 Index Fund",
+     "code": "USNQX",
+     "inception": "2000-10-27",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "USNQX on Tiingo",
+       "url": "https://www.tiingo.com/usnqx/overview"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
    "vehicle": "etf",
    "listing": "us",
    "asset": "S&P 500",
@@ -1672,13 +1775,13 @@
      "inception": "1993-01-22",
      "dateSource": "manual",
      "ccy": "USD",
-     "returnType": "NAV",
-     "how": "ssga",
+     "returnType": "Market price",
+     "how": "tiingo",
      "kind": "ETF",
      "links": [
       {
-       "label": "SPY NAV history (Excel)",
-       "url": "https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-spy.xlsx"
+       "label": "SPY on Tiingo",
+       "url": "https://www.tiingo.com/spy/overview"
       }
      ],
      "asset": "S&P 500"
@@ -1710,15 +1813,15 @@
      "name": "Vanguard S&P 500 ETF",
      "code": "VOO",
      "inception": "2010-09-09",
-     "dateSource": "yahoo",
+     "dateSource": "tiingo",
      "ccy": "USD",
      "returnType": "Market price",
-     "how": "yahoo",
+     "how": "tiingo",
      "kind": "ETF",
      "links": [
       {
-       "label": "VOO price history",
-       "url": "https://finance.yahoo.com/quote/VOO/history/"
+       "label": "VOO on Tiingo",
+       "url": "https://www.tiingo.com/voo/overview"
       }
      ],
      "asset": "S&P 500"
@@ -1737,15 +1840,33 @@
      "name": "Invesco QQQ Trust",
      "code": "QQQ",
      "inception": "1999-03-10",
-     "dateSource": "yahoo",
+     "dateSource": "tiingo",
      "ccy": "USD",
      "returnType": "Market price",
-     "how": "yahoo",
+     "how": "tiingo",
      "kind": "ETF",
      "links": [
       {
-       "label": "QQQ price history",
-       "url": "https://finance.yahoo.com/quote/QQQ/history/"
+       "label": "QQQ on Tiingo",
+       "url": "https://www.tiingo.com/qqq/overview"
+      }
+     ],
+     "asset": "Nasdaq 100"
+    },
+    {
+     "id": "etf-qqqm",
+     "name": "Invesco NASDAQ 100 ETF",
+     "code": "QQQM",
+     "inception": "2020-10-13",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "QQQM on Tiingo",
+       "url": "https://www.tiingo.com/qqqm/overview"
       }
      ],
      "asset": "Nasdaq 100"
@@ -1777,24 +1898,6 @@
       {
        "label": "CSPX fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/253743/ishares-core-sp-500-ucits-etf"
-      }
-     ],
-     "asset": "S&P 500"
-    },
-    {
-     "id": "etf-vuaa",
-     "name": "Vanguard S&P 500 UCITS ETF (Acc)",
-     "code": "VUAA",
-     "inception": "2019-05-14",
-     "dateSource": "yahoo",
-     "ccy": "USD",
-     "returnType": "Market price",
-     "how": "yahoo",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "VUAA price history",
-       "url": "https://finance.yahoo.com/quote/VUAA.L/history/"
       }
      ],
      "asset": "S&P 500"
@@ -1888,10 +1991,6 @@
       {
        "label": "SWDA fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/251882/ishares-msci-world-ucits-etf-acc-fund"
-      },
-      {
-       "label": "IWDA price history",
-       "url": "https://finance.yahoo.com/quote/IWDA.L/history/"
       }
      ],
      "asset": "MSCI World"
@@ -1988,6 +2087,59 @@
       }
      ],
      "asset": "MSCI Emerging Markets"
+    },
+    {
+     "id": "etf-iemg",
+     "name": "iShares Core MSCI Emerging Markets ETF",
+     "code": "IEMG",
+     "inception": "2012-10-18",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "IEMG NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=244050&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "IEMG fund page",
+       "url": "https://www.ishares.com/us/products/244050/ishares-core-msci-emerging-markets-etf"
+      }
+     ],
+     "asset": "MSCI Emerging Markets"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "MSCI World",
+   "instruments": [
+    {
+     "id": "etf-urth",
+     "name": "iShares MSCI World ETF",
+     "code": "URTH",
+     "inception": "2012-01-10",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "URTH NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239696&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "URTH fund page",
+       "url": "https://www.ishares.com/us/products/239696/ishares-msci-world-etf"
+      }
+     ],
+     "asset": "MSCI World"
     }
    ]
   },
@@ -2036,6 +2188,24 @@
       }
      ],
      "asset": "Gold"
+    },
+    {
+     "id": "etf-sgol",
+     "name": "abrdn Physical Gold Shares ETF",
+     "code": "SGOL",
+     "inception": "2009-09-09",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SGOL on Tiingo",
+       "url": "https://www.tiingo.com/sgol/overview"
+      }
+     ],
+     "asset": "Gold"
     }
    ]
   },
@@ -2051,15 +2221,19 @@
      "name": "Swisscanto (CH) Gold ETF (USD)",
      "code": "ZGLDUS",
      "inception": "2009-01-15",
-     "dateSource": "yahoo",
+     "dateSource": "manual",
      "ccy": "USD",
      "returnType": "Market price",
-     "how": "yahoo",
+     "how": "wsj",
      "kind": "ETF",
      "links": [
       {
-       "label": "ZGLDUS price history",
-       "url": "https://finance.yahoo.com/quote/ZGLDUS.SW/history/"
+       "label": "ZGLDUS on WSJ",
+       "url": "https://www.wsj.com/market-data/quotes/etf/CH/XSWX/ZGLDUS/historical-prices"
+      },
+      {
+       "label": "ZGLDUS download (CSV)",
+       "url": "https://www.wsj.com/market-data/quotes/etf/CH/XSWX/ZGLDUS/historical-prices/download?MOD_VIEW=page&num_rows=6470&range_days=6470&startDate=01/15/2009&endDate=10/02/2026"
       }
      ],
      "asset": "Gold"
@@ -2100,51 +2274,19 @@
      "name": "Sprott Physical Gold Trust",
      "code": "PHYS",
      "inception": "2010-02-26",
-     "dateSource": "yahoo",
+     "dateSource": "wsj",
      "ccy": "USD",
      "returnType": "Market price",
-     "how": "yahoo",
+     "how": "wsj",
      "kind": "ETF",
      "links": [
       {
-       "label": "PHYS price history",
-       "url": "https://finance.yahoo.com/quote/PHYS/history/"
-      }
-     ],
-     "asset": "Gold"
-    },
-    {
-     "id": "etf-kilo.u",
-     "name": "Purpose Gold Bullion Fund (USD)",
-     "code": "KILO.U",
-     "inception": "2018-10-29",
-     "dateSource": "yahoo",
-     "ccy": "USD",
-     "returnType": "Market price",
-     "how": "yahoo",
-     "kind": "ETF",
-     "links": [
+       "label": "PHYS on WSJ",
+       "url": "https://www.wsj.com/market-data/quotes/etf/PHYS/historical-prices"
+      },
       {
-       "label": "KILO.U price history",
-       "url": "https://finance.yahoo.com/quote/KILO-U.TO/history/"
-      }
-     ],
-     "asset": "Gold"
-    },
-    {
-     "id": "etf-valt.u",
-     "name": "CI Gold Bullion ETF (USD)",
-     "code": "VALT.U",
-     "inception": "2021-01-14",
-     "dateSource": "yahoo",
-     "ccy": "USD",
-     "returnType": "Market price",
-     "how": "yahoo",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "VALT.U price history",
-       "url": "https://finance.yahoo.com/quote/VALT-U.TO/history/"
+       "label": "PHYS download (CSV)",
+       "url": "https://www.wsj.com/market-data/quotes/etf/PHYS/historical-prices/download?MOD_VIEW=page&num_rows=6063&range_days=6063&startDate=02/26/2010&endDate=10/02/2026"
       }
      ],
      "asset": "Gold"
@@ -2162,16 +2304,20 @@
      "id": "etf-sgld",
      "name": "Invesco Physical Gold ETC",
      "code": "SGLD",
-     "inception": "2009-06-26",
-     "dateSource": "yahoo",
+     "inception": "2009-08-19",
+     "dateSource": "wsj",
      "ccy": "USD",
      "returnType": "Market price",
-     "how": "yahoo",
+     "how": "wsj",
      "kind": "ETF",
      "links": [
       {
-       "label": "SGLD price history",
-       "url": "https://finance.yahoo.com/quote/SGLD.L/history/"
+       "label": "SGLD on WSJ",
+       "url": "https://www.wsj.com/market-data/quotes/etf/UK/XLON/SGLD/historical-prices"
+      },
+      {
+       "label": "SGLD download (CSV)",
+       "url": "https://www.wsj.com/market-data/quotes/etf/UK/XLON/SGLD/historical-prices/download?MOD_VIEW=page&num_rows=6254&range_days=6254&startDate=08/19/2009&endDate=10/02/2026"
       }
      ],
      "asset": "Gold"
@@ -2208,19 +2354,23 @@
    "asset": "Short duration",
    "instruments": [
     {
-     "id": "etf-bil",
-     "name": "SPDR Bloomberg 1-3 Month T-Bill ETF",
-     "code": "BIL",
-     "inception": "2007-05-30",
-     "dateSource": "manual",
+     "id": "etf-shv",
+     "name": "iShares 0-1 Year Treasury Bond ETF",
+     "code": "SHV",
+     "inception": "2007-01-05",
+     "dateSource": "issuer",
      "ccy": "USD",
      "returnType": "NAV",
-     "how": "ssga",
+     "how": "ishares",
      "kind": "ETF",
      "links": [
       {
-       "label": "BIL NAV history (Excel)",
-       "url": "https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-bil.xlsx"
+       "label": "SHV NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239466&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "SHV fund page",
+       "url": "https://www.ishares.com/us/products/239466/ishares-short-treasury-bond-etf"
       }
      ],
      "asset": "Short duration"
@@ -2305,10 +2455,6 @@
       {
        "label": "IB01 fund page",
        "url": "https://www.ishares.com/uk/individual/en/products/307243/ishares-usd-treasury-bond-01yr-ucits-etf"
-      },
-      {
-       "label": "IB01 price history",
-       "url": "https://finance.yahoo.com/quote/IB01.L/history/"
       }
      ],
      "asset": "Short duration"
@@ -2358,15 +2504,68 @@
      "name": "Vanguard Total World Bond ETF",
      "code": "BNDW",
      "inception": "2018-09-06",
-     "dateSource": "yahoo",
+     "dateSource": "manual",
      "ccy": "USD",
      "returnType": "Market price",
-     "how": "yahoo",
+     "how": "tiingo",
      "kind": "ETF",
      "links": [
       {
-       "label": "BNDW price history",
-       "url": "https://finance.yahoo.com/quote/BNDW/history/"
+       "label": "BNDW on Tiingo",
+       "url": "https://www.tiingo.com/bndw/overview"
+      }
+     ],
+     "asset": "Aggregate"
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "Aggregate",
+   "instruments": [
+    {
+     "id": "etf-aggu",
+     "name": "iShares Core Global Aggregate Bond UCITS ETF USD Hedged (Acc)",
+     "code": "AGGU",
+     "inception": "2017-11-21",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "AGGU NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=291772&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "AGGU fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/291772/ishares-global-aggregate-bond-ucits-etf-usd-hedged-acc-fund"
+      }
+     ],
+     "asset": "Aggregate"
+    },
+    {
+     "id": "etf-agac",
+     "name": "iShares Core Global Aggregate Bond UCITS ETF USD (Acc)",
+     "code": "AGAC",
+     "inception": "2024-05-08",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "AGAC NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=337224&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "AGAC fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/337224/ishares-core-global-aggregate-bond-ucits-etf"
       }
      ],
      "asset": "Aggregate"
@@ -2398,96 +2597,6 @@
       {
        "label": "MON100 on NSE",
        "url": "https://www.nseindia.com/get-quotes/equity?symbol=MON100"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "us",
-   "vehicle": "etf",
-   "listing": "india",
-   "asset": "S&P 500 Top 50",
-   "instruments": [
-    {
-     "id": "nse-masptop50",
-     "name": "Mirae Asset S&P 500 Top 50 ETF",
-     "code": "MASPTOP50",
-     "inception": "2021-09-21",
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "Market price",
-     "how": "nseEtf",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NSE historical price data",
-       "url": "https://www.nseindia.com/report-detail/eq_security"
-      },
-      {
-       "label": "MASPTOP50 on NSE",
-       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MASPTOP50"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "us",
-   "vehicle": "etf",
-   "listing": "india",
-   "asset": "NYSE FANG+",
-   "instruments": [
-    {
-     "id": "nse-mafang",
-     "name": "Mirae Asset NYSE FANG+ ETF",
-     "code": "MAFANG",
-     "inception": "2021-05-07",
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "Market price",
-     "how": "nseEtf",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NSE historical price data",
-       "url": "https://www.nseindia.com/report-detail/eq_security"
-      },
-      {
-       "label": "MAFANG on NSE",
-       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MAFANG"
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "class": "equity",
-   "region": "us",
-   "vehicle": "etf",
-   "listing": "india",
-   "asset": "Nasdaq Q-50",
-   "instruments": [
-    {
-     "id": "nse-monq50",
-     "name": "Motilal Oswal Nasdaq Q 50 ETF",
-     "code": "MONQ50",
-     "inception": "2021-12-29",
-     "dateSource": "amfi",
-     "ccy": "INR",
-     "returnType": "Market price",
-     "how": "nseEtf",
-     "kind": "ETF",
-     "links": [
-      {
-       "label": "NSE historical price data",
-       "url": "https://www.nseindia.com/report-detail/eq_security"
-      },
-      {
-       "label": "MONQ50 on NSE",
-       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MONQ50"
       }
      ]
     }
@@ -2606,8 +2715,8 @@
      "kind": "Index",
      "links": [
       {
-       "label": "^GSPC on Yahoo Finance",
-       "url": "https://finance.yahoo.com/quote/%5EGSPC/history/"
+       "label": "^GSPC history, full range",
+       "url": "https://finance.yahoo.com/quote/%5EGSPC/history/?period1=-1325635200&period2=1790985600&frequency=1d"
       }
      ]
     },
@@ -2622,8 +2731,8 @@
      "kind": "Index",
      "links": [
       {
-       "label": "^SP500TR on Yahoo Finance",
-       "url": "https://finance.yahoo.com/quote/%5ESP500TR/history/"
+       "label": "^SP500TR history, full range",
+       "url": "https://finance.yahoo.com/quote/%5ESP500TR/history/?period1=568252800&period2=1790985600&frequency=1d"
       }
      ]
     }

@@ -229,7 +229,23 @@ async function isharesInception(url) {
     return m ? `${m[1]}-${String(+m[2] + 1).padStart(2, '0')}-${String(m[3]).padStart(2, '0')}` : null;
   } catch { return null; }
 }
-const yahoo = (t) => `https://finance.yahoo.com/quote/${t}/history/`;
+const TODAY_ISO = new Date().toISOString().slice(0, 10);
+const epoch = (d) => Math.floor(Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10)) / 1000);
+// Yahoo's own history page at its full daily range (the address its date picker produces). Only the two S&P 500
+// index rows use Yahoo, which has no download button; no bookmark is offered for it.
+const yahooRange = (sym, since) => `https://finance.yahoo.com/quote/${encodeURIComponent(sym)}/history/?period1=${epoch(since)}&period2=${epoch(TODAY_ISO) + 86400}&frequency=1d`;
+// Tiingo: the ticker's page there. Data comes from Tiingo's API with the user's own free token, through the Xfina
+// bookmark on tiingo.com (Tiingo's API refuses calls from other websites).
+const tiingo = (t) => `https://www.tiingo.com/${t.toLowerCase()}/overview`;
+// WSJ: the fund's historical prices page, and the spreadsheet download that page's own date picker produces for
+// launch-to-today (the range it allows; confirmed for QQQ from 1991 on 2026-09-30). `path` is WSJ's own, e.g.
+// etf/UK/XLON/SGLD for a London listing.
+const mdy = (d) => `${d.slice(5, 7)}/${d.slice(8, 10)}/${d.slice(0, 4)}`;
+const wsjPage = (path) => `https://www.wsj.com/market-data/quotes/${path}/historical-prices`;
+const wsjDownload = (path, since) => {
+  const days = Math.ceil((epoch(TODAY_ISO) - epoch(since)) / 86400) + 1;
+  return `${wsjPage(path)}/download?MOD_VIEW=page&num_rows=${days}&range_days=${days}&startDate=${mdy(since)}&endDate=${mdy(TODAY_ISO)}`;
+};
 // Nasdaq's own index-history export, direct and unauthenticated (confirmed live 2026-09-28, a real .xlsx). `since`
 // is the index's own "All" start date; the end date is always today, so this URL only ever needs regenerating
 // when the script itself is re-run (the guide.js UI builds its own current end date the same way for other sources).
@@ -253,72 +269,90 @@ async function ishNavCh(pageUrl) {
     return m ? new URL(m[1], pageUrl).href : null;
   } catch { return null; }
 }
-// State Street's own NAV history file for an SPDR ETF (confirmed for SPY, 2026-09-27).
-const ssgaNav = (t) => `https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-${t.toLowerCase()}.xlsx`;
 
-// listing: 'irish' | 'us' | 'canada'. `page` is scraped for the inception date; `manual` is a typed date, and
-// `manualSrc` overrides its dateSource label when the date is a confirmed reading (e.g. 'yahoo': the earliest row
-// Yahoo Finance's own history table returns), rather than an unverified launch date from a search result.
+// listing: 'irish' | 'us' | 'canada' | 'switzerland'. Where each one's data comes from, best first:
+//   page   an iShares fund page: inception scraped from it, and iShares' own NAV download (US funds add dividends).
+//   src    'spdrgold' (GLD's own archive), 'tiingo' (US-listed, no issuer download: the user's free Tiingo token,
+//          with dividends and splits) or 'wsj' (non-US gold listings: WSJ's spreadsheet, price only, fine for gold).
+//   manual a typed date; `manualSrc` names where it was read (e.g. 'tiingo': its first row), else 'manual'.
+// Yahoo Finance is no longer a source for any fund: it has no download button (its export is a paid feature).
+// State Street's SPY/BIL files had NAV only, no dividends, so SPY comes from Tiingo and BIL gave way to SHV.
 const ETFS = [
-  // Equity / US
-  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'SPDR S&P 500 ETF Trust', code: 'SPY', manual: '1993-01-22', links: [L('SPY price history', yahoo('SPY'))] },
-  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'iShares Core S&P 500 ETF', code: 'IVV', page: ishUs(239726, 'ishares-core-sp-500-etf'), links: [L('IVV price history', yahoo('IVV'))] },
-  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'Vanguard S&P 500 ETF', code: 'VOO', manual: '2010-09-09', manualSrc: 'yahoo', links: [L('VOO price history', yahoo('VOO'))] },
-  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco QQQ Trust', code: 'QQQ', manual: '1999-03-10', manualSrc: 'yahoo', links: [L('QQQ price history', yahoo('QQQ'))] },
+  // Equity / US. The three oldest S&P 500 ETFs and both Nasdaq-100 ones with real history (IQQ and QNDX, from
+  // mid-2026, are too new). SPLG (2005) is left out: it tracked a different index until 2013.
+  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'SPDR S&P 500 ETF Trust', code: 'SPY', manual: '1993-01-22', src: 'tiingo' },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'iShares Core S&P 500 ETF', code: 'IVV', page: ishUs(239726, 'ishares-core-sp-500-etf') },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'Vanguard S&P 500 ETF', code: 'VOO', manual: '2010-09-09', manualSrc: 'tiingo', src: 'tiingo' },
+  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco QQQ Trust', code: 'QQQ', manual: '1999-03-10', manualSrc: 'tiingo', src: 'tiingo' },
+  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco NASDAQ 100 ETF', code: 'QQQM', manual: '2020-10-13', src: 'tiingo' },
+  // Vanguard's VUAA is dropped: CSPX covers the same index and listing from 2010, with an issuer download.
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'irish', name: 'iShares Core S&P 500 UCITS ETF (Acc)', code: 'CSPX', page: ishUk(253743, 'ishares-core-sp-500-ucits-etf') },
-  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'irish', name: 'Vanguard S&P 500 UCITS ETF (Acc)', code: 'VUAA', manual: '2019-05-14', manualSrc: 'yahoo', links: [L('VUAA price history', yahoo('VUAA.L'))] },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'irish', name: 'iShares Nasdaq 100 UCITS ETF (Acc)', code: 'CNDX', page: ishUk(253741, 'ishares-nasdaq-100-ucits-etf') },
   // Equity / Global
   { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'irish', name: 'iShares MSCI ACWI UCITS ETF (Acc)', code: 'SSAC', page: ishUk(251850, 'ishares-msci-acwi-ucits-etf') },
-  { cls: 'equity', region: 'global', asset: 'MSCI World', listing: 'irish', name: 'iShares Core MSCI World UCITS ETF (Acc)', code: 'SWDA', page: ishUk(251882, 'ishares-msci-world-ucits-etf-acc-fund'), extra: [L('IWDA price history', yahoo('IWDA.L'))] },
+  { cls: 'equity', region: 'global', asset: 'MSCI World', listing: 'irish', name: 'iShares Core MSCI World UCITS ETF (Acc)', code: 'SWDA', page: ishUk(251882, 'ishares-msci-world-ucits-etf-acc-fund') },
   { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'irish', name: 'iShares Core MSCI EM IMI UCITS ETF (Acc)', code: 'EIMI', page: ishUk(264659, 'ishares-core-msci-em-imi-ucits-etf') },
-  { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'us', name: 'iShares MSCI ACWI ETF', code: 'ACWI', page: ishUs(239600, 'ishares-msci-acwi-etf'), links: [L('ACWI price history', yahoo('ACWI'))] },
-  { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares MSCI Emerging Markets ETF', code: 'EEM', manual: '2003-04-07', page: ishUs(239637, 'ishares-msci-emerging-markets-etf'), links: [L('EEM price history', yahoo('EEM'))] },
+  { cls: 'equity', region: 'global', asset: 'MSCI ACWI', listing: 'us', name: 'iShares MSCI ACWI ETF', code: 'ACWI', page: ishUs(239600, 'ishares-msci-acwi-etf') },
+  // URTH and IEMG: confirmed 2026-10-02 in iShares' own files (daily NAV with dividends from 2012-01-10 and 2012-10-18).
+  { cls: 'equity', region: 'global', asset: 'MSCI World', listing: 'us', name: 'iShares MSCI World ETF', code: 'URTH', page: ishUs(239696, 'ishares-msci-world-etf') },
+  { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares MSCI Emerging Markets ETF', code: 'EEM', manual: '2003-04-07', page: ishUs(239637, 'ishares-msci-emerging-markets-etf') },
+  { cls: 'equity', region: 'global', asset: 'MSCI Emerging Markets', listing: 'us', name: 'iShares Core MSCI Emerging Markets ETF', code: 'IEMG', page: ishUs(244050, 'ishares-core-msci-emerging-markets-etf') },
   // Gold (priced world-wide in USD)
   // Gold ETFs: US-domiciled ones under the US region, Switzerland/Canada/Ireland (all Global-only) as listing
   // choices, Switzerland first. US gold has no domicile choice, so its ETFs carry no listing.
-  { cls: 'gold', region: 'us', asset: 'Gold', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', links: [L('GLD price history', yahoo('GLD'))] },
-  { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund'), links: [L('IAU price history', yahoo('IAU'))] },
+  { cls: 'gold', region: 'us', asset: 'Gold', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', src: 'spdrgold' },
+  { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund') },
+  { cls: 'gold', region: 'us', asset: 'Gold', name: 'abrdn Physical Gold Shares ETF', code: 'SGOL', manual: '2009-09-09', src: 'tiingo' },
   // Switzerland: genuine Swiss collective investment schemes under CISA (FINMA-regulated), holding physical gold
   // directly as fund property. Not UCITS funds and not debt securities (unlike the Irish ETCs below): Switzerland
   // is outside the UCITS Directive, so it has no need for the debt-note workaround.
   // CSGOLD: confirmed 2026-09-27, NAV download link scraped live off the fund page, returns a real .xls (200 OK).
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'iShares Gold ETF (CH)', code: 'CSGOLD', page: ishCh(261149, 'ishares-gold-ch-fund') },
-  // ZGLDUS: the underlying ZKB/Swisscanto Gold ETF dates to 2006, but that is the CHF fund; the USD share class
-  // (ZGLDUS) only launched 2009-01-15, confirmed as Yahoo Finance's own earliest row for the ticker (2026-09-27) —
-  // barely older than CSGOLD, not meaningfully longer history once you're limited to the USD line. No issuer NAV
-  // download found (checked swissfunddata.ch and the Swisscanto site), so this one is Yahoo-sourced, market price.
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'Swisscanto (CH) Gold ETF (USD)', code: 'ZGLDUS', manual: '2009-01-15', manualSrc: 'yahoo', links: [L('ZGLDUS price history', yahoo('ZGLDUS.SW'))] },
-  // Canada: Ontario trusts holding physical gold directly as trust property (not debt securities). iShares' own CGL
-  // (2009-05-19) and Central GoldTrust (2003, merged into this same PHYS in 2016) are both older, but CGL has no
-  // USD unit (CAD-hedged or CAD-unhedged only) and GTU no longer trades independently — so PHYS remains the oldest
-  // currently-tradeable USD option here. KILO.U and VALT.U are both younger but cheaper (TER, confirmed 2026-09-27):
-  // PHYS 0.39%, KILO.U 0.28%, VALT.U 0.16% (the cheapest of the three) — added for that reason, not for history.
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-26', manualSrc: 'yahoo', links: [L('PHYS price history', yahoo('PHYS'))] },
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Purpose Gold Bullion Fund (USD)', code: 'KILO.U', manual: '2018-10-29', manualSrc: 'yahoo', links: [L('KILO.U price history', yahoo('KILO-U.TO'))] },
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'CI Gold Bullion ETF (USD)', code: 'VALT.U', manual: '2021-01-14', manualSrc: 'yahoo', links: [L('VALT.U price history', yahoo('VALT-U.TO'))] },
+  // ZGLDUS: the USD share class of the Swisscanto/ZKB Gold ETF, from 2009-01-15 (Yahoo's first row, 2026-09-27). No
+  // issuer download (swissfunddata.ch and Swisscanto checked) and SIX's own page gives ~5 months; WSJ lists it.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'Swisscanto (CH) Gold ETF (USD)', code: 'ZGLDUS', manual: '2009-01-15', src: 'wsj', wsj: 'etf/CH/XSWX/ZGLDUS' },
+  // Canada: Ontario trusts holding physical gold directly as trust property (not debt securities). PHYS is the oldest
+  // currently-tradeable USD one (iShares' CGL is CAD only, from 2011). KILO.U and VALT.U (younger, cheaper) are
+  // dropped: neither has a free download, and PHYS covers the same metal from 2010.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'canada', name: 'Sprott Physical Gold Trust', code: 'PHYS', manual: '2010-02-26', manualSrc: 'wsj', src: 'wsj', wsj: 'etf/PHYS' },
   // Ireland: legally a series of secured debt securities (limited-recourse bonds collateralised by gold) issued by
-  // the ETC provider, not fund units — UCITS forbids a fund from holding a single physical commodity, so the
+  // the ETC provider, not fund units -- UCITS forbids a fund from holding a single physical commodity, so the
   // gold-tracking product is structured as debt instead (UCITS-eligible under Article 50(1) of the Directive).
-  // Kept for comparison; Switzerland and Canada above are the ones without this structural wrinkle.
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'Invesco Physical Gold ETC', code: 'SGLD', manual: '2009-06-26', manualSrc: 'yahoo', links: [L('SGLD price history', yahoo('SGLD.L'))] },
+  // SGLD's London (USD) line on WSJ starts 2009-08-19 (confirmed 2026-09-30), about 8 weeks after the ETC launched.
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'Invesco Physical Gold ETC', code: 'SGLD', manual: '2009-08-19', manualSrc: 'wsj', src: 'wsj', wsj: 'etf/UK/XLON/SGLD' },
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'irish', name: 'iShares Physical Gold ETC', code: 'SGLN', page: ishUk(258441, 'ishares-physical-gold-etc') },
-  // Debt / US
-  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf'), links: [L('SGOV price history', yahoo('SGOV'))] },
-  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'SPDR Bloomberg 1-3 Month T-Bill ETF', code: 'BIL', manual: '2007-05-30', links: [L('BIL price history', yahoo('BIL'))] },
-  { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'us', name: 'iShares 20+ Year Treasury Bond ETF', code: 'TLT', page: ishUs(239454, 'ishares-20-year-treasury-bond-etf'), links: [L('TLT price history', yahoo('TLT'))] },
+  // Debt / US. SHV (0-1 year Treasuries, from 2007-01-05; iShares renamed it "0-1 Year Treasury Bond ETF") replaces
+  // State Street's BIL: confirmed 2026-10-02, its iShares file carries every monthly dividend, which for a T-bill
+  // fund is nearly all of its return (BIL's own file had NAV only).
+  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-1 Year Treasury Bond ETF', code: 'SHV', page: ishUs(239466, 'ishares-short-treasury-bond-etf') },
+  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'us', name: 'iShares 0-3 Month Treasury Bond ETF', code: 'SGOV', page: ishUs(314116, 'ishares-0-3-month-treasury-bond-etf') },
+  { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'us', name: 'iShares 20+ Year Treasury Bond ETF', code: 'TLT', page: ishUs(239454, 'ishares-20-year-treasury-bond-etf') },
   // IB01 IS the Acc share class (ISIN IE00BGSF1X88) -- confirmed live 2026-09-28 on iShares' own page ("USD
   // (Accumulating)"), and again by cross-referencing the same ISIN under its other exchange ticker, IBC1 (Xetra/
   // gettex). It just doesn't put "(Acc)" in its own title the way CSPX/VUAA/CNDX/etc. do, so distFlag()'s
   // name-text check alone would mislabel it Dist; the name here now carries the marker explicitly instead. There
   // never was a real Ireland/India-accumulating gap for this asset, despite an earlier pass concluding there was.
-  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'irish', name: 'iShares $ Treasury Bond 0-1yr UCITS ETF (Acc)', code: 'IB01', page: ishUk(307243, 'ishares-usd-treasury-bond-01yr-ucits-etf'), extra: [L('IB01 price history', yahoo('IB01.L'))] },
+  { cls: 'debt', region: 'us', asset: 'Short duration', listing: 'irish', name: 'iShares $ Treasury Bond 0-1yr UCITS ETF (Acc)', code: 'IB01', page: ishUk(307243, 'ishares-usd-treasury-bond-01yr-ucits-etf') },
   // DTLA, not IDTL: IDTL is the Distributing share class; India/Ireland rows use accumulating where one exists (confirmed on ishares.com, 2026-09-27).
   { cls: 'debt', region: 'us', asset: 'Long duration', listing: 'irish', name: 'iShares $ Treasury Bond 20+yr UCITS ETF USD (Acc)', code: 'DTLA', page: ishUk(297191, 'ishares-treasury-bond-20-yr-ucits-etf-usd-acc-fund') },
-  // Debt / Global
-  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-06', manualSrc: 'yahoo', links: [L('BNDW price history', yahoo('BNDW'))] },
-  // No AGGG (Irish): it's Distributing, and its only accumulating share classes are currency-hedged (EUR/USD/CHF),
-  // which would change the fund's exposure, not just its distribution policy. BNDW (US) covers this asset instead.
+  // Debt / Global. BNDW is the only US-listed global aggregate bond fund (BNDX, IAGG and IGOV leave out US bonds).
+  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'us', name: 'Vanguard Total World Bond ETF', code: 'BNDW', manual: '2018-09-06', src: 'tiingo' },
+  // Ireland: iShares Core Global Aggregate Bond, both accumulating USD classes, confirmed 2026-10-02 in iShares' own
+  // files. USD Hedged (Acc) from 2017-11-21 is BNDW's exposure (US bonds plus hedged non-US) with a longer history;
+  // the unhedged USD (Acc) class only started 2024-05-08. The fund's Distributing class (AGGG) is left out.
+  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'irish', name: 'iShares Core Global Aggregate Bond UCITS ETF USD Hedged (Acc)', code: 'AGGU', page: ishUk(291772, 'ishares-global-aggregate-bond-ucits-etf-usd-hedged-acc-fund') },
+  { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'irish', name: 'iShares Core Global Aggregate Bond UCITS ETF USD (Acc)', code: 'AGAC', page: ishUk(337224, 'ishares-core-global-aggregate-bond-ucits-etf') },
+];
+
+// US index mutual funds, under MF › US funds (US assets only), all from Tiingo with dividends. VFINX, the first index
+// fund (1976): Tiingo's rows carry no dividends before 1980-03-27, so it starts there (the earlier rows would show
+// price only). The rest are typed launch dates, to be checked against Tiingo's first rows.
+const US_FUNDS = [
+  { asset: 'S&P 500', name: 'Vanguard 500 Index Fund Investor Shares', code: 'VFINX', manual: '1980-03-27', manualSrc: 'tiingoDiv' },
+  { asset: 'S&P 500', name: 'Fidelity 500 Index Fund', code: 'FXAIX', manual: '1988-02-17' },
+  { asset: 'S&P 500', name: 'Schwab S&P 500 Index Fund', code: 'SWPPX', manual: '1997-05-19' },
+  { asset: 'Nasdaq 100', name: 'Rydex Nasdaq-100 Fund Investor Class', code: 'RYOCX', manual: '1994-02-14' },
+  { asset: 'Nasdaq 100', name: 'Victory Nasdaq-100 Index Fund', code: 'USNQX', manual: '2000-10-27' },
 ];
 
 // Indices: one instrument per asset, the benchmark itself. Start dates are only given where the
@@ -327,13 +361,14 @@ const INDICES = [
   // Start dates are the oldest rows NSE Indices returns for each Total Returns Index (measured by calling the same
   // endpoint the historical data page uses, on 2026-09-26).
   ...[['Nifty 50', '1999-06-30'], ['Nifty Next 50', '2002-11-08'], ['Nifty Midcap 150', '2005-04-01'], ['Nifty Smallcap 250', '2005-04-01']].map(([a, since]) => ({ cls: 'equity', region: 'india', asset: a, name: `${a} TRI`, how: 'nseTri', ccy: 'INR', links: [L('NSE Indices historical data', NSE_HIST)], since })),
-  // S&P 500, both from Yahoo Finance, both with a genuine "Max" button (not a param bypass, confirmed by clicking
-  // it on 2026-09-27 for ^GSPC and live again on 2026-09-28 for ^SP500TR): ^GSPC (price only) back to 1927, further
-  // than S&P DJI's own site (10 years only) allows; ^SP500TR (Total Return, the Acc-equivalent series -- dividends
-  // reinvested into the index level) genuinely from 1988-01-04, confirmed 9,756 rows live. Kept as two rows, not a
-  // swap: ^SP500TR does not reach back anywhere near as far as ^GSPC's own price-only history.
-  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 (^GSPC, price only)', how: 'yahoo', ccy: 'USD', since: '1927-12-30', src: 'yahoo', ret: 'Price only', links: [L('^GSPC on Yahoo Finance', 'https://finance.yahoo.com/quote/%5EGSPC/history/')] },
-  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 Total Return (^SP500TR)', how: 'yahoo', ccy: 'USD', since: '1988-01-04', src: 'yahoo', ret: 'Total return', links: [L('^SP500TR on Yahoo Finance', 'https://finance.yahoo.com/quote/%5ESP500TR/history/')] },
+  // S&P 500, both from Yahoo Finance (its "Max" range, confirmed 2026-09-27/28): ^GSPC (price only) back to 1927,
+  // further than S&P DJI's own site (10 years only) allows; ^SP500TR (Total Return, dividends reinvested into the
+  // index level) from 1988-01-04, 9,756 rows. Kept as entries even though Yahoo has no download button (its export
+  // is a paid feature): Xfina links the full range and reads Yahoo's columns, but offers no bookmark; how the table
+  // becomes a file is up to the user. For a downloadable S&P 500 total return, IVV (iShares, from 2000) and VFINX
+  // (Tiingo, from 1980) carry their dividends.
+  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 (^GSPC, price only)', how: 'yahoo', ccy: 'USD', since: '1927-12-30', src: 'yahoo', ret: 'Price only', links: [L('^GSPC history, full range', yahooRange('^GSPC', '1927-12-30'))] },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', name: 'S&P 500 Total Return (^SP500TR)', how: 'yahoo', ccy: 'USD', since: '1988-01-04', src: 'yahoo', ret: 'Total return', links: [L('^SP500TR history, full range', yahooRange('^SP500TR', '1988-01-04'))] },
   // Nasdaq-100: Nasdaq's own index portal (indexes.nasdaq.com, a different site from the nasdaq.com consumer page,
   // whose own calendar is ~10 years) has a real "All" range and a direct, no-login .xlsx export
   // (Index/ExportHistory/<symbol>?startDate=...&endDate=...&timeOfDay=EOD), confirmed live 2026-09-28: both NDX
@@ -413,47 +448,49 @@ await indiaEtfs();
 // Feeder ETFs are listed under Indian ETFs (below), so only the funds are taken here.
 for (const d of FEEDERS) await fromSchemes(d, 'us', 'equity', { etfs: false });
 console.log('Reading ETF inception dates ...');
-// Issuer NAV history, found and checked by hand on 2026-09-27 (see nse-data-sources notes): iShares' own "Data
-// Download" file covers every iShares fund on both the US and UK sites; State Street publishes the same for SPY and
-// GLD. Where none is known yet (VOO, QQQ, VUAA, PHYS, BIL, BNDW) the row still falls back to Yahoo's market price.
-const SSGA_NAV = new Set(['SPY', 'BIL']);
-const SPDR_GOLD_NAV = new Set(['GLD']);
+// Each ETF's source, from the ETFS entry: an iShares page (issuer NAV file, found and checked by hand 2026-09-27/
+// 2026-10-02), SPDR Gold's own archive for GLD, Tiingo for US-listed funds with no issuer download, WSJ for the
+// non-US gold listings. Every entry names one; there is no fallback source.
 const etfInst = await pool(ETFS, 6, async (e) => {
   let inception = e.manual || null, dateSource = e.manual ? (e.manualSrc || 'manual') : null;
   if (e.page) { const d = await isharesInception(e.page); if (d) { inception = d; dateSource = 'issuer'; } else console.warn(`  ! no inception found on ${e.page}`); }
   const ishMatch = e.page && e.page.match(/ishares\.com\/(us\/products|uk\/individual\/en\/products|ch\/individual\/en\/products)\/(\d+)\//);
-  let how = 'yahoo', returnType = 'Market price', links;
+  let how, returnType, links;
   if (ishMatch) {
     how = 'ishares'; returnType = 'NAV';
     const site = ishMatch[1];
     const navUrl = site.startsWith('us') ? ishNavUs(ishMatch[2]) : site.startsWith('uk') ? ishNavUk(ishMatch[2]) : await ishNavCh(e.page);
     if (!navUrl) console.warn(`  ! no NAV download link found on ${e.page}`);
     links = navUrl ? [L(`${e.code} NAV history (Excel)`, navUrl), L(`${e.code} fund page`, e.page)] : [L(`${e.code} fund page`, e.page)];
-  } else if (SSGA_NAV.has(e.code)) {
-    how = 'ssga'; returnType = 'NAV';
-    links = [L(`${e.code} NAV history (Excel)`, ssgaNav(e.code))];
-  } else if (SPDR_GOLD_NAV.has(e.code)) {
+  } else if (e.src === 'spdrgold') {
     how = 'spdrgold'; returnType = 'NAV';
     links = [L(`${e.code} historical data (Excel)`, 'https://api.spdrgoldshares.com/api/v1/historical-archive?product=gld&exchange=NYSE&lang=en')];
-  } else {
-    links = e.links || [L(`${e.code} fund page`, e.page)];
-    if (e.page && e.links) links.unshift(L(`${e.code} fund page`, e.page));
-  }
-  if (e.extra) links.push(...e.extra);
+  } else if (e.src === 'tiingo') {
+    how = 'tiingo'; returnType = 'Market price';
+    links = [L(`${e.code} on Tiingo`, tiingo(e.code))];
+  } else if (e.src === 'wsj') {
+    how = 'wsj'; returnType = 'Market price';
+    links = [L(`${e.code} on WSJ`, wsjPage(e.wsj)), L(`${e.code} download (CSV)`, wsjDownload(e.wsj, inception))];
+  } else throw new Error(`no source for ${e.code}`);
   return { e, inst: { id: `etf-${e.code.toLowerCase()}`, name: e.name, code: e.code, inception, dateSource, ccy: 'USD', returnType, how, kind: 'ETF', links } };
 });
 for (const { e, inst } of etfInst) {
   const n = node(e.cls, e.region, 'etf', e.listing, e.asset);
   n.instruments.push({ ...inst, asset: e.asset });
 }
+for (const f of US_FUNDS) {
+  node('equity', 'us', 'mf', 'usfund', f.asset).instruments.push({
+    id: `usmf-${f.code.toLowerCase()}`, name: f.name, code: f.code, inception: f.manual, dateSource: f.manualSrc || 'manual',
+    ccy: 'USD', returnType: 'NAV', how: 'tiingo', kind: 'MF', links: [L(`${f.code} on Tiingo`, tiingo(f.code))],
+  });
+}
 // Indian ETFs that track US indices: listed on NSE in INR. Global equity has none: the Hang Seng ones do not
 // follow the MSCI indexes that Global equity is built on. The date is the first NAV AMFI holds
 // for the same fund, found by name, so nothing here is typed.
 const FOREIGN = [
+  // Only the plain index: the S&P 500 Top 50, NYSE FANG+ and Nasdaq Q-50 ETFs are factor or subset indexes, not the
+  // S&P 500 or Nasdaq-100 the rest of the catalogue compares. NSE lists no plain S&P 500 ETF.
   { sym: 'MON100', name: 'Motilal Oswal Nasdaq 100 ETF', region: 'us', asset: 'Nasdaq 100', re: /motilal.*nasdaq\s*100 etf/i },
-  { sym: 'MASPTOP50', name: 'Mirae Asset S&P 500 Top 50 ETF', region: 'us', asset: 'S&P 500 Top 50', re: /mirae.*s&p 500 top 50 etf\s*$/i },
-  { sym: 'MAFANG', name: 'Mirae Asset NYSE FANG+ ETF', region: 'us', asset: 'NYSE FANG+', re: /mirae.*fang.*etf\s*$/i },
-  { sym: 'MONQ50', name: 'Motilal Oswal Nasdaq Q 50 ETF', region: 'us', asset: 'Nasdaq Q-50', re: /motilal.*nasdaq q.?50 etf/i },
 ];
 console.log('Reading Indian ETFs on foreign indices ...');
 for (const f of FOREIGN) {

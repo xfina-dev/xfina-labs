@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { ArrowLeft, ExternalLink, X, Check, Bookmark, ShieldCheck } from 'lucide-vue-next';
+import { ArrowLeft, ExternalLink, X, Check, Bookmark, ShieldCheck, FileSpreadsheet } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
-import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
+import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, CUSTOM_FORMAT, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
@@ -91,9 +91,9 @@ watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } c
 // on its row.
 //
 // Sites are in a fixed order: by where the source is (India, then US, then global), and within each, index
-// publisher before exchange prices before fund NAVs. A site that serves more than one region (Yahoo Finance,
-// iShares) sits with the first. Within a site, datasets go Index before ETF before MF.
-const SITE_ORDER = ['NSE Indices', 'NSE', 'MCX', 'AMFI', 'Nasdaq', 'Yahoo Finance', 'iShares', 'SSGA', 'SPDR Gold Shares', 'MSCI'];
+// publisher before exchange prices before fund NAVs. A site that serves more than one region (iShares, Tiingo,
+// WSJ) sits with the first. Within a site, datasets go Index before ETF before MF.
+const SITE_ORDER = ['NSE Indices', 'NSE', 'MCX', 'AMFI', 'Nasdaq', 'Yahoo Finance', 'iShares', 'SPDR Gold Shares', 'Tiingo', 'WSJ', 'MSCI'];
 const siteRank = (site) => (SITE_ORDER.includes(site) ? SITE_ORDER.indexOf(site) : SITE_ORDER.length);
 const VEHICLE_ORDER = { index: 0, etf: 1, mf: 2 };
 const vehicleRank = (i) => VEHICLE_ORDER[i.vehicle] ?? 3;
@@ -387,14 +387,40 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           </div>
 
           <!-- What is particular to this site's bookmark -->
-          <p v-if="g.bookmarklet && (g.bookmarklet.oneShot || g.bookmarklet.skipped || g.bookmarklet.caution)" class="text-xs text-muted-foreground">
-            <template v-if="g.bookmarklet.oneShot">This bookmark saves one ticker per click: open a ticker's page from its row, click the bookmark and press Start. If the page isn't at that range yet, it reloads there first; click the bookmark again and press Start. </template>
+          <p v-if="g.bookmarklet && (g.bookmarklet.skipped || g.bookmarklet.caution)" class="text-xs text-muted-foreground">
             <template v-if="g.bookmarklet.skipped">It doesn't cover {{ g.bookmarklet.skipped }} of these, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} by hand. </template>
             {{ g.bookmarklet.caution }}
           </p>
         </CardContent>
       </Card>
       </div>
+    </section>
+
+    <!-- Bring your own data: one format for any dataset, whatever its source -->
+    <section id="custom" class="rounded-md border bg-muted/30 p-4 space-y-3 text-sm scroll-mt-8">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <div class="flex items-center gap-2 font-semibold"><FileSpreadsheet class="h-4 w-4" />Your own data</div>
+        <span class="text-muted-foreground">Any dataset can come from a file you already have, in this format: Tiingo's daily layout, the most complete free one.</span>
+      </div>
+      <div class="overflow-x-auto rounded-md border bg-background">
+        <table class="w-full min-w-[560px] text-sm">
+          <tbody>
+            <tr v-for="[col, need, what] in CUSTOM_FORMAT.columns" :key="col" class="border-t first:border-t-0">
+              <td class="px-3 py-1.5 whitespace-nowrap font-mono text-xs">{{ col }}</td>
+              <td class="px-3 py-1.5 whitespace-nowrap"><Tag :variant="need === 'required' ? 'ok' : undefined">{{ need }}</Tag></td>
+              <td class="px-3 py-1.5 text-muted-foreground">{{ what }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="list-disc pl-5 space-y-0.5 text-muted-foreground">
+        <li v-for="n in CUSTOM_FORMAT.notes" :key="n">{{ n }}</li>
+      </ul>
+      <!-- An illustration of the layout, not real prices -->
+      <pre class="overflow-x-auto rounded-md border bg-background p-3 text-xs leading-5">date,close,divCash,splitFactor
+2024-03-14,100.00,0,1
+2024-03-15,100.40,0.45,1
+2024-03-18,50.30,0,2</pre>
     </section>
 
     <!-- A click on an Xfina button: it is meant to be dragged, not clicked here -->

@@ -21,10 +21,12 @@ export const REGIONS = [
   { id: 'us', title: 'US', blurb: 'USD, US markets' },
   { id: 'global', title: 'Global', blurb: 'USD, world-wide markets' },
 ];
-// Mutual fund plans. Regular first: it is the default because it has the longer history.
+// Mutual fund plans. Regular first: it is the default because it has the longer history. US funds are a third
+// choice for US assets only: US-domiciled index mutual funds (Vanguard's 500 Index Fund from 1976), not Indian plans.
 export const PLANS = [
   { id: 'regular', title: 'Regular', blurb: 'More history, higher cost' },
   { id: 'direct', title: 'Direct', blurb: 'Cheaper, history from 2013' },
+  { id: 'usfund', title: 'US funds', blurb: 'US index mutual funds, in USD' },
 ];
 export const VEHICLES = [
   { id: 'index', title: 'Index', blurb: 'The benchmark itself (total return)' },
@@ -93,32 +95,57 @@ export const HOW = {
     steps: ['Open Security-wise Archives (Equities).', 'Choose Security-wise price and volume data, then enter the ETF\'s symbol and the EQ series.', 'Set From and To at most 5 years apart (a longer range fetches nothing, with no error), so a long history is several downloads.', 'Download the file and import every part as it is.'],
     format: 'NSE\'s price and volume table, with a row per trading day. It is the exchange price, not NAV.',
   },
+  // Only the two S&P 500 index rows: Yahoo is the one free place with the index itself back to 1927 (price) and
+  // 1988 (total return). Yahoo has no download button (exporting history is a paid Yahoo feature), so Xfina offers
+  // no bookmark here: it links the index's history page at its full range and reads Yahoo's own column layout.
   yahoo: {
     site: 'Yahoo Finance',
     terms: 'https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html',
-    title: 'Yahoo Finance: price history (copy the table; there is no download button)',
+    title: 'Yahoo Finance: S&P 500 index history (no download button)',
     steps: [
-      'Open the history page for the ticker. Yahoo removed its Download button, so the table on this page is the data.',
-      'In the date-range picker, set the start as early as it goes (back past the fund\'s launch is fine) and the end to today, and keep the frequency Daily.',
-      'Select the whole table, header row included, and copy it.',
-      'Paste it at A1 of a new Google Sheet (or Excel), then download it as CSV (in Sheets: File › Download › Comma-separated values).',
-      'Name the file after the ticker, for example VOO.csv, and import it. Keep the header in the first row; don\'t add a title above it.',
+      'Open the index\'s history link below: it is already set to the full range, daily.',
+      'Yahoo has no download button for free accounts (exporting history is part of its paid plans), so how you get the table into a file is up to you, within Yahoo\'s terms.',
+      'Save it as CSV with Yahoo\'s own columns, named after the index, for example SP500TR.csv, and import it.',
     ],
-    format: 'Date, Open, High, Low, Close, Adj Close and Volume, as shown on the page. Adj Close includes dividends. This is exchange price, not the fund\'s own NAV; used only where no issuer or exchange NAV history is available.',
+    format: 'Date, Open, High, Low, Close, Adj Close and Volume, one row per day, as Yahoo shows them. For an index Close and Adj Close are the same; the Total Return index already includes dividends.',
+  },
+  // US-listed funds with no issuer download (QQQ, VOO, SPY, BNDW, SGOL) and US index mutual funds (VFINX and others).
+  // Tiingo's free plan gives the full history, with each dividend and split stated (checked 2026-10-02: QQQ within
+  // 0.1% and VOO within 0.5% of Yahoo's Adj Close, VFINX's dividends complete from 1980). Its API refuses calls from
+  // other websites, so Xfina's bookmark runs on tiingo.com itself, where it may call Tiingo's API with your token.
+  tiingo: {
+    site: 'Tiingo',
+    page: 'https://www.tiingo.com/',
+    pageLabel: 'tiingo.com',
+    terms: 'https://www.tiingo.com/about/terms',
+    title: 'Tiingo: daily prices with dividends and splits',
+    steps: [
+      'Create a free Tiingo account and copy your API token (signed in: Account, API, Token).',
+      'Open tiingo.com and click the Xfina · Tiingo bookmark. It asks for the token once and keeps it in this browser only (on tiingo.com), then saves one CSV per fund.',
+      'By hand instead: for each ticker open https://api.tiingo.com/tiingo/daily/<ticker>/prices?startDate=1970-01-01&format=csv&token=<your token>, save the CSV, and name it after the ticker.',
+    ],
+    format: 'Tiingo\'s CSV: date, close, high, low, open, volume, adjClose, adjHigh, adjLow, adjOpen, adjVolume, divCash, splitFactor. close is the price as traded on the day; divCash is the cash dividend on its ex-date and splitFactor any split, so the total return can be rebuilt and checked (adjClose has both applied). A mutual fund\'s close is its NAV. Tiingo\'s free plan is for personal use.',
+  },
+  // Exchange-listed gold funds outside the US (London, SIX) and PHYS: no issuer download, but WSJ's historical
+  // prices page offers a spreadsheet download for the full range its own date picker allows. Gold pays no
+  // dividends, so WSJ's price-only file loses nothing for these.
+  wsj: {
+    site: 'WSJ',
+    terms: 'https://www.wsj.com/policy/terms-of-use',
+    title: 'WSJ: historical prices',
+    steps: [
+      'Open the fund\'s Historical Prices page on WSJ (the link on its row).',
+      'In the page\'s date picker set the start to the fund\'s launch (or earlier) and the end to today, then download the spreadsheet. The Download link on its row is that same request, already set to the full range.',
+      'WSJ names every file HistoricalPrices.csv: rename it after the ticker, for example SGLD.csv, and import it.',
+    ],
+    format: 'Date, Open, High, Low, Close, Volume, newest first, dates as MM/DD/YY. Price only: no dividends (none of the gold funds taken from here pay any). Exchange holidays can appear as a row with volume 0 and the previous close, which the importer skips.',
   },
   ishares: {
     site: 'iShares',
     terms: 'https://www.blackrock.com/corporate/compliance/terms-and-conditions',
     title: 'iShares: NAV history',
     steps: ['Open the fund page.', 'Press its "Data Download" link.', 'Open the Historical (US funds) or Historical NAVs (UCITS funds) sheet. It is the full daily history from launch.'],
-    format: 'An Excel/XML file with a date and the NAV per share, as iShares publishes it. An accumulating fund\'s NAV already includes income.',
-  },
-  ssga: {
-    site: 'SSGA',
-    terms: 'https://www.ssga.com/us/en/intermediary/etfs/footer/terms-and-conditions',
-    title: 'State Street: NAV history',
-    steps: ['Open the fund page.', 'Press "Most Recent NAV / NAV History".', 'The download is the full daily NAV history from launch.'],
-    format: 'An Excel file with a date, the NAV, shares outstanding and total net assets, as State Street publishes it.',
+    format: 'An Excel/XML file with a date and the NAV per share, as iShares publishes it. US funds add an Ex-Dividends column (each dividend on its ex-date) and a Distributions sheet, so their total return can be rebuilt; an accumulating fund\'s NAV already includes income.',
   },
   spdrgold: {
     site: 'SPDR Gold Shares',
@@ -153,7 +180,26 @@ export const HOW = {
 };
 
 
-const DATE_SOURCE = { direct: 'Direct plans began on 1 Jan 2013', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices', yahoo: 'first row on Yahoo Finance', mcx: 'first row on MCX Spot Market Price', nasdaq: 'first row on Nasdaq\'s own index history' };
+// Bring your own data: the format Xfina will read for any dataset, whatever its source. It is Tiingo's daily
+// layout, the most complete free one (price as traded, plus each dividend and split), so a Tiingo file needs no
+// change and any other source can be mapped onto it. Only date and close are required.
+export const CUSTOM_FORMAT = {
+  columns: [
+    ['date', 'required', 'ISO date, YYYY-MM-DD, one row per trading day'],
+    ['close', 'required', 'Closing price (or NAV, or index level) as published on the day'],
+    ['open, high, low, volume', 'optional', 'As published on the day'],
+    ['divCash', 'optional', 'Cash dividend per unit, on its ex-date; 0 on other days'],
+    ['splitFactor', 'optional', 'Split on that day (2 for a 2-for-1 split, 0.5 for a 1-for-2 reverse split); 1 on other days'],
+    ['adjClose, adjOpen, adjHigh, adjLow, adjVolume', 'optional', 'The same, adjusted for every dividend and split'],
+  ],
+  notes: [
+    'Header row first, comma-separated, one file per dataset, named after its ticker (for example VOO.csv).',
+    'With divCash (and splitFactor where there was a split), the total return is rebuilt from close. Without them, Xfina takes close as already including dividends only for a total-return index or an accumulating fund.',
+    'A Tiingo CSV is already in this format; a Yahoo file maps Adj Close onto adjClose.',
+  ],
+};
+
+const DATE_SOURCE = { direct: 'Direct plans began on 1 Jan 2013', amfi: 'first NAV on AMFI', issuer: 'issuer\'s inception date', manual: 'launch date, not yet verified', publisher: 'publisher\'s start date', nse: 'first row on NSE Indices', yahoo: 'first row on Yahoo Finance', mcx: 'first row on MCX Spot Market Price', nasdaq: 'first row on Nasdaq\'s own index history', tiingo: 'first row on Tiingo', tiingoDiv: 'first Tiingo row with dividends recorded (earlier rows lack them)', wsj: 'first row on WSJ' };
 export const dateNote = (i) => (i.inception ? `History from ${i.inception}` : i.kind === 'Index' ? 'Full published history' : 'Listing date not recorded');
 // Whole years of history up to today, rounded down; null when the start date is not known.
 export const yearsOf = (i) => (i.inception ? Math.max(0, Math.floor((Date.now() - new Date(i.inception).getTime()) / (365.2425 * 864e5))) : null);
@@ -204,7 +250,8 @@ export const indexesFor = (cls, region) => nodes.filter((n) => n.class === cls &
 // just not paid to anyone). MCX's spot price is left blank rather than guessed (no return concept at all).
 export function distFlag(i) {
   if (i.kind === 'Index') return /total return/i.test(i.returnType || '') ? 'Acc' : i.returnType === 'Price only' ? 'Dist' : null;
-  if (i.kind === 'MF') return 'Acc';
+  // A US mutual fund pays its income out (the same '40 Act rule as a US ETF, below); Indian funds here are Growth.
+  if (i.kind === 'MF') return i.listing === 'usfund' ? 'Dist' : 'Acc';
   if (i.kind !== 'ETF' || i.asset === 'Gold') return null;
   if (i.region === 'india' || i.listing === 'india') return 'Acc';
   if (/\(Acc\)/i.test(i.name)) return 'Acc';

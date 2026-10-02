@@ -5,7 +5,7 @@
 import nseIndices from './bookmarklets/nse-indices.js?raw';
 import nseEtf from './bookmarklets/nse-etf.js?raw';
 import amfiNav from './bookmarklets/amfi-nav.js?raw';
-import yahooFinance from './bookmarklets/yahoo-finance.js?raw';
+import tiingo from './bookmarklets/tiingo.js?raw';
 import mcxSpot from './bookmarklets/mcx-spot.js?raw';
 import core from './bookmarklets/core.js?raw';
 import { bookmarkletHref } from './bookmarklet.js';
@@ -75,30 +75,22 @@ const BUILDERS = {
       skipped: items.length - etfs.length,
     };
   },
-  // Yahoo Finance: only for the handful of funds with no issuer, exchange or index NAV source. Takes no per-item
-  // parameters; it works whichever ticker's own history page is open when it's clicked, one file per click.
-  'Yahoo Finance': (items) => {
-    // Yahoo's own ticker in the page address (e.g. VUAA.L for the LSE listing, or %5EGSPC for an index) can differ
-    // from the catalogue's display code, or an index row may have no `code` at all; it only lives in the item's own
-    // Yahoo link, so read it from there (decoded, matching what the bookmark's own decodeURIComponent produces).
-    const yTicker = (i) => {
-      const m = i.links.find((l) => l.url.includes('finance.yahoo.com'))?.url.match(/\/quote\/([^/]+)\//);
-      return m ? decodeURIComponent(m[1]) : i.code;
-    };
-    const label = (i) => i.code || yTicker(i);
-    const starts = Object.fromEntries(items.filter((i) => i.inception).map((i) => [yTicker(i), i.inception]));
+  // Tiingo: US-listed funds with no issuer download and US index mutual funds, from Tiingo's API with the user's own
+  // free token (asked for once on tiingo.com, kept there). Yahoo Finance has no bookmark: it has no download button
+  // (its export is a paid feature), so Xfina only links its pages.
+  Tiingo: (items) => {
+    const funds = items.filter((i) => i.how === 'tiingo' && i.code);
+    if (!funds.length) return null;
     return {
-      site: 'Yahoo Finance',
-      openUrl: `https://finance.yahoo.com/quote/${encodeURIComponent(yTicker(items[0]))}/history/`,
-      openLabel: `Open ${label(items[0])} on Yahoo Finance`,
-      termsUrl: 'https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html',
-      label: 'Xfina · Yahoo Finance',
-      href: bookmarkletHref(withCore(yahooFinance), { STARTS: starts }),
-      indexes: items.map(label),
+      site: 'Tiingo',
+      ...open(HOW.tiingo),
+      termsUrl: HOW.tiingo.terms,
+      label: 'Xfina · Tiingo',
+      href: bookmarkletHref(withCore(tiingo), { TICKERS: funds.map((i) => [i.code.toLowerCase(), i.name, i.inception]) }),
+      indexes: funds.map((i) => i.code),
       action: 'Start',
-      oneShot: true,
-      caution: 'Yahoo\'s terms bar automated collection for any purpose, with no personal-use exception, and Yahoo removed its own download button. This bookmark opens a small panel on the ticker\'s own history page and, on a click, saves the same table you would otherwise copy out by hand: nothing it could not equally get by a person reading the page. Used only where no fund, exchange or index has a real download.',
-      skipped: 0,
+      caution: 'Uses your own free Tiingo API token, asked for once and kept in your browser on tiingo.com only; Tiingo\'s free plan is for personal use.',
+      skipped: items.length - funds.length,
     };
   },
   // MCX's own Spot Market Price Archives, for the spot indexes it polls (gold only, at Ahmedabad, for now).
