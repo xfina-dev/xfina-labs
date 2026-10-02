@@ -270,7 +270,10 @@ export function distFlag(i) {
 
 // The sources a dataset can come from, best first: its own (the catalogue's choice), any alternatives (e.g. Tiingo for
 // a US-listed iShares fund), and the user's own file. Each is { how, links }.
-export const sourcesOf = (i) => [{ how: i.how, links: i.links }, ...(i.alts || []), { how: 'custom', links: [] }];
+// India's own sources (NSE Indices, NSE, MCX, AMFI) are the real publishers, so their datasets offer no other
+// source, nor the user's own file: the official data is free and complete there.
+const INDIA_SOURCES = new Set(['nseTri', 'nseEtf', 'mcxSpot', 'amfi']);
+export const sourcesOf = (i) => (INDIA_SOURCES.has(i.how) ? [{ how: i.how, links: i.links }] : [{ how: i.how, links: i.links }, ...(i.alts || []), { how: 'custom', links: [] }]);
 
 // Whether a dataset, taken from a given source, gives its total return or its price only, and why. The total return
 // is there when the income is already inside the number (a total-return index, an accumulating fund, gold, which has
