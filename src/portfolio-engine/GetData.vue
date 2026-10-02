@@ -273,7 +273,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                     <div class="flex items-center justify-end gap-1.5">
                       <Select :modelValue="sourceOf(i)" @update:modelValue="(v) => setSource(i, v)">
                         <SelectTrigger class="h-9 w-28 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
-                        <SelectContent>
+                        <SelectContent :body-lock="false">
                           <SelectGroup><SelectItem v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</SelectItem></SelectGroup>
                         </SelectContent>
                       </Select>
