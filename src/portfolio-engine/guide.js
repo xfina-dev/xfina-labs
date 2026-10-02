@@ -170,6 +170,13 @@ export const HOW = {
     steps: ['Open the index\'s History tab (indexes.nasdaq.com, not the nasdaq.com consumer page, whose own date range is much shorter).', 'Under Performance, press All.', 'Press Download. No account is needed.'],
     format: 'An Excel file with a date and the index level daily, as Nasdaq publishes it, back to the index\'s own start.',
   },
+  // Every dataset can also come from a file the user already has, in the format described on the page (CUSTOM_FORMAT).
+  custom: {
+    site: 'Your own data',
+    title: 'Your own file',
+    steps: ['Make one CSV per dataset in the format under Your own data, at the end of this page, named after its ticker (for example VOO.csv).', 'Import it in Portfolio Engine.'],
+    format: 'date and close at least. With divCash (and splitFactor where there was a split) the total return is rebuilt from close.',
+  },
   mcxSpot: {
     site: 'MCX',
     page: 'https://www.mcxindia.com/market-data/spot-market-price',
@@ -259,6 +266,31 @@ export function distFlag(i) {
   if (/\(Acc\)/i.test(i.name)) return 'Acc';
   if (/\(Dist\)/i.test(i.name)) return 'Dist';
   return 'Dist';
+}
+
+// The sources a dataset can come from, best first: its own (the catalogue's choice), any alternatives (e.g. Tiingo for
+// a US-listed iShares fund), and the user's own file. Each is { how, links }.
+export const sourcesOf = (i) => [{ how: i.how, links: i.links }, ...(i.alts || []), { how: 'custom', links: [] }];
+
+// Whether a dataset, taken from a given source, gives its total return or its price only, and why. The total return
+// is there when the income is already inside the number (a total-return index, an accumulating fund, gold, which has
+// no income) or when the source lists each dividend beside the price (iShares' US files, Tiingo, Yahoo's Adj Close).
+// A distributing fund from a price-only source (WSJ, an exchange's price table) is missing its dividends. Splits
+// are handled by every source here: adjusted in the price, or stated (Tiingo's splitFactor). `ok` is null when it
+// depends on the user's own file.
+const DIV_LISTED = { tiingo: 'Tiingo lists each dividend (divCash) and split beside the price, so the total return is rebuilt from them.', ishares: 'iShares\' file lists each dividend on its ex-date (the Ex-Dividends column), so the total return is rebuilt from it.', yahoo: 'Yahoo\'s Adj Close includes every dividend and split.' };
+export function returnsFor(i, how = i.how) {
+  const total = (why) => ({ ok: true, label: 'Total return', why });
+  if (how === 'custom') return { ok: null, label: 'Your file', why: 'Total return if your file has divCash (and splitFactor), or if this is a total-return index or an accumulating fund; otherwise price only.' };
+  if (i.kind === 'Index') {
+    if (/total return/i.test(i.returnType || '')) return total('A total-return index: dividends are reinvested in the index level.');
+    if (i.returnType === 'Price only') return { ok: false, label: 'Price only', why: 'A price index: it leaves dividends out, so it understates the return by the dividend yield.' };
+    return total('Gold has no income: the spot price is the whole return.');
+  }
+  if (i.asset === 'Gold') return total('Gold pays no income: the price is the whole return.');
+  if (distFlag(i) === 'Acc') return total('Accumulating: income stays in the fund, so its NAV (or price) already includes it.');
+  if (DIV_LISTED[how]) return total(DIV_LISTED[how]);
+  return { ok: false, label: 'Price only', why: 'This fund pays its income out, and this source has prices only, so the dividends are missing.' };
 }
 
 export function findDataset(id) {

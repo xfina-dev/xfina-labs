@@ -1806,7 +1806,18 @@
        "url": "https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf"
       }
      ],
-     "asset": "S&P 500"
+     "asset": "S&P 500",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "IVV on Tiingo",
+         "url": "https://www.tiingo.com/ivv/overview"
+        }
+       ]
+      }
+     ]
     },
     {
      "id": "etf-voo",
@@ -2055,7 +2066,18 @@
        "url": "https://www.ishares.com/us/products/239600/ishares-msci-acwi-etf"
       }
      ],
-     "asset": "MSCI ACWI"
+     "asset": "MSCI ACWI",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "ACWI on Tiingo",
+         "url": "https://www.tiingo.com/acwi/overview"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -2086,7 +2108,18 @@
        "url": "https://www.ishares.com/us/products/239637/ishares-msci-emerging-markets-etf"
       }
      ],
-     "asset": "MSCI Emerging Markets"
+     "asset": "MSCI Emerging Markets",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "EEM on Tiingo",
+         "url": "https://www.tiingo.com/eem/overview"
+        }
+       ]
+      }
+     ]
     },
     {
      "id": "etf-iemg",
@@ -2108,7 +2141,18 @@
        "url": "https://www.ishares.com/us/products/244050/ishares-core-msci-emerging-markets-etf"
       }
      ],
-     "asset": "MSCI Emerging Markets"
+     "asset": "MSCI Emerging Markets",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "IEMG on Tiingo",
+         "url": "https://www.tiingo.com/iemg/overview"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -2139,7 +2183,18 @@
        "url": "https://www.ishares.com/us/products/239696/ishares-msci-world-etf"
       }
      ],
-     "asset": "MSCI World"
+     "asset": "MSCI World",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "URTH on Tiingo",
+         "url": "https://www.tiingo.com/urth/overview"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -2165,7 +2220,18 @@
        "url": "https://api.spdrgoldshares.com/api/v1/historical-archive?product=gld&exchange=NYSE&lang=en"
       }
      ],
-     "asset": "Gold"
+     "asset": "Gold",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "GLD on Tiingo",
+         "url": "https://www.tiingo.com/gld/overview"
+        }
+       ]
+      }
+     ]
     },
     {
      "id": "etf-iau",
@@ -2187,7 +2253,18 @@
        "url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund"
       }
      ],
-     "asset": "Gold"
+     "asset": "Gold",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "IAU on Tiingo",
+         "url": "https://www.tiingo.com/iau/overview"
+        }
+       ]
+      }
+     ]
     },
     {
      "id": "etf-sgol",
@@ -2289,7 +2366,18 @@
        "url": "https://www.wsj.com/market-data/quotes/etf/PHYS/historical-prices/download?MOD_VIEW=page&num_rows=6063&range_days=6063&startDate=02/26/2010&endDate=10/02/2026"
       }
      ],
-     "asset": "Gold"
+     "asset": "Gold",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "PHYS on Tiingo",
+         "url": "https://www.tiingo.com/phys/overview"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -2373,7 +2461,18 @@
        "url": "https://www.ishares.com/us/products/239466/ishares-short-treasury-bond-etf"
       }
      ],
-     "asset": "Short duration"
+     "asset": "Short duration",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "SHV on Tiingo",
+         "url": "https://www.tiingo.com/shv/overview"
+        }
+       ]
+      }
+     ]
     },
     {
      "id": "etf-sgov",
@@ -2395,7 +2494,18 @@
        "url": "https://www.ishares.com/us/products/314116/ishares-0-3-month-treasury-bond-etf"
       }
      ],
-     "asset": "Short duration"
+     "asset": "Short duration",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "SGOV on Tiingo",
+         "url": "https://www.tiingo.com/sgov/overview"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -2426,7 +2536,18 @@
        "url": "https://www.ishares.com/us/products/239454/ishares-20-year-treasury-bond-etf"
       }
      ],
-     "asset": "Long duration"
+     "asset": "Long duration",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "TLT on Tiingo",
+         "url": "https://www.tiingo.com/tlt/overview"
+        }
+       ]
+      }
+     ]
     }
    ]
   },

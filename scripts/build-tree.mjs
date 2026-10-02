@@ -473,7 +473,11 @@ const etfInst = await pool(ETFS, 6, async (e) => {
     how = 'wsj'; returnType = 'Market price';
     links = [L(`${e.code} on WSJ`, wsjPage(e.wsj)), L(`${e.code} download (CSV)`, wsjDownload(e.wsj, inception))];
   } else throw new Error(`no source for ${e.code}`);
-  return { e, inst: { id: `etf-${e.code.toLowerCase()}`, name: e.name, code: e.code, inception, dateSource, ccy: 'USD', returnType, how, kind: 'ETF', links } };
+  // Other sources the user may pick instead (the guide adds "your own file" to every dataset). Tiingo carries every
+  // US-listed fund (PHYS trades on NYSE too), with dividends and splits; it needs the user's own free token.
+  const usListed = e.listing === 'us' || (e.cls === 'gold' && e.region === 'us') || e.code === 'PHYS';
+  const alts = usListed && how !== 'tiingo' ? [{ how: 'tiingo', links: [L(`${e.code} on Tiingo`, tiingo(e.code))] }] : undefined;
+  return { e, inst: { id: `etf-${e.code.toLowerCase()}`, name: e.name, code: e.code, inception, dateSource, ccy: 'USD', returnType, how, kind: 'ETF', links, ...(alts ? { alts } : {}) } };
 });
 for (const { e, inst } of etfInst) {
   const n = node(e.cls, e.region, 'etf', e.listing, e.asset);

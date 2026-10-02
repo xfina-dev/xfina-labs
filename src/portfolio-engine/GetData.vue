@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
-import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, CUSTOM_FORMAT, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
+import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, CUSTOM_FORMAT, sourcesOf, returnsFor, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
@@ -57,12 +57,35 @@ const fromHash = () => {
 };
 watch([cls, region, vehicle, listing], () => { try { history.replaceState(null, '', `#${toHash()}`); } catch { /* ignore */ } });
 
-// What the user added, by instrument id. Kept in this browser only.
-const STORE = 'xfina_labs_guide_selection_v3';
-const picked = ref([]);
-const has = (id) => picked.value.includes(id);
-const toggle = (id) => (picked.value = has(id) ? picked.value.filter((x) => x !== id) : [...picked.value, id]);
-const list = computed(() => picked.value.map(findDataset).filter(Boolean));
+// What the user picked: dataset id → the source chosen for it (its `how`). Kept in this browser only. A dataset
+// carries its own source plus any alternatives and the user's own file (sourcesOf); picking a source adds the
+// dataset from there, picking the chosen one again removes it. The list below takes each dataset as from its
+// chosen source, so the download cards, bookmarks and returns follow the choice.
+const STORE = 'xfina_labs_guide_selection_v4';
+const OLD_STORE = 'xfina_labs_guide_selection_v3';
+const picked = ref({});
+const chosen = (id) => picked.value[id] || null;
+const has = (id) => !!chosen(id);
+const choose = (id, how) => {
+  const next = { ...picked.value };
+  if (next[id] === how) delete next[id]; else next[id] = how;
+  picked.value = next;
+};
+const remove = (id) => { const next = { ...picked.value }; delete next[id]; picked.value = next; };
+// The source shown for a row: the chosen one once added, else what was set before adding, else the first (default).
+const draft = ref({});
+const sourceOf = (i) => chosen(i.id) || draft.value[i.id] || sourcesOf(i)[0].how;
+const setSource = (i, how) => {
+  if (has(i.id)) picked.value = { ...picked.value, [i.id]: how };
+  else draft.value = { ...draft.value, [i.id]: how };
+};
+const sourceLabel = (how) => (how === 'custom' ? 'Own file' : HOW[how].site);
+const list = computed(() => Object.entries(picked.value).map(([id, how]) => {
+  const d = findDataset(id);
+  if (!d) return null;
+  const s = sourcesOf(d).find((x) => x.how === how) || sourcesOf(d)[0];
+  return { ...d, how: s.how, links: s.links };
+}).filter(Boolean));
 // One row per asset (and region) inside each asset class, with what was picked under Index, ETF and MF.
 const selectedRows = computed(() => CLASSES.map((cls) => {
   const rows = new Map();
@@ -82,7 +105,15 @@ const regionTitle = (id) => REGIONS.find((r) => r.id === id)?.title || id;
 onMounted(() => {
   fromHash();
   window.addEventListener('hashchange', fromHash);
-  try { picked.value = JSON.parse(localStorage.getItem(STORE) || '[]'); } catch { /* storage blocked: start empty */ }
+  try {
+    const now = localStorage.getItem(STORE);
+    if (now) picked.value = JSON.parse(now);
+    else {
+      // A list saved before sources could be chosen: every dataset on its own source.
+      const old = JSON.parse(localStorage.getItem(OLD_STORE) || '[]');
+      picked.value = Object.fromEntries(old.map(findDataset).filter(Boolean).map((d) => [d.id, d.how]));
+    }
+  } catch { /* storage blocked: start empty */ }
 });
 watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch { /* ignore */ } }, { deep: true });
 
@@ -93,7 +124,7 @@ watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } c
 // Sites are in a fixed order: by where the source is (India, then US, then global), and within each, index
 // publisher before exchange prices before fund NAVs. A site that serves more than one region (iShares, Tiingo,
 // WSJ) sits with the first. Within a site, datasets go Index before ETF before MF.
-const SITE_ORDER = ['NSE Indices', 'NSE', 'MCX', 'AMFI', 'Nasdaq', 'Yahoo Finance', 'iShares', 'SPDR Gold Shares', 'Tiingo', 'WSJ', 'MSCI'];
+const SITE_ORDER = ['NSE Indices', 'NSE', 'MCX', 'AMFI', 'Nasdaq', 'Yahoo Finance', 'iShares', 'SPDR Gold Shares', 'Tiingo', 'WSJ', 'MSCI', 'Your own data'];
 const siteRank = (site) => (SITE_ORDER.includes(site) ? SITE_ORDER.indexOf(site) : SITE_ORDER.length);
 const VEHICLE_ORDER = { index: 0, etf: 1, mf: 2 };
 const vehicleRank = (i) => VEHICLE_ORDER[i.vehicle] ?? 3;
@@ -165,7 +196,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
       <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
         <div class="space-y-1.5">
           <CardTitle>Find your data</CardTitle>
-          <CardDescription>Pick as many datasets as you need. They collect below, grouped by website.</CardDescription>
+          <CardDescription>Pick a source for each dataset you need (pick it again to remove it). They collect below, grouped by website.</CardDescription>
         </div>
         <span class="shrink-0 text-sm text-muted-foreground"><span class="font-semibold text-foreground">{{ TOTAL }}</span> datasets</span>
       </CardHeader>
@@ -226,17 +257,30 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <td class="px-3 py-2 whitespace-nowrap">
                     <Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested (or, for an index, included in the level)' : 'Distributing: income is paid out, not reinvested (or, for an index, excluded from the level)'">{{ distFlag(i) }}</Tag>
                   </td>
-                  <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ HOW[i.how].site }}</td>
                   <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
-                  <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
+                  <!-- Total return or price only, for the chosen source (or the dataset's own, before one is picked) -->
+                  <td class="px-3 py-2 whitespace-nowrap">
+                    <Tag :variant="returnsFor(i, sourceOf(i)).ok === true ? 'ok' : returnsFor(i, sourceOf(i)).ok === false ? 'warn' : 'soon'" :title="`${i.returnType}. ${returnsFor(i, sourceOf(i)).why}`">{{ returnsFor(i, sourceOf(i)).label }}</Tag>
+                  </td>
                   <td class="px-3 py-2 whitespace-nowrap">
                     <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
                   </td>
                   <td class="px-3 py-2 text-right">
-                    <!-- Added looks like a selected filter tile above: a primary border on a faint primary tint -->
-                    <Button variant="outline" size="sm" class="w-28 justify-center" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="toggle(i.id)">
-                      <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
-                    </Button>
+                    <!-- The source, from the dataset's array (its own first, the default), and Add. Changing the source of
+                         an added dataset switches it; before adding, it sets where Add takes it from. Added looks like a
+                         selected filter tile above: a primary border on a faint primary tint. -->
+                    <div class="flex items-center justify-end gap-1.5">
+                      <select
+                        class="h-8 rounded-md border bg-background px-2 text-sm text-muted-foreground"
+                        :value="sourceOf(i)" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"
+                        @change="setSource(i, $event.target.value)"
+                      >
+                        <option v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</option>
+                      </select>
+                      <Button variant="outline" size="sm" class="w-28 justify-center" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
+                        <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -260,7 +304,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
           <CardTitle>Selected</CardTitle>
           <CardDescription>{{ list.length ? `${list.length} dataset${list.length > 1 ? 's' : ''} across ${bySite.length} website${bySite.length > 1 ? 's' : ''}.` : 'Nothing selected yet. Add datasets above.' }}</CardDescription>
         </div>
-        <Button v-if="list.length" variant="ghost" size="sm" @click="picked = []">Clear all</Button>
+        <Button v-if="list.length" variant="ghost" size="sm" @click="picked = {}">Clear all</Button>
       </CardHeader>
       <CardContent>
         <div v-if="!list.length" class="rounded-md border border-dashed bg-muted/30 p-8 text-center text-sm text-muted-foreground">Nothing added yet.</div>
@@ -280,7 +324,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <td v-for="v in VEHICLES" :key="v.id" class="py-2 pr-3">
                   <div v-for="i in r.cells[v.id]" :key="i.id" class="flex items-start justify-between gap-1">
                     <span class="min-w-0">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name && HOW[i.how].site !== 'AMFI'">{{ i.code }}</Tag> <span class="text-xs text-muted-foreground">{{ HOW[i.how].site }}</span></span>
-                    <button type="button" class="shrink-0 text-muted-foreground hover:text-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></button>
+                    <button type="button" class="shrink-0 text-muted-foreground hover:text-foreground" title="Remove" @click="remove(i.id)"><X class="h-4 w-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -359,14 +403,14 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                     <td class="px-3 py-2 min-w-0 whitespace-nowrap font-medium" :title="i.name">{{ clip(i.name) }}</td>
                     <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i)" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.returnType }}</td>
+                    <td class="px-3 py-2 whitespace-nowrap"><Tag :variant="returnsFor(i).ok === true ? 'ok' : returnsFor(i).ok === false ? 'warn' : 'soon'" :title="`${i.returnType}. ${returnsFor(i).why}`">{{ returnsFor(i).label }}</Tag></td>
                     <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="dateSourceNote(i)">{{ i.inception || '—' }}</td>
                     <td class="px-3 py-2 text-right">
                       <div class="flex items-center justify-end gap-1.5">
                         <a v-for="l in i.links.filter((x) => x.url !== g.page)" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
                           <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
                         </a>
-                        <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="toggle(i.id)"><X class="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="remove(i.id)"><X class="h-4 w-4" /></Button>
                       </div>
                     </td>
                   </tr>
