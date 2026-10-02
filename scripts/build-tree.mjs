@@ -344,7 +344,7 @@ const ETFS = [
   { cls: 'debt', region: 'global', asset: 'Aggregate', listing: 'irish', name: 'iShares Core Global Aggregate Bond UCITS ETF USD (Acc)', code: 'AGAC', page: ishUk(337224, 'ishares-core-global-aggregate-bond-ucits-etf') },
 ];
 
-// US index mutual funds, under MF › US funds (US assets only), all from Tiingo with dividends. VFINX, the first index
+// US index mutual funds, under MF › US (US assets only), all from Tiingo with dividends. VFINX, the first index
 // fund (1976): Tiingo's rows carry no dividends before 1980-03-27, so it starts there (the earlier rows would show
 // price only). The other dates are Tiingo's first rows (checked 2026-10-02 with the Xfina bookmark): FXAIX's
 // current share class only from 2011 (its 1988 history sits under an older class), RYOCX's from 1995.
