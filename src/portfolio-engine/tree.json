@@ -1683,28 +1683,11 @@
      ]
     },
     {
-     "id": "usmf-fxaix",
-     "name": "Fidelity 500 Index Fund",
-     "code": "FXAIX",
-     "inception": "1988-02-17",
-     "dateSource": "manual",
-     "ccy": "USD",
-     "returnType": "NAV",
-     "how": "tiingo",
-     "kind": "MF",
-     "links": [
-      {
-       "label": "FXAIX on Tiingo",
-       "url": "https://www.tiingo.com/fxaix/overview"
-      }
-     ]
-    },
-    {
      "id": "usmf-swppx",
      "name": "Schwab S&P 500 Index Fund",
      "code": "SWPPX",
-     "inception": "1997-05-19",
-     "dateSource": "manual",
+     "inception": "1997-05-20",
+     "dateSource": "tiingo",
      "ccy": "USD",
      "returnType": "NAV",
      "how": "tiingo",
@@ -1713,6 +1696,23 @@
       {
        "label": "SWPPX on Tiingo",
        "url": "https://www.tiingo.com/swppx/overview"
+      }
+     ]
+    },
+    {
+     "id": "usmf-fxaix",
+     "name": "Fidelity 500 Index Fund",
+     "code": "FXAIX",
+     "inception": "2011-05-04",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "FXAIX on Tiingo",
+       "url": "https://www.tiingo.com/fxaix/overview"
       }
      ]
     }
@@ -1729,8 +1729,8 @@
      "id": "usmf-ryocx",
      "name": "Rydex Nasdaq-100 Fund Investor Class",
      "code": "RYOCX",
-     "inception": "1994-02-14",
-     "dateSource": "manual",
+     "inception": "1995-01-03",
+     "dateSource": "tiingo",
      "ccy": "USD",
      "returnType": "NAV",
      "how": "tiingo",
@@ -1747,7 +1747,7 @@
      "name": "Victory Nasdaq-100 Index Fund",
      "code": "USNQX",
      "inception": "2000-10-27",
-     "dateSource": "manual",
+     "dateSource": "tiingo",
      "ccy": "USD",
      "returnType": "NAV",
      "how": "tiingo",

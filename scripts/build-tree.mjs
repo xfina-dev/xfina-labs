@@ -346,13 +346,14 @@ const ETFS = [
 
 // US index mutual funds, under MF › US funds (US assets only), all from Tiingo with dividends. VFINX, the first index
 // fund (1976): Tiingo's rows carry no dividends before 1980-03-27, so it starts there (the earlier rows would show
-// price only). The rest are typed launch dates, to be checked against Tiingo's first rows.
+// price only). The other dates are Tiingo's first rows (checked 2026-10-02 with the Xfina bookmark): FXAIX's
+// current share class only from 2011 (its 1988 history sits under an older class), RYOCX's from 1995.
 const US_FUNDS = [
   { asset: 'S&P 500', name: 'Vanguard 500 Index Fund Investor Shares', code: 'VFINX', manual: '1980-03-27', manualSrc: 'tiingoDiv' },
-  { asset: 'S&P 500', name: 'Fidelity 500 Index Fund', code: 'FXAIX', manual: '1988-02-17' },
-  { asset: 'S&P 500', name: 'Schwab S&P 500 Index Fund', code: 'SWPPX', manual: '1997-05-19' },
-  { asset: 'Nasdaq 100', name: 'Rydex Nasdaq-100 Fund Investor Class', code: 'RYOCX', manual: '1994-02-14' },
-  { asset: 'Nasdaq 100', name: 'Victory Nasdaq-100 Index Fund', code: 'USNQX', manual: '2000-10-27' },
+  { asset: 'S&P 500', name: 'Fidelity 500 Index Fund', code: 'FXAIX', manual: '2011-05-04', manualSrc: 'tiingo' },
+  { asset: 'S&P 500', name: 'Schwab S&P 500 Index Fund', code: 'SWPPX', manual: '1997-05-20', manualSrc: 'tiingo' },
+  { asset: 'Nasdaq 100', name: 'Rydex Nasdaq-100 Fund Investor Class', code: 'RYOCX', manual: '1995-01-03', manualSrc: 'tiingo' },
+  { asset: 'Nasdaq 100', name: 'Victory Nasdaq-100 Index Fund', code: 'USNQX', manual: '2000-10-27', manualSrc: 'tiingo' },
 ];
 
 // Indices: one instrument per asset, the benchmark itself. Start dates are only given where the
