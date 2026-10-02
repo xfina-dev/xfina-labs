@@ -1,0 +1,3055 @@
+{
+ "generatedAt": "2026-10-02",
+ "keep": 3,
+ "nodes": [
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Nifty 50",
+   "instruments": [
+    {
+     "id": "mf101349",
+     "name": "ICICI Prudential Nifty 50 Index Fund - Regular Plan - Cumulative",
+     "code": "101349",
+     "plan": "Regular",
+     "inception": "2006-04-02",
+     "lastNav": "2026-09-25",
+     "observations": 5044,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf100822",
+     "name": "UTI Nifty 50 Index Fund - Regular Plan - Growth",
+     "code": "100822",
+     "plan": "Regular",
+     "inception": "2006-04-03",
+     "lastNav": "2026-09-25",
+     "observations": 5037,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf101525",
+     "name": "HDFC Nifty 50 Index Fund - Regular Plan - Growth Option",
+     "code": "101525",
+     "plan": "Regular",
+     "inception": "2006-04-03",
+     "lastNav": "2026-09-25",
+     "observations": 5043,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nifty 50",
+   "instruments": [
+    {
+     "id": "mf119063",
+     "name": "HDFC Nifty 50 Index Fund - Direct Plan - Growth Option",
+     "code": "119063",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3381,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf120620",
+     "name": "ICICI Prudential Nifty 50 Index Fund - Direct Plan - Cumulative",
+     "code": "120620",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3380,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf120716",
+     "name": "UTI Nifty 50 Index Fund - Direct Plan - Growth",
+     "code": "120716",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3380,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Nifty Next 50",
+   "instruments": [
+    {
+     "id": "mf112957",
+     "name": "ICICI Prudential Nifty Next 50 Index Fund - Regular Plan - Growth",
+     "code": "112957",
+     "plan": "Regular",
+     "inception": "2010-06-29",
+     "lastNav": "2026-09-25",
+     "observations": 4003,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf143340",
+     "name": "UTI - Nifty Next 50 Index Fund - Regular Plan - Growth",
+     "code": "143340",
+     "plan": "Regular",
+     "inception": "2018-06-29",
+     "lastNav": "2026-09-25",
+     "observations": 2029,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf146380",
+     "name": "DSP Nifty Next 50 Index Fund - Regular Plan - Growth",
+     "code": "146380",
+     "plan": "Regular",
+     "inception": "2019-02-22",
+     "lastNav": "2026-09-25",
+     "observations": 1869,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nifty Next 50",
+   "instruments": [
+    {
+     "id": "mf120684",
+     "name": "ICICI Prudential Nifty Next 50 Index Fund - Direct Plan - Growth",
+     "code": "120684",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3380,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf143341",
+     "name": "UTI - Nifty Next 50 Index Fund - Direct Plan - Growth",
+     "code": "143341",
+     "plan": "Direct",
+     "inception": "2018-06-29",
+     "lastNav": "2026-09-25",
+     "observations": 2029,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf146381",
+     "name": "DSP Nifty Next 50 Index Fund - Direct Plan - Growth",
+     "code": "146381",
+     "plan": "Direct",
+     "inception": "2019-02-22",
+     "lastNav": "2026-09-25",
+     "observations": 1869,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Nifty Midcap 150",
+   "instruments": [
+    {
+     "id": "mf147621",
+     "name": "Motilal Oswal Nifty Midcap 150 Index Fund - Regular Plan - Growth",
+     "code": "147621",
+     "plan": "Regular",
+     "inception": "2019-09-11",
+     "lastNav": "2026-09-25",
+     "observations": 1737,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148723",
+     "name": "Nippon India Nifty Midcap 150 Index Fund - Regular Plan - Growth Option",
+     "code": "148723",
+     "plan": "Regular",
+     "inception": "2021-02-23",
+     "lastNav": "2026-09-25",
+     "observations": 1377,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148805",
+     "name": "Aditya Birla Sun Life Nifty Midcap 150 Index Fund - Regular Plan - GROWTH",
+     "code": "148805",
+     "plan": "Regular",
+     "inception": "2021-04-06",
+     "lastNav": "2026-09-25",
+     "observations": 1350,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nifty Midcap 150",
+   "instruments": [
+    {
+     "id": "mf147622",
+     "name": "Motilal Oswal Nifty Midcap 150 Index Fund - Direct Plan - Growth",
+     "code": "147622",
+     "plan": "Direct",
+     "inception": "2019-09-11",
+     "lastNav": "2026-09-25",
+     "observations": 1737,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148726",
+     "name": "Nippon India Nifty Midcap 150 Index Fund - Direct Plan - Growth Option",
+     "code": "148726",
+     "plan": "Direct",
+     "inception": "2021-02-23",
+     "lastNav": "2026-09-25",
+     "observations": 1377,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148807",
+     "name": "Aditya Birla Sun Life Nifty Midcap 150 Index Fund - Direct Plan - GROWTH",
+     "code": "148807",
+     "plan": "Direct",
+     "inception": "2021-04-06",
+     "lastNav": "2026-09-25",
+     "observations": 1350,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Nifty Smallcap 250",
+   "instruments": [
+    {
+     "id": "mf147624",
+     "name": "Motilal Oswal Nifty Smallcap 250 Index Fund - Regular Plan - GROWTH",
+     "code": "147624",
+     "plan": "Regular",
+     "inception": "2019-09-11",
+     "lastNav": "2026-09-25",
+     "observations": 1737,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148518",
+     "name": "Nippon India Nifty Smallcap 250 Index Fund - Regular Plan - Growth Option",
+     "code": "148518",
+     "plan": "Regular",
+     "inception": "2020-10-19",
+     "lastNav": "2026-09-25",
+     "observations": 1464,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149281",
+     "name": "ICICI Prudential Nifty Smallcap 250 Index Fund - Regular Plan - Growth",
+     "code": "149281",
+     "plan": "Regular",
+     "inception": "2021-11-03",
+     "lastNav": "2026-09-25",
+     "observations": 1206,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nifty Smallcap 250",
+   "instruments": [
+    {
+     "id": "mf147623",
+     "name": "Motilal Oswal Nifty Smallcap 250 Index Fund - Direct Plan - Growth",
+     "code": "147623",
+     "plan": "Direct",
+     "inception": "2019-09-11",
+     "lastNav": "2026-09-25",
+     "observations": 1737,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf148519",
+     "name": "Nippon India Nifty Smallcap 250 Index Fund - Direct Plan - Growth Option",
+     "code": "148519",
+     "plan": "Direct",
+     "inception": "2020-10-19",
+     "lastNav": "2026-09-25",
+     "observations": 1464,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149283",
+     "name": "ICICI Prudential Nifty Smallcap 250 Index Fund - Direct Plan - Growth",
+     "code": "149283",
+     "plan": "Direct",
+     "inception": "2021-11-03",
+     "lastNav": "2026-09-25",
+     "observations": 1206,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "mf114616",
+     "name": "Nippon India Gold Savings Fund - Regular Plan - Growth Option",
+     "code": "114616",
+     "plan": "Regular",
+     "inception": "2011-03-11",
+     "lastNav": "2026-09-25",
+     "observations": 3826,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf114758",
+     "name": "Kotak Gold Fund - Regular Plan - Growth",
+     "code": "114758",
+     "plan": "Regular",
+     "inception": "2011-03-31",
+     "lastNav": "2026-09-25",
+     "observations": 3752,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf115676",
+     "name": "SBI GOLD FUND - Regular Plan - Growth",
+     "code": "115676",
+     "plan": "Regular",
+     "inception": "2011-09-19",
+     "lastNav": "2026-09-25",
+     "observations": 3639,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "mf118663",
+     "name": "Nippon India Gold Savings Fund - Direct Plan - Growth Option",
+     "code": "118663",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3380,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119781",
+     "name": "Kotak Gold Fund - Direct Plan - Growth",
+     "code": "119781",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3331,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119788",
+     "name": "SBI GOLD FUND - Direct Plan - Growth",
+     "code": "119788",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3329,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "mf102012",
+     "name": "UTI - Liquid Fund - Regular Plan - Growth",
+     "code": "102012",
+     "plan": "Regular",
+     "inception": "2006-04-01",
+     "lastNav": "2026-09-27",
+     "observations": 6994,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf101408",
+     "name": "BARODA BNP PARIBAS LIQUID FUND - Growth Option",
+     "code": "101408",
+     "inception": "2006-04-01",
+     "lastNav": "2026-09-27",
+     "observations": 6294,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf100868",
+     "name": "HDFC Liquid Fund - Regular Plan - Growth Option",
+     "code": "100868",
+     "plan": "Regular",
+     "inception": "2006-04-02",
+     "lastNav": "2026-09-27",
+     "observations": 6313,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "mf120304",
+     "name": "UTI - Liquid Fund - Direct Plan - Growth",
+     "code": "120304",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-27",
+     "observations": 4529,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119415",
+     "name": "BARODA BNP PARIBAS LIQUID FUND - Direct Plan - Growth Option",
+     "code": "119415",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-27",
+     "observations": 4086,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119091",
+     "name": "HDFC Liquid Fund - Direct Plan - Growth Option",
+     "code": "119091",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-27",
+     "observations": 4242,
+     "dateSource": "direct",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "mf100369",
+     "name": "ICICI Prudential Gilt Fund - Regular Plan - Growth",
+     "code": "100369",
+     "plan": "Regular",
+     "inception": "2006-04-02",
+     "lastNav": "2026-09-25",
+     "observations": 4948,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf100265",
+     "name": "Kotak Gilt Fund - Regular Plan - Growth",
+     "code": "100265",
+     "plan": "Regular",
+     "inception": "2006-04-02",
+     "lastNav": "2026-09-25",
+     "observations": 4948,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf101083",
+     "name": "HDFC Gilt Fund - Regular Plan - Growth Option",
+     "code": "101083",
+     "plan": "Regular",
+     "inception": "2006-04-03",
+     "lastNav": "2026-09-25",
+     "observations": 4961,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "mf119116",
+     "name": "HDFC Gilt Fund - Direct Plan - Growth Option",
+     "code": "119116",
+     "plan": "Direct",
+     "inception": "2013-01-01",
+     "lastNav": "2026-09-25",
+     "observations": 3318,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf120590",
+     "name": "ICICI Prudential Gilt Fund - Direct Plan - Growth",
+     "code": "120590",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3316,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf119759",
+     "name": "Kotak Gilt Fund - Direct Plan - Growth",
+     "code": "119759",
+     "plan": "Direct",
+     "inception": "2013-01-02",
+     "lastNav": "2026-09-25",
+     "observations": 3315,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty 50",
+   "instruments": [
+    {
+     "id": "nse-niftybees",
+     "name": "Nippon India ETF Nifty 50 BeES",
+     "code": "NIFTYBEES",
+     "inception": "2002-01-08",
+     "dateSource": "manual",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "NIFTYBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=NIFTYBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-qnifty",
+     "name": "Quantum Nifty 50 ETF",
+     "code": "QNIFTY",
+     "inception": "2008-07-17",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "QNIFTY on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=QNIFTY"
+      }
+     ]
+    },
+    {
+     "id": "nse-mom50",
+     "name": "Motilal Oswal Nifty 50 ETF",
+     "code": "MOM50",
+     "inception": "2010-07-30",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MOM50 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MOM50"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty Next 50",
+   "instruments": [
+    {
+     "id": "nse-juniorbees",
+     "name": "Nippon India ETF Nifty Next 50 Junior BeES",
+     "code": "JUNIORBEES",
+     "inception": "2003-02-21",
+     "dateSource": "manual",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "JUNIORBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=JUNIORBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-setfnn50",
+     "name": "SBI Nifty Next 50 ETF",
+     "code": "SETFNN50",
+     "inception": "2015-03-25",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "SETFNN50 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=SETFNN50"
+      }
+     ]
+    },
+    {
+     "id": "nse-next50ietf",
+     "name": "ICICI Prudential Nifty Next 50 ETF",
+     "code": "NEXT50IETF",
+     "inception": "2018-08-24",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "NEXT50IETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=NEXT50IETF"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty Midcap 150",
+   "instruments": [
+    {
+     "id": "nse-mid150bees",
+     "name": "Nippon India ETF Nifty Midcap 150",
+     "code": "MID150BEES",
+     "inception": "2019-02-01",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MID150BEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MID150BEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-midcapietf",
+     "name": "ICICI Prudential Nifty Midcap 150 ETF",
+     "code": "MIDCAPIETF",
+     "inception": "2020-01-27",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MIDCAPIETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MIDCAPIETF"
+      }
+     ]
+    },
+    {
+     "id": "nse-midcapetf",
+     "name": "Mirae Asset Nifty Midcap 150 ETF",
+     "code": "MIDCAPETF",
+     "inception": "2022-03-10",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MIDCAPETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MIDCAPETF"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Nifty Smallcap 250",
+   "instruments": [
+    {
+     "id": "nse-hdfcsml250",
+     "name": "HDFC Nifty Smallcap 250 ETF",
+     "code": "HDFCSML250",
+     "inception": "2023-02-15",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "HDFCSML250 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=HDFCSML250"
+      }
+     ]
+    },
+    {
+     "id": "nse-mosmall250",
+     "name": "Motilal Oswal Nifty Smallcap 250 ETF",
+     "code": "MOSMALL250",
+     "inception": "2024-03-21",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MOSMALL250 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MOSMALL250"
+      }
+     ]
+    },
+    {
+     "id": "nse-small250",
+     "name": "Mirae Asset Nifty Smallcap 250 ETF",
+     "code": "SMALL250",
+     "inception": "2025-11-10",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "SMALL250 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=SMALL250"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "nse-goldbees",
+     "name": "Nippon India ETF Gold BeES",
+     "code": "GOLDBEES",
+     "inception": "2007-03-08",
+     "dateSource": "manual",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "GOLDBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=GOLDBEES"
+      }
+     ]
+    },
+    {
+     "id": "nse-qgoldhalf",
+     "name": "Quantum Gold ETF",
+     "code": "QGOLDHALF",
+     "inception": "2008-02-27",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "QGOLDHALF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=QGOLDHALF"
+      }
+     ]
+    },
+    {
+     "id": "nse-hdfcgold",
+     "name": "HDFC Gold ETF",
+     "code": "HDFCGOLD",
+     "inception": "2010-08-16",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "HDFCGOLD on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=HDFCGOLD"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "nse-liquid1",
+     "name": "Kotak Nifty 1D Rate Liquid ETF",
+     "code": "LIQUID1",
+     "inception": "2023-01-31",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LIQUID1 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LIQUID1"
+      }
+     ]
+    },
+    {
+     "id": "nse-liquidcase",
+     "name": "Zerodha Nifty 1D Rate Liquid ETF",
+     "code": "LIQUIDCASE",
+     "inception": "2024-01-23",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LIQUIDCASE on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LIQUIDCASE"
+      }
+     ]
+    },
+    {
+     "id": "nse-liquidbetf",
+     "name": "Bajaj Finserv Nifty 1D Rate Liquid ETF",
+     "code": "LIQUIDBETF",
+     "inception": "2024-06-03",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LIQUIDBETF on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LIQUIDBETF"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "etf",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "nse-licnetfgsc",
+     "name": "LIC MF Nifty 8-13 yr G-Sec ETF",
+     "code": "LICNETFGSC",
+     "inception": "2014-12-26",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LICNETFGSC on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LICNETFGSC"
+      }
+     ]
+    },
+    {
+     "id": "nse-setf10gilt",
+     "name": "SBI Nifty 10 yr Benchmark G-Sec ETF",
+     "code": "SETF10GILT",
+     "inception": "2016-06-16",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "SETF10GILT on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=SETF10GILT"
+      }
+     ]
+    },
+    {
+     "id": "nse-ltgiltbees",
+     "name": "Nippon India ETF Nifty 8-13 yr G-Sec Long Term Gilt",
+     "code": "LTGILTBEES",
+     "inception": "2016-07-07",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "LTGILTBEES on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=LTGILTBEES"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "mf148382",
+     "name": "Motilal Oswal S&P 500 Index Fund - Regular Plan - GROWTH",
+     "code": "148382",
+     "plan": "Regular",
+     "inception": "2020-04-29",
+     "lastNav": "2026-09-25",
+     "observations": 1583,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "mf148381",
+     "name": "Motilal Oswal S&P 500 Index Fund - Direct Plan - GROWTH",
+     "code": "148381",
+     "plan": "Direct",
+     "inception": "2020-04-29",
+     "lastNav": "2026-09-25",
+     "observations": 1583,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "regular",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "mf145551",
+     "name": "Motilal Oswal Nasdaq 100 Fund of Fund",
+     "code": "145551",
+     "inception": "2018-12-03",
+     "lastNav": "2026-09-25",
+     "observations": 1927,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149218",
+     "name": "ICICI Prudential NASDAQ 100 Index Fund - Regular Plan - Growth",
+     "code": "149218",
+     "plan": "Regular",
+     "inception": "2021-10-19",
+     "lastNav": "2026-09-25",
+     "observations": 1173,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149911",
+     "name": "Navi NASDAQ100 US Specific Equity Passive FOF",
+     "code": "149911",
+     "inception": "2022-03-25",
+     "lastNav": "2026-09-25",
+     "observations": 1071,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "direct",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "mf145552",
+     "name": "Motilal Oswal Nasdaq 100 Fund of Fund",
+     "code": "145552",
+     "plan": "Direct",
+     "inception": "2018-12-03",
+     "lastNav": "2026-09-25",
+     "observations": 1927,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149219",
+     "name": "ICICI Prudential NASDAQ 100 Index Fund - Direct Plan - Growth",
+     "code": "149219",
+     "plan": "Direct",
+     "inception": "2021-10-19",
+     "lastNav": "2026-09-25",
+     "observations": 1173,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    },
+    {
+     "id": "mf149910",
+     "name": "Navi NASDAQ100 US Specific Equity Passive FOF",
+     "code": "149910",
+     "plan": "Direct",
+     "inception": "2022-03-25",
+     "lastNav": "2026-09-25",
+     "observations": 1071,
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "NAV",
+     "how": "amfi",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "AMFI NAV history",
+       "url": "https://www.amfiindia.com/net-asset-value/nav-history"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "usfund",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "usmf-vfinx",
+     "name": "Vanguard 500 Index Fund Investor Shares",
+     "code": "VFINX",
+     "inception": "1980-03-27",
+     "dateSource": "tiingoDiv",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "VFINX on Tiingo",
+       "url": "https://www.tiingo.com/vfinx/overview"
+      }
+     ]
+    },
+    {
+     "id": "usmf-swppx",
+     "name": "Schwab S&P 500 Index Fund",
+     "code": "SWPPX",
+     "inception": "1997-05-20",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "SWPPX on Tiingo",
+       "url": "https://www.tiingo.com/swppx/overview"
+      }
+     ]
+    },
+    {
+     "id": "usmf-fxaix",
+     "name": "Fidelity 500 Index Fund",
+     "code": "FXAIX",
+     "inception": "2011-05-04",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "FXAIX on Tiingo",
+       "url": "https://www.tiingo.com/fxaix/overview"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "mf",
+   "listing": "usfund",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "usmf-ryocx",
+     "name": "Rydex Nasdaq-100 Fund Investor Class",
+     "code": "RYOCX",
+     "inception": "1995-01-03",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "RYOCX on Tiingo",
+       "url": "https://www.tiingo.com/ryocx/overview"
+      }
+     ]
+    },
+    {
+     "id": "usmf-usnqx",
+     "name": "Victory Nasdaq-100 Index Fund",
+     "code": "USNQX",
+     "inception": "2000-10-27",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "tiingo",
+     "kind": "MF",
+     "links": [
+      {
+       "label": "USNQX on Tiingo",
+       "url": "https://www.tiingo.com/usnqx/overview"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "etf-spy",
+     "name": "SPDR S&P 500 ETF Trust",
+     "code": "SPY",
+     "inception": "1993-01-29",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SPY on Tiingo",
+       "url": "https://www.tiingo.com/spy/overview"
+      }
+     ],
+     "asset": "S&P 500"
+    },
+    {
+     "id": "etf-ivv",
+     "name": "iShares Core S&P 500 ETF",
+     "code": "IVV",
+     "inception": "2000-05-15",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "IVV NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239726&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "IVV fund page",
+       "url": "https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf"
+      }
+     ],
+     "asset": "S&P 500",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "IVV on Tiingo",
+         "url": "https://www.tiingo.com/ivv/overview"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "etf-voo",
+     "name": "Vanguard S&P 500 ETF",
+     "code": "VOO",
+     "inception": "2010-09-09",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "VOO on Tiingo",
+       "url": "https://www.tiingo.com/voo/overview"
+      }
+     ],
+     "asset": "S&P 500"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "etf-qqq",
+     "name": "Invesco QQQ Trust",
+     "code": "QQQ",
+     "inception": "1999-03-10",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "QQQ on Tiingo",
+       "url": "https://www.tiingo.com/qqq/overview"
+      }
+     ],
+     "asset": "Nasdaq 100"
+    },
+    {
+     "id": "etf-qqqm",
+     "name": "Invesco NASDAQ 100 ETF",
+     "code": "QQQM",
+     "inception": "2020-10-13",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "QQQM on Tiingo",
+       "url": "https://www.tiingo.com/qqqm/overview"
+      }
+     ],
+     "asset": "Nasdaq 100"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "etf-cspx",
+     "name": "iShares Core S&P 500 UCITS ETF (Acc)",
+     "code": "CSPX",
+     "inception": "2010-05-19",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "CSPX NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=253743&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "CSPX fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/253743/ishares-core-sp-500-ucits-etf"
+      }
+     ],
+     "asset": "S&P 500"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "etf-cndx",
+     "name": "iShares Nasdaq 100 UCITS ETF (Acc)",
+     "code": "CNDX",
+     "inception": "2010-01-26",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "CNDX NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=253741&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "CNDX fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/253741/ishares-nasdaq-100-ucits-etf"
+      }
+     ],
+     "asset": "Nasdaq 100"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "MSCI ACWI",
+   "instruments": [
+    {
+     "id": "etf-ssac",
+     "name": "iShares MSCI ACWI UCITS ETF (Acc)",
+     "code": "SSAC",
+     "inception": "2011-10-21",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SSAC NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=251850&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "SSAC fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/251850/ishares-msci-acwi-ucits-etf"
+      }
+     ],
+     "asset": "MSCI ACWI"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "MSCI World",
+   "instruments": [
+    {
+     "id": "etf-swda",
+     "name": "iShares Core MSCI World UCITS ETF (Acc)",
+     "code": "SWDA",
+     "inception": "2009-09-25",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SWDA NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=251882&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "SWDA fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/251882/ishares-msci-world-ucits-etf-acc-fund"
+      }
+     ],
+     "asset": "MSCI World"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "MSCI Emerging Markets",
+   "instruments": [
+    {
+     "id": "etf-eimi",
+     "name": "iShares Core MSCI EM IMI UCITS ETF (Acc)",
+     "code": "EIMI",
+     "inception": "2014-05-30",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "EIMI NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=264659&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "EIMI fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/264659/ishares-core-msci-em-imi-ucits-etf"
+      }
+     ],
+     "asset": "MSCI Emerging Markets"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "MSCI ACWI",
+   "instruments": [
+    {
+     "id": "etf-acwi",
+     "name": "iShares MSCI ACWI ETF",
+     "code": "ACWI",
+     "inception": "2008-03-26",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "ACWI NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239600&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "ACWI fund page",
+       "url": "https://www.ishares.com/us/products/239600/ishares-msci-acwi-etf"
+      }
+     ],
+     "asset": "MSCI ACWI",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "ACWI on Tiingo",
+         "url": "https://www.tiingo.com/acwi/overview"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "MSCI Emerging Markets",
+   "instruments": [
+    {
+     "id": "etf-eem",
+     "name": "iShares MSCI Emerging Markets ETF",
+     "code": "EEM",
+     "inception": "2003-04-07",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "EEM NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239637&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "EEM fund page",
+       "url": "https://www.ishares.com/us/products/239637/ishares-msci-emerging-markets-etf"
+      }
+     ],
+     "asset": "MSCI Emerging Markets",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "EEM on Tiingo",
+         "url": "https://www.tiingo.com/eem/overview"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "etf-iemg",
+     "name": "iShares Core MSCI Emerging Markets ETF",
+     "code": "IEMG",
+     "inception": "2012-10-18",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "IEMG NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=244050&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "IEMG fund page",
+       "url": "https://www.ishares.com/us/products/244050/ishares-core-msci-emerging-markets-etf"
+      }
+     ],
+     "asset": "MSCI Emerging Markets",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "IEMG on Tiingo",
+         "url": "https://www.tiingo.com/iemg/overview"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "MSCI World",
+   "instruments": [
+    {
+     "id": "etf-urth",
+     "name": "iShares MSCI World ETF",
+     "code": "URTH",
+     "inception": "2012-01-10",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "URTH NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239696&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "URTH fund page",
+       "url": "https://www.ishares.com/us/products/239696/ishares-msci-world-etf"
+      }
+     ],
+     "asset": "MSCI World",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "URTH on Tiingo",
+         "url": "https://www.tiingo.com/urth/overview"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "us",
+   "vehicle": "etf",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "etf-gld",
+     "name": "SPDR Gold Shares",
+     "code": "GLD",
+     "inception": "2004-11-18",
+     "dateSource": "manual",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "spdrgold",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "GLD historical data (Excel)",
+       "url": "https://api.spdrgoldshares.com/api/v1/historical-archive?product=gld&exchange=NYSE&lang=en"
+      }
+     ],
+     "asset": "Gold",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "GLD on Tiingo",
+         "url": "https://www.tiingo.com/gld/overview"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "etf-iau",
+     "name": "iShares Gold Trust",
+     "code": "IAU",
+     "inception": "2005-01-21",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "IAU NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239561&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "IAU fund page",
+       "url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund"
+      }
+     ],
+     "asset": "Gold",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "IAU on Tiingo",
+         "url": "https://www.tiingo.com/iau/overview"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "etf-sgol",
+     "name": "abrdn Physical Gold Shares ETF",
+     "code": "SGOL",
+     "inception": "2009-09-09",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SGOL on Tiingo",
+       "url": "https://www.tiingo.com/sgol/overview"
+      }
+     ],
+     "asset": "Gold"
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "switzerland",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "etf-zgldus",
+     "name": "Swisscanto (CH) Gold ETF (USD)",
+     "code": "ZGLDUS",
+     "inception": "2009-01-16",
+     "dateSource": "wsj",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "wsj",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "ZGLDUS on WSJ",
+       "url": "https://www.wsj.com/market-data/quotes/etf/CH/XSWX/ZGLDUS/historical-prices"
+      },
+      {
+       "label": "ZGLDUS download (CSV)",
+       "url": "https://www.wsj.com/market-data/quotes/etf/CH/XSWX/ZGLDUS/historical-prices/download?MOD_VIEW=page&num_rows=6469&range_days=6469&startDate=01/16/2009&endDate=10/02/2026"
+      }
+     ],
+     "asset": "Gold"
+    },
+    {
+     "id": "etf-csgold",
+     "name": "iShares Gold ETF (CH)",
+     "code": "CSGOLD",
+     "inception": "2009-10-05",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "CSGOLD NAV history (Excel)",
+       "url": "https://www.ishares.com/ch/individual/en/products/261149/ishares-gold-ch-fund/1535604580403.ajax?fileType=xls&fileName=Gold-ETF-CH_fund&dataType=fund"
+      },
+      {
+       "label": "CSGOLD fund page",
+       "url": "https://www.ishares.com/ch/individual/en/products/261149/ishares-gold-ch-fund"
+      }
+     ],
+     "asset": "Gold"
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "canada",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "etf-phys",
+     "name": "Sprott Physical Gold Trust",
+     "code": "PHYS",
+     "inception": "2010-02-26",
+     "dateSource": "wsj",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "wsj",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "PHYS on WSJ",
+       "url": "https://www.wsj.com/market-data/quotes/etf/PHYS/historical-prices"
+      },
+      {
+       "label": "PHYS download (CSV)",
+       "url": "https://www.wsj.com/market-data/quotes/etf/PHYS/historical-prices/download?MOD_VIEW=page&num_rows=6063&range_days=6063&startDate=02/26/2010&endDate=10/02/2026"
+      }
+     ],
+     "asset": "Gold",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "PHYS on Tiingo",
+         "url": "https://www.tiingo.com/phys/overview"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "etf-sgld",
+     "name": "Invesco Physical Gold ETC",
+     "code": "SGLD",
+     "inception": "2009-08-19",
+     "dateSource": "wsj",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "wsj",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SGLD on WSJ",
+       "url": "https://www.wsj.com/market-data/quotes/etf/UK/XLON/SGLD/historical-prices"
+      },
+      {
+       "label": "SGLD download (CSV)",
+       "url": "https://www.wsj.com/market-data/quotes/etf/UK/XLON/SGLD/historical-prices/download?MOD_VIEW=page&num_rows=6254&range_days=6254&startDate=08/19/2009&endDate=10/02/2026"
+      }
+     ],
+     "asset": "Gold"
+    },
+    {
+     "id": "etf-sgln",
+     "name": "iShares Physical Gold ETC",
+     "code": "SGLN",
+     "inception": "2011-04-08",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SGLN NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=258441&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "SGLN fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/258441/ishares-physical-gold-etc"
+      }
+     ],
+     "asset": "Gold"
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "etf-shv",
+     "name": "iShares 0-1 Year Treasury Bond ETF",
+     "code": "SHV",
+     "inception": "2007-01-05",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SHV NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239466&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "SHV fund page",
+       "url": "https://www.ishares.com/us/products/239466/ishares-short-treasury-bond-etf"
+      }
+     ],
+     "asset": "Short duration",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "SHV on Tiingo",
+         "url": "https://www.tiingo.com/shv/overview"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "etf-sgov",
+     "name": "iShares 0-3 Month Treasury Bond ETF",
+     "code": "SGOV",
+     "inception": "2020-05-26",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "SGOV NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=314116&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "SGOV fund page",
+       "url": "https://www.ishares.com/us/products/314116/ishares-0-3-month-treasury-bond-etf"
+      }
+     ],
+     "asset": "Short duration",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "SGOV on Tiingo",
+         "url": "https://www.tiingo.com/sgov/overview"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "etf-tlt",
+     "name": "iShares 20+ Year Treasury Bond ETF",
+     "code": "TLT",
+     "inception": "2002-07-22",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "TLT NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/blk-one01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=us-ishares&locale=en_US&portfolioId=239454&component=fundDownload&userType=individual"
+      },
+      {
+       "label": "TLT fund page",
+       "url": "https://www.ishares.com/us/products/239454/ishares-20-year-treasury-bond-etf"
+      }
+     ],
+     "asset": "Long duration",
+     "alts": [
+      {
+       "how": "tiingo",
+       "links": [
+        {
+         "label": "TLT on Tiingo",
+         "url": "https://www.tiingo.com/tlt/overview"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "etf-ib01",
+     "name": "iShares $ Treasury Bond 0-1yr UCITS ETF (Acc)",
+     "code": "IB01",
+     "inception": "2019-02-20",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "IB01 NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=307243&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "IB01 fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/307243/ishares-usd-treasury-bond-01yr-ucits-etf"
+      }
+     ],
+     "asset": "Short duration"
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "etf-dtla",
+     "name": "iShares $ Treasury Bond 20+yr UCITS ETF USD (Acc)",
+     "code": "DTLA",
+     "inception": "2018-05-10",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "DTLA NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=297191&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "DTLA fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/297191/ishares-treasury-bond-20-yr-ucits-etf-usd-acc-fund"
+      }
+     ],
+     "asset": "Long duration"
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "us",
+   "asset": "Aggregate",
+   "instruments": [
+    {
+     "id": "etf-bndw",
+     "name": "Vanguard Total World Bond ETF",
+     "code": "BNDW",
+     "inception": "2018-09-06",
+     "dateSource": "tiingo",
+     "ccy": "USD",
+     "returnType": "Market price",
+     "how": "tiingo",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "BNDW on Tiingo",
+       "url": "https://www.tiingo.com/bndw/overview"
+      }
+     ],
+     "asset": "Aggregate"
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "global",
+   "vehicle": "etf",
+   "listing": "irish",
+   "asset": "Aggregate",
+   "instruments": [
+    {
+     "id": "etf-aggu",
+     "name": "iShares Core Global Aggregate Bond UCITS ETF USD Hedged (Acc)",
+     "code": "AGGU",
+     "inception": "2017-11-21",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "AGGU NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=291772&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "AGGU fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/291772/ishares-global-aggregate-bond-ucits-etf-usd-hedged-acc-fund"
+      }
+     ],
+     "asset": "Aggregate"
+    },
+    {
+     "id": "etf-agac",
+     "name": "iShares Core Global Aggregate Bond UCITS ETF USD (Acc)",
+     "code": "AGAC",
+     "inception": "2024-05-08",
+     "dateSource": "issuer",
+     "ccy": "USD",
+     "returnType": "NAV",
+     "how": "ishares",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "AGAC NAV history (Excel)",
+       "url": "https://www.blackrock.com/varnish-api/uk-retail01-product-data/product-data/api/v1/get-fund-document?appType=PRODUCT_PAGE&appSubType=ISHARES&targetSite=ishares-uk&locale=en_GB&portfolioId=337224&component=fundDownloadV2&userType=individual"
+      },
+      {
+       "label": "AGAC fund page",
+       "url": "https://www.ishares.com/uk/individual/en/products/337224/ishares-core-global-aggregate-bond-ucits-etf"
+      }
+     ],
+     "asset": "Aggregate"
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "etf",
+   "listing": "india",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "nse-mon100",
+     "name": "Motilal Oswal Nasdaq 100 ETF",
+     "code": "MON100",
+     "inception": "2011-03-30",
+     "dateSource": "amfi",
+     "ccy": "INR",
+     "returnType": "Market price",
+     "how": "nseEtf",
+     "kind": "ETF",
+     "links": [
+      {
+       "label": "NSE historical price data",
+       "url": "https://www.nseindia.com/report-detail/eq_security"
+      },
+      {
+       "label": "MON100 on NSE",
+       "url": "https://www.nseindia.com/get-quotes/equity?symbol=MON100"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Nifty 50",
+   "instruments": [
+    {
+     "id": "idx-nifty-50-tri",
+     "name": "Nifty 50 TRI",
+     "inception": "1999-06-30",
+     "dateSource": "nse",
+     "ccy": "INR",
+     "returnType": "Total return",
+     "how": "nseTri",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NSE Indices historical data",
+       "url": "https://www.niftyindices.com/reports/historical-data"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Nifty Next 50",
+   "instruments": [
+    {
+     "id": "idx-nifty-next-50-tri",
+     "name": "Nifty Next 50 TRI",
+     "inception": "2002-11-08",
+     "dateSource": "nse",
+     "ccy": "INR",
+     "returnType": "Total return",
+     "how": "nseTri",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NSE Indices historical data",
+       "url": "https://www.niftyindices.com/reports/historical-data"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Nifty Midcap 150",
+   "instruments": [
+    {
+     "id": "idx-nifty-midcap-150-tri",
+     "name": "Nifty Midcap 150 TRI",
+     "inception": "2005-04-01",
+     "dateSource": "nse",
+     "ccy": "INR",
+     "returnType": "Total return",
+     "how": "nseTri",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NSE Indices historical data",
+       "url": "https://www.niftyindices.com/reports/historical-data"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Nifty Smallcap 250",
+   "instruments": [
+    {
+     "id": "idx-nifty-smallcap-250-tri",
+     "name": "Nifty Smallcap 250 TRI",
+     "inception": "2005-04-01",
+     "dateSource": "nse",
+     "ccy": "INR",
+     "returnType": "Total return",
+     "how": "nseTri",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NSE Indices historical data",
+       "url": "https://www.niftyindices.com/reports/historical-data"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "index",
+   "asset": "S&P 500",
+   "instruments": [
+    {
+     "id": "idx-s-p-500-gspc-price-only",
+     "name": "S&P 500 (^GSPC, price only)",
+     "inception": "1927-12-30",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "yahoo",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "^GSPC history, full range",
+       "url": "https://finance.yahoo.com/quote/%5EGSPC/history/?period1=-1325635200&period2=1790985600&frequency=1d"
+      }
+     ]
+    },
+    {
+     "id": "idx-s-p-500-total-return-sp500tr",
+     "name": "S&P 500 Total Return (^SP500TR)",
+     "inception": "1988-01-04",
+     "dateSource": "yahoo",
+     "ccy": "USD",
+     "returnType": "Total return",
+     "how": "yahoo",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "^SP500TR history, full range",
+       "url": "https://finance.yahoo.com/quote/%5ESP500TR/history/?period1=568252800&period2=1790985600&frequency=1d"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "us",
+   "vehicle": "index",
+   "asset": "Nasdaq 100",
+   "instruments": [
+    {
+     "id": "idx-nasdaq-100-ndx-price-only",
+     "name": "Nasdaq-100 (NDX, price only)",
+     "inception": "1985-01-31",
+     "dateSource": "nasdaq",
+     "ccy": "USD",
+     "returnType": "Price only",
+     "how": "nasdaqIndex",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NDX history",
+       "url": "https://indexes.nasdaq.com/Index/History/NDX"
+      },
+      {
+       "label": "NDX download (Excel)",
+       "url": "https://indexes.nasdaq.com/Index/ExportHistory/NDX?startDate=1985-01-31T00:00:00.000&endDate=2026-09-28T00:00:00.000&timeOfDay=EOD"
+      }
+     ]
+    },
+    {
+     "id": "idx-nasdaq-100-total-return-xndx",
+     "name": "Nasdaq-100 Total Return (XNDX)",
+     "inception": "1999-03-04",
+     "dateSource": "nasdaq",
+     "ccy": "USD",
+     "returnType": "Total return",
+     "how": "nasdaqIndex",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "XNDX history",
+       "url": "https://indexes.nasdaq.com/Index/History/XNDX"
+      },
+      {
+       "label": "XNDX download (Excel)",
+       "url": "https://indexes.nasdaq.com/Index/ExportHistory/XNDX?startDate=1999-03-04T00:00:00.000&endDate=2026-09-28T00:00:00.000&timeOfDay=EOD"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "index",
+   "asset": "MSCI ACWI",
+   "instruments": [
+    {
+     "id": "idx-msci-acwi-index",
+     "name": "MSCI ACWI Index",
+     "inception": "1998-12-31",
+     "dateSource": "publisher",
+     "ccy": "USD",
+     "returnType": "Net Total Return",
+     "how": "msci",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "MSCI ACWI on MSCI",
+       "url": "https://www.msci.com/indexes/index/892400"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "index",
+   "asset": "MSCI World",
+   "instruments": [
+    {
+     "id": "idx-msci-world-index",
+     "name": "MSCI World Index",
+     "inception": "1998-12-31",
+     "dateSource": "publisher",
+     "ccy": "USD",
+     "returnType": "Net Total Return",
+     "how": "msci",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "MSCI World on MSCI",
+       "url": "https://www.msci.com/indexes/index/990100"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "equity",
+   "region": "global",
+   "vehicle": "index",
+   "asset": "MSCI Emerging Markets",
+   "instruments": [
+    {
+     "id": "idx-msci-emerging-markets-index",
+     "name": "MSCI Emerging Markets Index",
+     "inception": "1998-12-31",
+     "dateSource": "publisher",
+     "ccy": "USD",
+     "returnType": "Net Total Return",
+     "how": "msci",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "MSCI Emerging Markets on MSCI",
+       "url": "https://www.msci.com/indexes/index/891800"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "gold",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Gold",
+   "instruments": [
+    {
+     "id": "idx-mcx-spot-market-price-gold-ahmedabad",
+     "name": "MCX Spot Market Price: Gold (Ahmedabad)",
+     "inception": "2005-06-06",
+     "dateSource": "mcx",
+     "ccy": "INR",
+     "returnType": "Spot price",
+     "how": "mcxSpot",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "MCX Spot Market Price",
+       "url": "https://www.mcxindia.com/market-data/spot-market-price"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Short duration",
+   "instruments": [
+    {
+     "id": "idx-nse-short-duration-debt-index-liquid-or-1d-rate",
+     "name": "NSE short-duration debt index (Liquid or 1D Rate)",
+     "inception": "2011-01-03",
+     "dateSource": "nse",
+     "ccy": "INR",
+     "returnType": "Total return",
+     "how": "nseTri",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NSE Indices historical data",
+       "url": "https://www.niftyindices.com/reports/historical-data"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "class": "debt",
+   "region": "india",
+   "vehicle": "index",
+   "asset": "Long duration",
+   "instruments": [
+    {
+     "id": "idx-nifty-10-yr-benchmark-g-sec-index",
+     "name": "Nifty 10 yr Benchmark G-Sec Index",
+     "inception": "2011-01-03",
+     "dateSource": "nse",
+     "ccy": "INR",
+     "returnType": "Total return",
+     "how": "nseTri",
+     "kind": "Index",
+     "links": [
+      {
+       "label": "NSE Indices historical data",
+       "url": "https://www.niftyindices.com/reports/historical-data"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

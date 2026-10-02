@@ -4,7 +4,7 @@ export default {
     content: [
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./backtest/**/*.{html,js}",
+    "./portfolio-engine/**/*.{html,js}",
   ],
   theme: {
   	extend: {

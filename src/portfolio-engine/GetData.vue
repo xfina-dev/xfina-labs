@@ -1,0 +1,485 @@
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
+import { ArrowLeft, ExternalLink, X, Check, Bookmark, ShieldCheck } from 'lucide-vue-next';
+import AppShell from '@/components/AppShell.vue';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Tag from './Tag.vue';
+import GifPreview from './GifPreview.vue';
+import { bookmarkletFor } from './bookmarklets.js';
+import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, sourcesOf, returnsFor, basisFor, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
+
+// The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
+// Every asset for that path is then listed as a group with its oldest three. The path lives in the
+// URL hash, e.g. #equity/us/etf/irish, so a link lands on the same step.
+//
+// Lanes 1 to 3 always hold a choice: Equity, India, Index unless the URL says otherwise. Changing an
+// earlier lane keeps the later choice when it still exists and otherwise falls back to the first that does.
+const cls = ref('equity');
+const region = ref('india');
+const vehicle = ref('index');
+const listing = ref(null);
+
+const vehicles = computed(() => vehiclesFor(cls.value, region.value));
+const offers = (id) => vehicles.value.some((v) => v.id === id);
+const listings = computed(() => listingsFor(cls.value, region.value, vehicle.value));
+// The fourth lane has content only when there is something to choose: the ETF listing for US and Global ETFs, or the plan for mutual funds.
+const showListing = computed(() => listings.value.length > 0);
+const groups = computed(() => {
+  const g = groupsFor(cls.value, region.value, vehicle.value, listing.value);
+  // An index is named after its own asset ("Nifty 50" then "Nifty 50 TRI"), so a per-asset heading would just
+  // repeat it: one flat list under a single "<Region> Index" heading instead, comparable to ETF/MF's per-asset one.
+  return vehicle.value === 'index' ? (g.length ? [{ asset: `${regionTitle(region.value)} Index`, instruments: g.flatMap((x) => x.instruments) }] : []) : g;
+});
+
+// Bring the lanes back to a valid state after any change. Irish ETFs are the default listing.
+function settle(wantListing = null) {
+  if (!offers(vehicle.value)) vehicle.value = vehicles.value.find((v) => v.id === 'index')?.id || vehicles.value[0]?.id || vehicle.value;
+  const ls = listingsFor(cls.value, region.value, vehicle.value);
+  listing.value = ls.length ? (ls.some((x) => x.id === wantListing) ? wantListing : ls[0].id) : null;
+}
+const pick = (which, v) => {
+  const keepListing = listing.value;
+  if (which === 'cls') cls.value = v;
+  if (which === 'region') region.value = v;
+  if (which === 'vehicle') { vehicle.value = v; settle(); return; }
+  if (which === 'listing') { listing.value = v; return; }
+  settle(keepListing);
+};
+const toHash = () => [cls.value, region.value, vehicle.value, listing.value].filter(Boolean).join('/');
+const fromHash = () => {
+  const [c, r, v, l] = location.hash.slice(1).split('/');
+  if (CLASSES.some((x) => x.id === c)) cls.value = c;
+  if (REGIONS.some((x) => x.id === r)) region.value = r;
+  if (VEHICLES.some((x) => x.id === v)) vehicle.value = v;
+  settle(l);
+};
+watch([cls, region, vehicle, listing], () => { try { history.replaceState(null, '', `#${toHash()}`); } catch { /* ignore */ } });
+
+// What the user picked: dataset id → the source chosen for it (its `how`). Kept in this browser only. A dataset
+// carries its own source plus any alternatives (sourcesOf); picking a source adds the
+// dataset from there, picking the chosen one again removes it. The list below takes each dataset as from its
+// chosen source, so the download cards, bookmarks and returns follow the choice.
+const STORE = 'xfina_labs_guide_selection_v4';
+const OLD_STORE = 'xfina_labs_guide_selection_v3';
+const picked = ref({});
+const chosen = (id) => picked.value[id] || null;
+const has = (id) => !!chosen(id);
+const choose = (id, how) => {
+  const next = { ...picked.value };
+  if (next[id] === how) delete next[id]; else next[id] = how;
+  picked.value = next;
+};
+const remove = (id) => { const next = { ...picked.value }; delete next[id]; picked.value = next; };
+// The source shown for a row: the chosen one once added, else what was set before adding, else the first (default).
+const draft = ref({});
+const sourceOf = (i) => [chosen(i.id), draft.value[i.id]].find((h) => h && sourcesOf(i).some((s) => s.how === h)) || sourcesOf(i)[0].how;
+const setSource = (i, how) => {
+  if (has(i.id)) picked.value = { ...picked.value, [i.id]: how };
+  else draft.value = { ...draft.value, [i.id]: how };
+};
+// Short names for the source dropdown (the cards keep each site's full name).
+const SHORT = { 'SPDR Gold Shares': 'SPDR Gold' };
+const sourceLabel = (how) => SHORT[HOW[how].site] || HOW[how].site;
+const list = computed(() => Object.entries(picked.value).map(([id, how]) => {
+  const d = findDataset(id);
+  if (!d) return null;
+  const s = sourcesOf(d).find((x) => x.how === how) || sourcesOf(d)[0];
+  return { ...d, how: s.how, links: s.links };
+}).filter(Boolean));
+// One row per asset (and region) inside each asset class, with what was picked under Index, ETF and MF.
+const selectedRows = computed(() => CLASSES.map((cls) => {
+  const rows = new Map();
+  for (const i of list.value.filter((x) => x.cls === cls.id)) {
+    const key = `${i.region}|${i.asset}`;
+    if (!rows.has(key)) rows.set(key, { key, asset: i.asset, region: i.region, cells: { index: [], etf: [], mf: [] } });
+    rows.get(key).cells[i.vehicle].push(i);
+  }
+  const order = (r) => REGIONS.findIndex((x) => x.id === r.region);
+  return { cls, rows: [...rows.values()].sort((a, b) => order(a) - order(b)) };
+}).filter((g) => g.rows.length));
+const REGION_CODE = { india: 'IN', us: 'US', global: 'GL' };
+// Every dataset in the catalogue, counted once (an instrument can sit under more than one path).
+const TOTAL = new Set(nodes.flatMap((n) => n.instruments.map((i) => i.id))).size;
+const regionTitle = (id) => REGIONS.find((r) => r.id === id)?.title || id;
+
+onMounted(() => {
+  fromHash();
+  window.addEventListener('hashchange', fromHash);
+  try {
+    const now = localStorage.getItem(STORE);
+    if (now) picked.value = JSON.parse(now);
+    else {
+      // A list saved before sources could be chosen: every dataset on its own source.
+      const old = JSON.parse(localStorage.getItem(OLD_STORE) || '[]');
+      picked.value = Object.fromEntries(old.map(findDataset).filter(Boolean).map((d) => [d.id, d.how]));
+    }
+  } catch { /* storage blocked: start empty */ }
+});
+watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch { /* ignore */ } }, { deep: true });
+
+// The download list is grouped by website, so each site is visited once. The site's one download page, where it
+// has one (HOW's `page`), shows once in the card header; links specific to one dataset (a ticker's own page) stay
+// on its row.
+//
+// Sites are in a fixed order: by where the source is (India, then US, then global), and within each, index
+// publisher before exchange prices before fund NAVs. A site that serves more than one region (iShares, Tiingo,
+// WSJ) sits with the first. Within a site, datasets go Index before ETF before MF.
+const SITE_ORDER = ['NSE Indices', 'NSE', 'MCX', 'AMFI', 'Nasdaq', 'Yahoo Finance', 'iShares', 'SPDR Gold Shares', 'Tiingo', 'WSJ', 'MSCI'];
+const siteRank = (site) => (SITE_ORDER.includes(site) ? SITE_ORDER.indexOf(site) : SITE_ORDER.length);
+const VEHICLE_ORDER = { index: 0, etf: 1, mf: 2 };
+const vehicleRank = (i) => VEHICLE_ORDER[i.vehicle] ?? 3;
+const bySite = computed(() => {
+  const m = new Map();
+  for (const i of list.value) {
+    const site = HOW[i.how].site;
+    m.set(site, [...(m.get(site) || []), i]);
+  }
+  const groups = [...m.entries()].map(([site, its]) => {
+    its = [...its].sort((a, b) => vehicleRank(a) - vehicleRank(b));
+    // Each source with the datasets it serves here, since its steps can depend on them.
+    const hows = [...new Set(its.map((i) => i.how))].map((h) => ({ ...HOW[h], items: its.filter((i) => i.how === h) }));
+    return { site, items: its, page: hows[0].page, pageLabel: hows[0].pageLabel, terms: hows[0].terms, hows, bookmarklet: bookmarkletFor(site, its) };
+  });
+  return groups.sort((a, b) => siteRank(a.site) - siteRank(b.site) || a.site.localeCompare(b.site));
+});
+
+const anyBookmark = computed(() => bySite.value.some((g) => g.bookmarklet));
+// A HOW's steps or format: text, or a function of the datasets it serves.
+const txt = (v, items) => (typeof v === 'function' ? v(items) : v);
+// Clicking a bookmarklet link on this page would run it here, where it does nothing useful. It is for dragging,
+// so a click opens a dialog saying so, with the same button to drag from there.
+const dragFor = ref(null);
+const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+// Sites with a recorded walkthrough in public/help/<slug>.gif. Tiingo's bookmark has no page to show (it only calls
+// Tiingo's API), so it has none, and its card shows the steps at full width.
+const GIFS = new Set(['nse-indices', 'nse', 'mcx', 'amfi']);
+const hasGif = (site) => GIFS.has(slug(site));
+// min-w-0 so a long blurb (e.g. Switzerland's) truncates inside its grid column instead of forcing
+// the column, and the whole grid, wider than its container (a CSS Grid default: a child's intrinsic
+// content width otherwise wins over the column's 1fr share).
+const tile = (on) => ['w-full min-w-0 text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
+const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
+</script>
+
+<template>
+  <AppShell tool="/portfolio-engine/">
+    <template #tagline>
+      Answer a few questions and get the exact page to download each dataset from.<br />
+      Xfina reads the file as the source publishes it. Nothing is uploaded to any server.
+    </template>
+
+    <div>
+      <a href="/portfolio-engine/" class="no-underline">
+        <Button variant="outline" size="sm"><ArrowLeft class="h-4 w-4 mr-2" />Back to Portfolio Engine</Button>
+      </a>
+    </div>
+
+    <!-- Where the data goes, before anything is picked -->
+    <div class="rounded-md border bg-muted/30 p-4 space-y-2 text-sm">
+      <div class="flex items-center gap-2 font-semibold"><ShieldCheck class="h-4 w-4" />Data you download stays with you</div>
+      <ul class="list-disc pl-5 space-y-0.5 text-muted-foreground">
+        <li>You download the data from each source in your browser, and use it in your browser.</li>
+        <li>Xfina Labs and Portfolio Engine are a static website: there is no API or form that stores anything on a server, so Xfina never sees your data.</li>
+        <li>Each source's own terms of use apply (the Terms link on its card). Xfina isn't affiliated with any of them.</li>
+        <li>A few open, public series come with Portfolio Engine, so there is nothing to download for them: USD/INR and inflation (CPI).</li>
+      </ul>
+    </div>
+
+    <!-- 1. Picker, full width -->
+    <section id="select" class="space-y-4 scroll-mt-8">
+      <div class="flex items-center gap-3">
+        <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">1</span>
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Select Datasets For Download</h2>
+        <div class="h-px flex-1 bg-border" />
+      </div>
+    <Card class="bg-card border-border shadow-sm">
+      <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
+        <div class="space-y-1.5">
+          <CardTitle>Find your data</CardTitle>
+          <CardDescription>Choose a source and press Add for each dataset you need. They collect below, grouped by website.</CardDescription>
+        </div>
+        <span class="shrink-0 text-sm text-muted-foreground"><span class="font-semibold text-foreground">{{ TOTAL }}</span> datasets</span>
+      </CardHeader>
+      <CardContent class="space-y-6">
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <section class="space-y-2">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">1</span>Asset class</h3>
+            <div class="grid gap-2">
+              <button v-for="c in CLASSES" :key="c.id" type="button" :class="tile(cls === c.id)" @click="pick('cls', c.id)">
+                <div class="font-medium">{{ c.title }}</div><div class="text-xs text-muted-foreground truncate">{{ c.blurb }}</div>
+              </button>
+            </div>
+          </section>
+
+          <section class="space-y-2">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">2</span>Region</h3>
+            <div class="grid gap-2">
+              <button v-for="r in REGIONS" :key="r.id" type="button" :class="tile(region === r.id)" @click="pick('region', r.id)">
+                <div class="font-medium">{{ r.title }}</div><div class="text-xs text-muted-foreground truncate">{{ r.blurb }}</div>
+              </button>
+            </div>
+          </section>
+
+          <section class="space-y-2">
+            <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">3</span>Model it as</h3>
+            <div class="grid gap-2">
+              <!-- Only the models that exist for this class and region; Gold has no Index, for example. -->
+              <button v-for="v in vehicles" :key="v.id" type="button" :class="tile(vehicle === v.id)" @click="pick('vehicle', v.id)">
+                <div class="font-medium">{{ v.title }}</div><div class="text-xs text-muted-foreground truncate">{{ v.blurb }}</div>
+              </button>
+            </div>
+          </section>
+
+          <!-- Lane 4 keeps its column so the picker never changes shape. Its content shows only for US and
+               Global ETFs, where Irish ETFs are the default; otherwise the lane is simply empty. -->
+          <section class="space-y-2">
+            <template v-if="showListing">
+              <h3 class="text-sm font-semibold flex items-center gap-2"><span class="inline-grid place-items-center w-5 h-5 rounded-full bg-muted text-[11px]">4</span>{{ vehicle === 'mf' ? 'Which plan' : 'ETF Domicile' }}</h3>
+              <div class="grid gap-2">
+                <button v-for="l in listings" :key="l.id" type="button" :class="tile(listing === l.id)" @click="pick('listing', l.id)">
+                  <div class="font-medium">{{ l.title }}</div><div class="text-xs text-muted-foreground truncate">{{ l.blurb }}</div>
+                </button>
+              </div>
+            </template>
+          </section>
+        </div>
+
+        <!-- Every asset for the path, grouped, each with its oldest three -->
+        <section v-if="vehicle" class="space-y-4 border-t pt-6">
+          <p v-if="!groups.length" class="text-sm text-muted-foreground">Nothing is listed for this yet.</p>
+          <div v-else class="overflow-x-auto rounded-md border">
+            <table class="w-full min-w-[760px] text-sm">
+              <tbody v-for="g in groups" :key="g.asset || 'indexes'">
+                <tr v-if="g.asset"><th colspan="9" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
+                <tr v-for="i in g.instruments" :key="i.id" class="border-t">
+                  <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
+                  <td class="px-2 py-2 min-w-[10rem] font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ i.name }}</td>
+                  <td class="px-2 py-2 whitespace-nowrap">
+                    <Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested (or, for an index, included in the level)' : 'Distributing: income is paid out, not reinvested (or, for an index, excluded from the level)'">{{ distFlag(i) }}</Tag>
+                  </td>
+                  <td class="px-2 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
+                  <!-- Total return or price only, for the chosen source (or the dataset's own, before one is picked) -->
+                  <td class="px-2 py-2 whitespace-nowrap">
+                    <Tag :variant="returnsFor(i, sourceOf(i)).ok === true ? 'ok' : returnsFor(i, sourceOf(i)).ok === false ? 'warn' : 'soon'" :title="returnsFor(i, sourceOf(i)).why">{{ returnsFor(i, sourceOf(i)).label }}</Tag>
+                  </td>
+                  <td class="px-2 py-2 whitespace-nowrap">
+                    <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
+                  </td>
+                  <td class="px-2 py-2">
+                    <!-- The source, from the dataset's array (its own first, the default). Changing it on an added dataset
+                         switches it; before adding, it sets where Add takes it from. One source only (India's own
+                         publishers): its name, where the dropdown would be. -->
+                    <span v-if="sourcesOf(i).length === 1" class="text-sm text-muted-foreground">{{ sourceLabel(sourceOf(i)) }}</span>
+                    <Select v-else :modelValue="sourceOf(i)" @update:modelValue="(v) => setSource(i, v)">
+                      <SelectTrigger class="h-9 w-36 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
+                      <SelectContent :body-lock="false">
+                        <SelectGroup><SelectItem v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</SelectItem></SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <!-- What that source's number is: NAV, market price or an index level -->
+                  <td class="w-[7.75rem] px-2 py-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</td>
+                  <td class="px-2 py-2 text-right">
+                    <!-- Added looks like a selected filter tile above: a primary border on a faint primary tint -->
+                    <Button variant="outline" size="sm" class="w-[5.5rem] justify-center px-2" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
+                      <Check v-if="has(i.id)" class="h-3.5 w-3.5 mr-1" />{{ has(i.id) ? 'Added' : 'Add' }}
+                    </Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </CardContent>
+    </Card>
+    </section>
+
+    <!-- 2. Everything selected -->
+    <section id="review" class="space-y-4 scroll-mt-8">
+      <div class="flex items-center gap-3">
+        <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">2</span>
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Review Selected Datasets</h2>
+        <div class="h-px flex-1 bg-border" />
+      </div>
+    <Card class="bg-card border-border shadow-sm">
+      <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
+        <div class="space-y-1.5">
+          <CardTitle>Selected</CardTitle>
+          <CardDescription>{{ list.length ? `${list.length} dataset${list.length > 1 ? 's' : ''} across ${bySite.length} website${bySite.length > 1 ? 's' : ''}.` : 'Nothing selected yet. Add datasets above.' }}</CardDescription>
+        </div>
+        <Button v-if="list.length" variant="ghost" size="sm" @click="picked = {}">Clear all</Button>
+      </CardHeader>
+      <CardContent>
+        <div v-if="!list.length" class="rounded-md border border-dashed bg-muted/30 p-8 text-center text-sm text-muted-foreground">Nothing added yet.</div>
+        <!-- Grouped by asset class, one row per asset, how it is modelled across. -->
+        <div v-else class="overflow-x-auto">
+          <table class="w-full min-w-[720px] text-sm">
+            <thead>
+              <tr class="text-left text-xs text-muted-foreground">
+                <th class="w-44 py-1 pr-3 font-medium">Asset</th>
+                <th v-for="v in VEHICLES" :key="v.id" class="py-1 pr-3 font-medium">{{ v.title }}</th>
+              </tr>
+            </thead>
+            <tbody v-for="g in selectedRows" :key="g.cls.id">
+              <tr><th colspan="4" class="border-t bg-muted/40 px-2 py-1 text-left text-xs font-semibold uppercase tracking-wide">{{ g.cls.title }}</th></tr>
+              <tr v-for="r in g.rows" :key="r.key" class="align-top border-t">
+                <td class="py-2 pr-3 font-medium"><Tag :title="regionTitle(r.region)">{{ REGION_CODE[r.region] || r.region }}</Tag> {{ r.asset }}</td>
+                <td v-for="v in VEHICLES" :key="v.id" class="py-2 pr-3">
+                  <div v-for="i in r.cells[v.id]" :key="i.id" class="flex items-start justify-between gap-1">
+                    <span class="min-w-0">{{ clip(i.name) }} <Tag v-if="i.code && i.code.length <= 10 && i.code !== i.name && HOW[i.how].site !== 'AMFI'">{{ i.code }}</Tag> <span class="text-xs text-muted-foreground">{{ HOW[i.how].site }}</span></span>
+                    <button type="button" class="shrink-0 text-muted-foreground hover:text-foreground" title="Remove" @click="remove(i.id)"><X class="h-4 w-4" /></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </CardContent>
+    </Card>
+    </section>
+
+    <!-- 3. Download list, by website -->
+    <section v-if="list.length" id="download" class="space-y-4 scroll-mt-8">
+      <div class="flex items-center gap-3">
+        <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">3</span>
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Download Datasets</h2>
+        <div class="h-px flex-1 bg-border" />
+      </div>
+      <!-- The bookmark, explained once for every site that has one -->
+      <div v-if="anyBookmark" class="rounded-md border bg-muted/30 p-4 space-y-3 text-sm">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <div class="flex items-center gap-2 font-semibold"><Bookmark class="h-4 w-4" />Xfina bookmarklet</div>
+          <span class="text-muted-foreground">Sites cap each request (a year on NSE Indices, five on AMFI); it does the repeat downloads on the site's own page.</span>
+        </div>
+        <div class="grid gap-3 md:grid-cols-2">
+          <div>
+            <div class="font-medium text-muted-foreground text-xs mb-1">Use</div>
+            <ol class="list-decimal pl-5 space-y-0.5">
+              <li>Drag the site's Xfina button to your bookmarks bar, once.</li>
+              <li>Open the site's page (the Open button on its card), click the bookmark there and press Start. A new, empty tab can't run bookmarks.</li>
+              <li>Keep that tab in front until it says Done.</li>
+              <li>Import the files in Portfolio Engine: it merges by date.</li>
+            </ol>
+          </div>
+          <div>
+            <div class="font-medium text-muted-foreground text-xs mb-1">Good to know</div>
+            <ul class="list-disc pl-5 space-y-0.5 text-muted-foreground">
+              <li>Each button is set up with the datasets you selected: drag it again after changing the list.</li>
+              <li>The next run fetches only what's new.</li>
+              <li>Chrome and Edge save to one folder you pick; elsewhere, allow multiple downloads.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-8">
+      <Card v-for="g in bySite" :key="g.site" class="bg-card border-border shadow-sm">
+        <CardHeader class="flex flex-col gap-3 space-y-0 pb-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0 space-y-1.5">
+            <CardTitle class="text-xl">{{ g.site }}</CardTitle>
+            <CardDescription>
+              {{ g.items.length }} dataset{{ g.items.length > 1 ? 's' : '' }} to download here. Follow the steps, then import the files.
+            </CardDescription>
+          </div>
+          <!-- The bookmark (to drag), the site's one download page where it has one, and its terms of use -->
+          <div class="flex flex-wrap items-center gap-2 sm:shrink-0">
+            <a
+              v-if="g.bookmarklet" :href="g.bookmarklet.href" draggable="true" title="Drag to your bookmarks bar"
+              class="inline-flex items-center h-8 px-3 rounded-md border border-primary bg-primary/5 hover:bg-primary/10 text-sm font-medium cursor-grab no-underline"
+              @click.prevent="dragFor = g.bookmarklet"
+            ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ g.bookmarklet.label }}</a>
+            <a v-if="g.page" :href="g.page" target="_blank" rel="noopener noreferrer" class="no-underline">
+              <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Open {{ g.pageLabel }}</Button>
+            </a>
+            <a v-if="g.terms" :href="g.terms" target="_blank" rel="noopener noreferrer" class="no-underline">
+              <Button variant="ghost" size="sm" class="text-muted-foreground"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />Terms</Button>
+            </a>
+          </div>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <div>
+            <div class="font-medium text-muted-foreground text-xs mb-1">Datasets to download</div>
+            <div class="overflow-x-auto rounded-md border">
+              <table class="w-full min-w-[640px] text-sm">
+                <tbody>
+                  <tr v-for="i in g.items" :key="i.id" class="border-t">
+                    <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
+                    <td class="px-2 py-2 min-w-[14rem] font-medium">{{ i.name }}</td>
+                    <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
+                    <td class="px-2 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
+                    <td class="px-2 py-2 whitespace-nowrap text-muted-foreground" :title="basisFor(i).why">{{ basisFor(i).label }}</td>
+                    <td class="px-2 py-2 whitespace-nowrap"><Tag :variant="returnsFor(i).ok === true ? 'ok' : returnsFor(i).ok === false ? 'warn' : 'soon'" :title="returnsFor(i).why">{{ returnsFor(i).label }}</Tag></td>
+                    <td class="px-2 py-2 whitespace-nowrap text-muted-foreground" :title="dateSourceNote(i)">{{ i.inception || '—' }}</td>
+                    <td class="px-2 py-2 text-right">
+                      <div class="flex items-center justify-end gap-1.5">
+                        <a v-for="l in i.links.filter((x) => x.url !== g.page)" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
+                          <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
+                        </a>
+                        <Button variant="ghost" size="sm" class="h-7 px-2 text-muted-foreground" title="Remove" @click="remove(i.id)"><X class="h-4 w-4" /></Button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- By hand: the walkthrough beside the steps for what is selected. Only sites with a recorded walkthrough
+               have one; a direct download is a link and a click, so its steps stand alone at full width. -->
+          <div class="grid gap-4 md:items-start" :class="{ 'md:grid-cols-2': hasGif(g.site) }">
+            <GifPreview v-if="hasGif(g.site)" :slug="slug(g.site)" :title="g.site" />
+            <div class="space-y-3 text-sm">
+              <div v-for="h in g.hows" :key="h.title">
+                <div class="font-medium text-muted-foreground text-xs mb-1">{{ g.hows.length > 1 ? h.title : 'Steps' }}</div>
+                <ol class="list-decimal pl-5 space-y-1">
+                  <li v-for="(s, k) in txt(h.steps, h.items)" :key="k">{{ s }}</li>
+                </ol>
+                <p v-if="h.format" class="text-xs text-muted-foreground mt-1">You get: {{ txt(h.format, h.items) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- What is particular to this site's bookmark -->
+          <p v-if="g.bookmarklet && (g.bookmarklet.skipped || g.bookmarklet.caution)" class="text-xs text-muted-foreground">
+            <template v-if="g.bookmarklet.skipped">It doesn't cover {{ g.bookmarklet.skipped }} of these, so download {{ g.bookmarklet.skipped > 1 ? 'them' : 'it' }} by hand. </template>
+            {{ g.bookmarklet.caution }}
+          </p>
+        </CardContent>
+      </Card>
+      </div>
+    </section>
+
+    <!-- A click on an Xfina button: it is meant to be dragged, not clicked here -->
+    <Dialog :open="!!dragFor" @update:open="(v) => { if (!v) dragFor = null; }">
+      <DialogContent v-if="dragFor" class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Drag it to your bookmarks bar</DialogTitle>
+          <DialogDescription>This button is a bookmarklet. It only works on the {{ dragFor.site }} site, so clicking it here does nothing.</DialogDescription>
+        </DialogHeader>
+        <ol class="list-decimal pl-5 space-y-3 text-sm">
+          <li>Show the bookmarks bar if it's hidden: <strong>⌘ Shift B</strong> on a Mac, <strong>Ctrl Shift B</strong> on Windows or Linux.</li>
+          <li>
+            Drag this onto the bar:
+            <div class="mt-2">
+              <a
+                :href="dragFor.href" draggable="true" title="Drag to your bookmarks bar"
+                class="inline-flex items-center h-8 px-3 rounded-md border border-primary bg-primary/5 hover:bg-primary/10 text-sm font-medium cursor-grab no-underline"
+                @click.prevent
+              ><Bookmark class="h-3.5 w-3.5 mr-1.5" />{{ dragFor.label }}</a>
+            </div>
+          </li>
+          <li>
+            Open {{ dragFor.site }}, then click the bookmark there:
+            <div class="mt-2">
+              <a :href="dragFor.openUrl" target="_blank" rel="noopener noreferrer" class="no-underline">
+                <Button variant="outline" size="sm"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ dragFor.openLabel }}</Button>
+              </a>
+            </div>
+          </li>
+        </ol>
+      </DialogContent>
+    </Dialog>
+  </AppShell>
+</template>
