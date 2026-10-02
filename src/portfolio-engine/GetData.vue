@@ -5,6 +5,7 @@ import AppShell from '@/components/AppShell.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Tag from './Tag.vue';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
@@ -270,15 +271,14 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                          an added dataset switches it; before adding, it sets where Add takes it from. Added looks like a
                          selected filter tile above: a primary border on a faint primary tint. -->
                     <div class="flex items-center justify-end gap-1.5">
-                      <select
-                        class="h-8 rounded-md border bg-background px-2 text-sm text-muted-foreground"
-                        :value="sourceOf(i)" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"
-                        @change="setSource(i, $event.target.value)"
-                      >
-                        <option v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</option>
-                      </select>
+                      <Select :modelValue="sourceOf(i)" @update:modelValue="(v) => setSource(i, v)">
+                        <SelectTrigger class="h-9 w-28 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup><SelectItem v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</SelectItem></SelectGroup>
+                        </SelectContent>
+                      </Select>
                       <!-- What that source's number is: NAV, market price or an index level -->
-                      <span class="w-24 text-left text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</span>
+                      <span class="ml-2 w-24 text-left text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</span>
                       <Button variant="outline" size="sm" class="w-28 justify-center" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
                         <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
                       </Button>
