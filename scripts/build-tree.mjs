@@ -284,7 +284,7 @@ const ETFS = [
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'iShares Core S&P 500 ETF', code: 'IVV', page: ishUs(239726, 'ishares-core-sp-500-etf') },
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'Vanguard S&P 500 ETF', code: 'VOO', manual: '2010-09-09', manualSrc: 'tiingo', src: 'tiingo' },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco QQQ Trust', code: 'QQQ', manual: '1999-03-10', manualSrc: 'tiingo', src: 'tiingo' },
-  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco NASDAQ 100 ETF', code: 'QQQM', manual: '2020-10-13', src: 'tiingo' },
+  { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco NASDAQ 100 ETF', code: 'QQQM', manual: '2020-10-13', manualSrc: 'tiingo', src: 'tiingo' },
   // Vanguard's VUAA is dropped: CSPX covers the same index and listing from 2010, with an issuer download.
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'irish', name: 'iShares Core S&P 500 UCITS ETF (Acc)', code: 'CSPX', page: ishUk(253743, 'ishares-core-sp-500-ucits-etf') },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'irish', name: 'iShares Nasdaq 100 UCITS ETF (Acc)', code: 'CNDX', page: ishUk(253741, 'ishares-nasdaq-100-ucits-etf') },
@@ -302,7 +302,7 @@ const ETFS = [
   // choices, Switzerland first. US gold has no domicile choice, so its ETFs carry no listing.
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'SPDR Gold Shares', code: 'GLD', manual: '2004-11-18', src: 'spdrgold' },
   { cls: 'gold', region: 'us', asset: 'Gold', name: 'iShares Gold Trust', code: 'IAU', page: ishUs(239561, 'ishares-gold-trust-fund') },
-  { cls: 'gold', region: 'us', asset: 'Gold', name: 'abrdn Physical Gold Shares ETF', code: 'SGOL', manual: '2009-09-09', src: 'tiingo' },
+  { cls: 'gold', region: 'us', asset: 'Gold', name: 'abrdn Physical Gold Shares ETF', code: 'SGOL', manual: '2009-09-09', manualSrc: 'tiingo', src: 'tiingo' },
   // Switzerland: genuine Swiss collective investment schemes under CISA (FINMA-regulated), holding physical gold
   // directly as fund property. Not UCITS funds and not debt securities (unlike the Irish ETCs below): Switzerland
   // is outside the UCITS Directive, so it has no need for the debt-note workaround.
