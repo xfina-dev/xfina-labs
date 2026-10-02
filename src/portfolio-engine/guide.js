@@ -131,7 +131,7 @@ export const HOW = {
   // dividends, so WSJ's price-only file loses nothing for these.
   wsj: {
     site: 'WSJ',
-    terms: 'https://www.wsj.com/policy/terms-of-use',
+    terms: 'https://www.wsj.com/policy/additional-terms-conditions',
     title: 'WSJ: historical prices',
     steps: [
       'Open the fund\'s Historical Prices page on WSJ (the link on its row).',

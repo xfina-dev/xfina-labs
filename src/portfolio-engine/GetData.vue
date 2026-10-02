@@ -119,6 +119,10 @@ const txt = (v, items) => (typeof v === 'function' ? v(items) : v);
 // so a click opens a dialog saying so, with the same button to drag from there.
 const dragFor = ref(null);
 const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+// Sites with a recorded walkthrough in public/help/<slug>.gif. Tiingo's bookmark has no page to show (it only calls
+// Tiingo's API), so it has none, and its card shows the steps at full width.
+const GIFS = new Set(['nse-indices', 'nse', 'mcx', 'amfi']);
+const hasGif = (site) => GIFS.has(slug(site));
 // min-w-0 so a long blurb (e.g. Switzerland's) truncates inside its grid column instead of forcing
 // the column, and the whole grid, wider than its container (a CSS Grid default: a child's intrinsic
 // content width otherwise wins over the column's 1fr share).
@@ -371,10 +375,10 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
             </div>
           </div>
 
-          <!-- By hand: the walkthrough beside the steps for what is selected. Only sites with a bookmarklet have one; a
-               direct download is a link and a click, so its steps stand alone at full width. -->
-          <div class="grid gap-4 md:items-start" :class="{ 'md:grid-cols-2': g.bookmarklet }">
-            <GifPreview v-if="g.bookmarklet" :slug="slug(g.site)" :title="g.site" />
+          <!-- By hand: the walkthrough beside the steps for what is selected. Only sites with a recorded walkthrough
+               have one; a direct download is a link and a click, so its steps stand alone at full width. -->
+          <div class="grid gap-4 md:items-start" :class="{ 'md:grid-cols-2': hasGif(g.site) }">
+            <GifPreview v-if="hasGif(g.site)" :slug="slug(g.site)" :title="g.site" />
             <div class="space-y-3 text-sm">
               <div v-for="h in g.hows" :key="h.title">
                 <div class="font-medium text-muted-foreground text-xs mb-1">{{ g.hows.length > 1 ? h.title : 'Steps' }}</div>
