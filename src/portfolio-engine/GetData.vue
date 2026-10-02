@@ -80,7 +80,9 @@ const setSource = (i, how) => {
   if (has(i.id)) picked.value = { ...picked.value, [i.id]: how };
   else draft.value = { ...draft.value, [i.id]: how };
 };
-const sourceLabel = (how) => (how === 'custom' ? 'Own file' : HOW[how].site);
+// Short names for the source dropdown (the cards keep each site's full name).
+const SHORT = { 'SPDR Gold Shares': 'SPDR Gold' };
+const sourceLabel = (how) => (how === 'custom' ? 'Own file' : SHORT[HOW[how].site] || HOW[how].site);
 const list = computed(() => Object.entries(picked.value).map(([id, how]) => {
   const d = findDataset(id);
   if (!d) return null;
@@ -197,7 +199,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
       <CardHeader class="flex flex-row items-start justify-between space-y-0 gap-4 pb-4">
         <div class="space-y-1.5">
           <CardTitle>Find your data</CardTitle>
-          <CardDescription>Pick a source for each dataset you need (pick it again to remove it). They collect below, grouped by website.</CardDescription>
+          <CardDescription>Choose a source and press Add for each dataset you need. They collect below, grouped by website.</CardDescription>
         </div>
         <span class="shrink-0 text-sm text-muted-foreground"><span class="font-semibold text-foreground">{{ TOTAL }}</span> datasets</span>
       </CardHeader>
@@ -253,20 +255,20 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               <tbody v-for="g in groups" :key="g.asset || 'indexes'">
                 <tr v-if="g.asset"><th colspan="8" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
                 <tr v-for="i in g.instruments" :key="i.id" class="border-t">
-                  <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
-                  <td class="px-3 py-2 min-w-[14rem] font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ i.name }}</td>
-                  <td class="px-3 py-2 whitespace-nowrap">
+                  <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
+                  <td class="px-2 py-2 min-w-[11rem] font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ i.name }}</td>
+                  <td class="px-2 py-2 whitespace-nowrap">
                     <Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested (or, for an index, included in the level)' : 'Distributing: income is paid out, not reinvested (or, for an index, excluded from the level)'">{{ distFlag(i) }}</Tag>
                   </td>
-                  <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
+                  <td class="px-2 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
                   <!-- Total return or price only, for the chosen source (or the dataset's own, before one is picked) -->
-                  <td class="px-3 py-2 whitespace-nowrap">
+                  <td class="px-2 py-2 whitespace-nowrap">
                     <Tag :variant="returnsFor(i, sourceOf(i)).ok === true ? 'ok' : returnsFor(i, sourceOf(i)).ok === false ? 'warn' : 'soon'" :title="returnsFor(i, sourceOf(i)).why">{{ returnsFor(i, sourceOf(i)).label }}</Tag>
                   </td>
-                  <td class="px-3 py-2 whitespace-nowrap">
+                  <td class="px-2 py-2 whitespace-nowrap">
                     <span v-if="yearsOf(i) !== null" title="Years of history, rounded down" class="text-sm font-medium text-primary">{{ yearsOf(i) < 1 ? '<1 yr' : `${yearsOf(i)} yr${yearsOf(i) > 1 ? 's' : ''}` }}</span>
                   </td>
-                  <td class="px-3 py-2 text-right">
+                  <td class="px-2 py-2 text-right">
                     <!-- The source, from the dataset's array (its own first, the default), and Add. Changing the source of
                          an added dataset switches it; before adding, it sets where Add takes it from. Added looks like a
                          selected filter tile above: a primary border on a faint primary tint. -->
@@ -274,15 +276,15 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                       <!-- One source only (India's own publishers): its name, where the dropdown would be -->
                       <span v-if="sourcesOf(i).length === 1" class="text-sm text-muted-foreground">{{ sourceLabel(sourceOf(i)) }}</span>
                       <Select v-else :modelValue="sourceOf(i)" @update:modelValue="(v) => setSource(i, v)">
-                        <SelectTrigger class="h-9 w-44 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
+                        <SelectTrigger class="h-9 w-36 bg-background shadow-sm" :title="`${returnsFor(i, sourceOf(i)).label} from ${sourceLabel(sourceOf(i))}. ${returnsFor(i, sourceOf(i)).why}`"><SelectValue /></SelectTrigger>
                         <SelectContent :body-lock="false">
                           <SelectGroup><SelectItem v-for="s in sourcesOf(i)" :key="s.how" :value="s.how">{{ sourceLabel(s.how) }}</SelectItem></SelectGroup>
                         </SelectContent>
                       </Select>
                       <!-- What that source's number is: NAV, market price or an index level -->
-                      <span class="ml-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</span>
-                      <Button variant="outline" size="sm" class="w-28 justify-center" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
-                        <Check v-if="has(i.id)" class="h-4 w-4 mr-1.5" />{{ has(i.id) ? 'Added' : 'Add to list' }}
+                      <span class="mx-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</span>
+                      <Button variant="outline" size="sm" class="w-[5.5rem] justify-center px-2" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">
+                        <Check v-if="has(i.id)" class="h-3.5 w-3.5 mr-1" />{{ has(i.id) ? 'Added' : 'Add' }}
                       </Button>
                     </div>
                   </td>
@@ -403,14 +405,14 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
               <table class="w-full min-w-[640px] text-sm">
                 <tbody>
                   <tr v-for="i in g.items" :key="i.id" class="border-t">
-                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
-                    <td class="px-3 py-2 min-w-[14rem] font-medium">{{ i.name }}</td>
-                    <td class="px-3 py-2 whitespace-nowrap"><Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
-                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="basisFor(i).why">{{ basisFor(i).label }}</td>
-                    <td class="px-3 py-2 whitespace-nowrap"><Tag :variant="returnsFor(i).ok === true ? 'ok' : returnsFor(i).ok === false ? 'warn' : 'soon'" :title="returnsFor(i).why">{{ returnsFor(i).label }}</Tag></td>
-                    <td class="px-3 py-2 whitespace-nowrap text-muted-foreground" :title="dateSourceNote(i)">{{ i.inception || '—' }}</td>
-                    <td class="px-3 py-2 text-right">
+                    <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
+                    <td class="px-2 py-2 min-w-[14rem] font-medium">{{ i.name }}</td>
+                    <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'">{{ distFlag(i) }}</Tag></td>
+                    <td class="px-2 py-2 whitespace-nowrap text-muted-foreground">{{ i.ccy }}</td>
+                    <td class="px-2 py-2 whitespace-nowrap text-muted-foreground" :title="basisFor(i).why">{{ basisFor(i).label }}</td>
+                    <td class="px-2 py-2 whitespace-nowrap"><Tag :variant="returnsFor(i).ok === true ? 'ok' : returnsFor(i).ok === false ? 'warn' : 'soon'" :title="returnsFor(i).why">{{ returnsFor(i).label }}</Tag></td>
+                    <td class="px-2 py-2 whitespace-nowrap text-muted-foreground" :title="dateSourceNote(i)">{{ i.inception || '—' }}</td>
+                    <td class="px-2 py-2 text-right">
                       <div class="flex items-center justify-end gap-1.5">
                         <a v-for="l in i.links.filter((x) => x.url !== g.page)" :key="l.url" :href="l.url" target="_blank" rel="noopener noreferrer" class="no-underline">
                           <Button variant="outline" size="sm" class="h-7"><ExternalLink class="h-3.5 w-3.5 mr-1.5" />{{ l.label }}</Button>
