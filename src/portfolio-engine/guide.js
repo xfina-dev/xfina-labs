@@ -21,13 +21,14 @@ export const REGIONS = [
   { id: 'us', title: 'US', blurb: 'USD, US markets' },
   { id: 'global', title: 'Global', blurb: 'USD, world-wide markets' },
 ];
-// Mutual fund plans. Regular first: it is the default because it has the longer history. US is a third choice
-// for US assets only: US-domiciled index mutual funds (Vanguard's 500 Index Fund from 1976), not Indian plans;
-// where it is on offer, the Indian plans read IN Regular and IN Direct (see listingsFor).
+// Mutual fund plans. US is for US assets only: US-domiciled index mutual funds (Vanguard's 500 Index Fund from
+// 1976), not Indian plans; where it is on offer it comes first (the default, the longest history) and the Indian
+// plans read India Regular and India Direct (see listingsFor). Elsewhere Regular is first: it is the default
+// because it has the longer history.
 export const PLANS = [
+  { id: 'usfund', title: 'US', blurb: 'US index mutual funds, in USD' },
   { id: 'regular', title: 'Regular', blurb: 'More history, higher cost' },
   { id: 'direct', title: 'Direct', blurb: 'Cheaper, history from 2013' },
-  { id: 'usfund', title: 'US', blurb: 'US index mutual funds, in USD' },
 ];
 export const VEHICLES = [
   { id: 'index', title: 'Index', blurb: 'The benchmark itself (total return)' },
@@ -224,7 +225,7 @@ export const vehiclesFor = (cls, region) => VEHICLES.filter((v) => nodes.some((n
 // Lane 4 holds a listing for ETFs (Irish, US, Indian) and a plan for mutual funds (Regular, Direct).
 export const listingsFor = (cls, region, vehicle = 'etf') => {
   const ls = (vehicle === 'mf' ? PLANS : vehicle === 'etf' ? LISTINGS : []).filter((l) => nodes.some((n) => n.class === cls && n.region === region && n.vehicle === vehicle && n.listing === l.id));
-  return ls.some((l) => l.id === 'usfund') ? ls.map((l) => (l.id === 'usfund' ? l : { ...l, title: `IN ${l.title}` })) : ls;
+  return ls.some((l) => l.id === 'usfund') ? ls.map((l) => (l.id === 'usfund' ? l : { ...l, title: `India ${l.title}` })) : ls;
 };
 export const hasListings = (cls, region, vehicle) => listingsFor(cls, region, vehicle).length > 0;
 export const assetsFor = (cls, region, vehicle, listing) => [...new Set(nodes.filter((n) => same(n, cls, region, vehicle, listing)).map((n) => n.asset))];
