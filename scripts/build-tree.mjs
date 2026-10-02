@@ -280,7 +280,7 @@ async function ishNavCh(pageUrl) {
 const ETFS = [
   // Equity / US. The three oldest S&P 500 ETFs and both Nasdaq-100 ones with real history (IQQ and QNDX, from
   // mid-2026, are too new). SPLG (2005) is left out: it tracked a different index until 2013.
-  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'SPDR S&P 500 ETF Trust', code: 'SPY', manual: '1993-01-22', src: 'tiingo' },
+  { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'SPDR S&P 500 ETF Trust', code: 'SPY', manual: '1993-01-29', manualSrc: 'tiingo', src: 'tiingo' },
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'iShares Core S&P 500 ETF', code: 'IVV', page: ishUs(239726, 'ishares-core-sp-500-etf') },
   { cls: 'equity', region: 'us', asset: 'S&P 500', listing: 'us', name: 'Vanguard S&P 500 ETF', code: 'VOO', manual: '2010-09-09', manualSrc: 'tiingo', src: 'tiingo' },
   { cls: 'equity', region: 'us', asset: 'Nasdaq 100', listing: 'us', name: 'Invesco QQQ Trust', code: 'QQQ', manual: '1999-03-10', manualSrc: 'tiingo', src: 'tiingo' },
