@@ -256,7 +256,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                 <tr v-if="g.asset"><th colspan="9" class="border-t bg-muted/40 px-3 py-1.5 text-left text-xs font-semibold">{{ g.asset }}</th></tr>
                 <tr v-for="i in g.instruments" :key="i.id" class="border-t">
                   <td class="px-2 py-2 whitespace-nowrap"><Tag v-if="i.kind === 'Index'">INDEX</Tag><Tag v-else-if="i.code && i.code.length <= 10 && i.code !== i.name && i.how !== 'amfi'">{{ i.code }}</Tag></td>
-                  <td class="px-2 py-2 min-w-[11rem] font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ i.name }}</td>
+                  <td class="px-2 py-2 min-w-[10rem] font-medium" :title="dateNote(i) + (dateSourceNote(i) ? ` (${dateSourceNote(i)})` : '')">{{ i.name }}</td>
                   <td class="px-2 py-2 whitespace-nowrap">
                     <Tag v-if="distFlag(i) && i.kind !== 'Index'" :variant="distFlag(i) === 'Acc' ? 'ok' : 'warn'" :title="distFlag(i) === 'Acc' ? 'Accumulating: income is reinvested (or, for an index, included in the level)' : 'Distributing: income is paid out, not reinvested (or, for an index, excluded from the level)'">{{ distFlag(i) }}</Tag>
                   </td>
@@ -281,7 +281,7 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                     </Select>
                   </td>
                   <!-- What that source's number is: NAV, market price or an index level -->
-                  <td class="w-[6.5rem] px-2 py-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</td>
+                  <td class="w-[7.75rem] px-2 py-2 whitespace-nowrap text-sm text-muted-foreground" :title="basisFor(i, sourceOf(i)).why">{{ basisFor(i, sourceOf(i)).label }}</td>
                   <td class="px-2 py-2 text-right">
                     <!-- Added looks like a selected filter tile above: a primary border on a faint primary tint -->
                     <Button variant="outline" size="sm" class="w-[5.5rem] justify-center px-2" :class="has(i.id) && 'border-primary bg-primary/5 hover:bg-primary/10'" @click="has(i.id) ? remove(i.id) : choose(i.id, sourceOf(i))">

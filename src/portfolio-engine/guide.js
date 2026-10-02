@@ -306,6 +306,8 @@ const NAV_SOURCES = new Set(['amfi', 'ishares', 'spdrgold']);
 export function basisFor(i, how = i.how) {
   if (how === 'custom') return { label: 'Your file', why: 'As published by wherever your file comes from.' };
   if (i.kind === 'Index') return i.how === 'mcxSpot' ? { label: 'Spot price', why: 'MCX\'s spot gold price, polled several times a day.' } : { label: 'Index level', why: 'The index\'s own level, as its publisher states it.' };
+  // A distributing iShares fund (the US-domiciled ones) lists each dividend on its ex-date beside the NAV.
+  if (how === 'ishares' && distFlag(i) === 'Dist') return { label: 'NAV + Dividends', why: 'The fund\'s own net asset value per share, with each dividend on its ex-date, both from iShares.' };
   if (NAV_SOURCES.has(how) || (how === 'tiingo' && i.kind === 'MF')) return { label: 'NAV', why: 'The fund\'s own net asset value per unit, from the fund house (or AMFI).' };
   return { label: 'Market price', why: 'The price it traded at on the exchange, which can differ slightly from the fund\'s NAV.' };
 }
