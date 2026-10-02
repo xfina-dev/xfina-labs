@@ -172,7 +172,7 @@ export const HOW = {
     steps: ['Open the index\'s History tab (indexes.nasdaq.com, not the nasdaq.com consumer page, whose own date range is much shorter).', 'Under Performance, press All.', 'Press Download. No account is needed.'],
     format: 'An Excel file with a date and the index level daily, as Nasdaq publishes it, back to the index\'s own start.',
   },
-  // Every dataset can also come from a file the user already has, in the format described on the page (CUSTOM_FORMAT).
+  // A file the user already has, in CUSTOM_FORMAT. Not offered as a source for now (see sourcesOf).
   custom: {
     site: 'Your own data',
     title: 'Your own file',
@@ -273,12 +273,10 @@ export function distFlag(i) {
   return 'Dist';
 }
 
-// The sources a dataset can come from, best first: its own (the catalogue's choice), any alternatives (e.g. Tiingo for
-// a US-listed iShares fund), and the user's own file. Each is { how, links }.
-// India's own sources (NSE Indices, NSE, MCX, AMFI) are the real publishers, so their datasets offer no other
-// source, nor the user's own file: the official data is free and complete there.
-const INDIA_SOURCES = new Set(['nseTri', 'nseEtf', 'mcxSpot', 'amfi']);
-export const sourcesOf = (i) => (INDIA_SOURCES.has(i.how) ? [{ how: i.how, links: i.links }] : [{ how: i.how, links: i.links }, ...(i.alts || []), { how: 'custom', links: [] }]);
+// The sources a dataset can come from, best first: its own (the catalogue's choice), then any alternatives (e.g.
+// Tiingo for a US-listed iShares fund). Each is { how, links }. The user's own file (HOW.custom, CUSTOM_FORMAT) is
+// not offered for now.
+export const sourcesOf = (i) => [{ how: i.how, links: i.links }, ...(i.alts || [])];
 
 // Whether a dataset, taken from a given source, gives its total return or its price only, and why. The total return
 // is there when the income is already inside the number (a total-return index, an accumulating fund, gold, which has
