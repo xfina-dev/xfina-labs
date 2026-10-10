@@ -1,0 +1,26 @@
+name: Share how you used it
+description: Tell us what you used a Labs tool for. It shapes what we build next.
+title: "[Story] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you! Hearing how Labs is used is the best feedback there is. Issues here are public: please leave out your own amounts and details.
+  - type: input
+    id: tool
+    attributes:
+      label: Tool
+      placeholder: Portfolio Engine
+    validations:
+      required: true
+  - type: textarea
+    id: story
+    attributes:
+      label: What did you use it for?
+      description: The question you had, and what you found.
+    validations:
+      required: true
+  - type: textarea
+    id: better
+    attributes:
+      label: What would have made it better?
