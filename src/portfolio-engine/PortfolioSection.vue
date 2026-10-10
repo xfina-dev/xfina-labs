@@ -5,15 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Tag from './Tag.vue';
-import Seg from './Seg.vue';
 import Field from './Field.vue';
 import { ASSETS } from './mockData.js';
 
 const weights = ref(ASSETS.map((a) => a.weight));
 const total = computed(() => weights.value.reduce((a, b) => a + Number(b || 0), 0));
-const currency = ref('INR');
-const capital = ref('₹10,00,000');
+// Same inputs as the RealValue SIP engine on sakthipriyan.com: lumpsum, monthly investment, yearly hike, contribution period.
+const lumpsum = ref('₹10,00,000');
 const monthly = ref('₹50,000');
+const hike = ref('10%');
+const period = ref('Whole period');
 </script>
 
 <template>
@@ -24,6 +25,10 @@ const monthly = ref('₹50,000');
         <CardDescription>Target weights must total 100%.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
+        <div class="rounded-md border p-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <div><span class="text-sm text-muted-foreground">Data range</span> <span class="font-mono text-sm ml-2">2010-01-04 → 2026-09-21</span></div>
+          <span class="text-xs text-muted-foreground">Limited by Nasdaq 100 (starts 2010). Add an earlier series to extend it.</span>
+        </div>
         <Table>
           <TableHeader>
             <TableRow><TableHead>Asset</TableHead><TableHead>Series used</TableHead><TableHead class="w-[22%]">Weight</TableHead><TableHead class="w-24 text-right">%</TableHead></TableRow>
@@ -50,23 +55,15 @@ const monthly = ref('₹50,000');
 
     <div class="space-y-8">
       <Card class="bg-card border-border shadow-sm">
-        <CardHeader class="pb-4"><CardTitle class="text-xl">Money</CardTitle><CardDescription>Base currency and cash flows.</CardDescription></CardHeader>
+        <CardHeader class="pb-4"><CardTitle class="text-xl">Monthly Investment</CardTitle><CardDescription>What you start with and what you add each month.</CardDescription></CardHeader>
         <CardContent class="space-y-4">
-          <div class="space-y-1.5"><div class="text-sm font-medium text-muted-foreground">Base currency</div><Seg v-model="currency" :options="['INR', 'USD']" /></div>
           <div class="grid grid-cols-2 gap-4">
-            <Field v-model="capital" label="Starting capital" />
-            <Field v-model="monthly" label="Monthly contribution" />
-            <Field model-value="10%" disabled><template #label>Growth / yr <Tag variant="soon">later</Tag></template></Field>
-            <Field model-value="None" disabled><template #label>Withdrawals <Tag variant="soon">later</Tag></template></Field>
+            <Field v-model="lumpsum" label="Lumpsum" />
+            <Field v-model="monthly" label="Monthly investment" />
+            <Field v-model="hike" label="Yearly hike" />
+            <Field v-model="period" label="Contribution period" :options="['Whole period', '10 years', '15 years', '20 years']" />
           </div>
-          <p class="text-sm text-muted-foreground">Salary model <Tag variant="soon">later</Tag> — an optional cash-flow generator.</p>
-        </CardContent>
-      </Card>
-      <Card class="bg-card border-border shadow-sm">
-        <CardHeader class="pb-4"><CardTitle class="text-xl">Coverage</CardTitle><CardDescription>Common range from your datasets.</CardDescription></CardHeader>
-        <CardContent>
-          <div class="rounded-md border p-3 font-mono text-sm">2010-01-04 → 2026-09-21</div>
-          <p class="text-xs text-muted-foreground mt-3">Limited by Nasdaq 100 (starts 2010). Add an earlier series to extend it.</p>
+          <p class="text-xs text-muted-foreground">Investments start on the first day of the data range. Salary model <Tag variant="soon">later</Tag>.</p>
         </CardContent>
       </Card>
     </div>

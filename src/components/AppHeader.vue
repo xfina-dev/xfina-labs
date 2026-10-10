@@ -7,12 +7,12 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import PrivacyDialog from '@/components/PrivacyDialog.vue';
 
 const props = defineProps({
-  // Path of the current tool, e.g. "/backtest/". Empty on the Labs home page.
+  // Path of the current tool, e.g. "/portfolio-engine/". Empty on the Labs home page.
   tool: { type: String, default: '' },
 });
 
 // Add a tool here and it appears in every page's switcher.
-const TOOLS = [{ path: '/backtest/', label: 'Backtest' }];
+const TOOLS = [{ path: '/portfolio-engine/', label: 'Portfolio Engine' }];
 const HOME = '/';
 
 const selected = ref(props.tool || HOME);
@@ -41,7 +41,7 @@ onMounted(() => document.documentElement.classList.toggle('dark', isDark.value))
           </a>
           <div class="flex items-center">
             <Select :modelValue="selected" @update:modelValue="go">
-              <SelectTrigger class="w-[140px] h-9 border-border bg-background shadow-sm focus:z-10 focus:ring-1">
+              <SelectTrigger class="w-[170px] h-9 border-border bg-background shadow-sm focus:z-10 focus:ring-1">
                 <SelectValue placeholder="Tool" />
               </SelectTrigger>
               <SelectContent>
