@@ -1,9 +1,15 @@
 <script setup>
 import { ref } from 'vue';
 import { ChevronDown } from 'lucide-vue-next';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+} from 'xfina-ui';
 import { GA_MEASUREMENT_ID, LEVEL_OFF, LEVEL_ANONYMOUS, getStoredAnalyticsLevel, setStoredAnalyticsLevel } from '@/lib/analytics.js';
+
+// Labs runs analytics, so it keeps its own consent dialog. The shared header's
+// privacy button opens it (XfinaHeader own-privacy, @privacy in AppShell).
+const open = defineModel('open', { type: Boolean, default: false });
 
 const level = ref(getStoredAnalyticsLevel());
 const setLevel = (l) => {
@@ -24,8 +30,7 @@ const payload = [
 </script>
 
 <template>
-  <Dialog>
-    <DialogTrigger as-child><slot /></DialogTrigger>
+  <Dialog v-model:open="open">
     <DialogContent class="sm:max-w-3xl">
       <DialogHeader>
         <DialogTitle>Privacy &amp; Analytics</DialogTitle>
@@ -46,13 +51,13 @@ const payload = [
                 <div class="flex items-center justify-between w-full">
                   <div class="font-semibold text-base flex items-center">
                     Anonymous Usage Statistics
-                    <span class="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-md text-[10px] uppercase font-bold ml-2 tracking-wide">Recommended</span>
+                    <Badge class="ml-2">Recommended</Badge>
                   </div>
                   <div @click.stop>
                     <AccordionTrigger class="group hover:no-underline p-0 data-[state=open]:border-b-0">
                       <span class="sr-only">View exact payload details</span>
                       <template #icon>
-                        <div class="flex items-center gap-1.5 text-xs font-mono bg-primary/10 text-primary pl-2.5 pr-2 py-1.5 rounded shrink-0 ml-2 hover:bg-primary/20 transition-colors">
+                        <div class="flex items-center gap-1.5 text-xs font-mono bg-primary/10 text-primary-text pl-2.5 pr-2 py-1.5 rounded shrink-0 ml-2 hover:bg-primary/20 transition-colors">
                           <span>Payload</span>
                           <ChevronDown class="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                         </div>
@@ -77,7 +82,7 @@ const payload = [
                           </thead>
                           <tbody class="divide-y">
                             <tr v-for="[k, d, e] in payload" :key="k">
-                              <td class="px-2 py-1.5 font-mono text-primary/80">{{ k }}</td>
+                              <td class="px-2 py-1.5 font-mono text-primary-text">{{ k }}</td>
                               <td class="px-2 py-1.5">{{ d }}</td>
                               <td class="px-2 py-1.5 font-mono">{{ e }}</td>
                             </tr>

@@ -1,10 +1,9 @@
 <script setup>
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Badge } from 'xfina-ui';
 import AppShell from '@/components/AppShell.vue';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Tag from '@/backtest/Tag.vue';
 
 const tools = [
-  { path: '/backtest/', name: 'Backtest', desc: 'Multi-asset portfolio backtester. Bring your own price data; test weights, rebalancing and cash flows.', status: 'design mock' },
+  { path: '/portfolio-engine/', name: 'Portfolio Engine', desc: 'Backtest an asset mix the way you\'d actually invest: a lumpsum, then a share of your salary every month, rebalanced by the rules you choose. Runs in your browser.', status: 'design mock' },
 ];
 </script>
 
@@ -14,7 +13,7 @@ const tools = [
       <a v-for="t in tools" :key="t.path" :href="t.path" class="no-underline">
         <Card class="bg-card border-border shadow-sm hover:border-primary/40 transition-colors h-full">
           <CardHeader class="pb-4">
-            <CardTitle class="flex items-center gap-2"><span>{{ t.name }}</span><Tag variant="warn">{{ t.status }}</Tag></CardTitle>
+            <CardTitle class="flex items-center gap-2"><span>{{ t.name }}</span><Badge variant="warning">{{ t.status }}</Badge></CardTitle>
             <CardDescription>{{ t.desc }}</CardDescription>
           </CardHeader>
           <CardContent />

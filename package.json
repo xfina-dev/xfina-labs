@@ -6,16 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:tree": "node scripts/build-tree.mjs"
   },
   "dependencies": {
-    "@vueuse/core": "^10.11.1",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
     "lucide-vue-next": "^1.0.0",
-    "reka-ui": "^2.10.1",
-    "tailwind-merge": "^3.6.0",
-    "vue": "^3.5.34"
+    "vue": "^3.5.34",
+    "xfina-ui": "0.9.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
