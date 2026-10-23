@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
+import 'xfina-ui/style.css';
 import './style.css';
-import './labs.css';
 
 // Every Labs page mounts one component into #app: `mount(Component)`.
 export function mount(component) {
