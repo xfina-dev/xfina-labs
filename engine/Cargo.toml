@@ -1,0 +1,48 @@
+# The Portfolio Engine's WebAssembly module.
+#
+# It belongs here, in Xfina Labs, rather than in either library it composes:
+# the data half comes from `xfina` (it reads a publisher's download into a
+# price series) and the computation half from `xfingine` (data in, arithmetic,
+# data out). Neither depends on the other, and this crate is what puts the two
+# together for the browser. A dependency either way between them would be the
+# wrong shape; the composition is the application's.
+#
+# Both arrive as path dependencies under `vendor/`, which `scripts/engine-deps.mjs`
+# fills: a symlink to the sibling checkout when there is one, a shallow clone
+# otherwise. See the README.
+[package]
+name = "xfina-labs-engine"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "The Portfolio Engine's WASM module: xfina reads the data, xfingine computes, Xfina Labs composes them"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = "0.4"
+rust_decimal = "1.42"
+
+# Reading the files: only the market-data parsers, so the module carries no PDF
+# or statement machinery it never calls.
+xfina = { path = "vendor/xfina", default-features = false, features = [
+    "md-amfi-nav", "md-nse-security", "md-nse-indices", "md-mcx-spot",
+    "md-ishares", "md-tiingo", "md-wsj", "md-msci", "md-nasdaq",
+    "md-yahoo", "md-spdr-gold",
+] }
+
+# The computation. Until xfina-dev/xfingine#15 publishes the portfolio engine
+# API, only the shared numeric helpers are used from here and the portfolio
+# simulation lives in `src/portfolio/` behind the boundary that API will take
+# over; see src/portfolio/mod.rs.
+xfingine = { path = "vendor/xfingine", default-features = false }
+
+[profile.release]
+opt-level = "s"
+lto = true

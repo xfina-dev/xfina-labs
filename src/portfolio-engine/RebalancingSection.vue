@@ -6,7 +6,7 @@ import {
 import { RotateCcw, ExternalLink, Check } from 'lucide-vue-next';
 import { ref, computed, watch, toRefs } from 'vue';
 import Field from './Field.vue';
-import { ASSETS } from './mockData.js';
+import { ASSETS } from './allocation.js';
 import { STRATEGIES as strategies, rebalancing, toggleTicked } from './store.js';
 
 // Two columns, like step 2: the strategies on the left, ticked to include them in a run (Perpetual by default,
@@ -56,8 +56,10 @@ const badRange = (a) => { const { lo, hi } = rangeOf(a), t = Number(a.weight) ||
 // - Sell engine: when portfolio drift exceeds the maximum (N), the overweight assets are trimmed by reverse
 //   water-filling, the most overweight first, with the drift ceiling stepping down to the minimum (N/2) over
 //   M monthly reviews. Proceeds go through the same buy step, after tax.
-// TODO(engine): lot tracking for 'LTCG lots only' (holding periods per asset class), tax reserved on sale;
-// the framework's liquidity reserves (emergency / retirement) are not in this backtest.
+// The engine keeps every purchase as its own lot and sells oldest first, so a sale's tax is the tax on that
+// sale: long-term above a year, short-term below it, and with 'LTCG lots only' on, a lot younger than a year
+// is left alone. The tax comes out of the proceeds before the rest is put back to work.
+// The framework's liquidity reserves (emergency / retirement) are not in this backtest.
 const FRAMEWORK = 'https://sakthipriyan.com/building-wealth/blogs/the-perpetual-rebalancing-framework/';
 const MAX_DRIFT = [5, 7.5, 10, 12.5, 15, 20];
 const { maxDrift, minDrift, sellMonths, ltcgOnly } = toRefs(rebalancing.perpetual);

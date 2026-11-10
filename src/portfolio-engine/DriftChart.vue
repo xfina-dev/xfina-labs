@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { ASSETS } from './mockData.js';
+import { ASSETS } from './allocation.js';
 
 // Drift from the targets over time: each asset's weight less its target as a thin line (above zero when
 // overweight), and the total drift, the sum of the overweights, as the filled area. Dashed lines mark the

@@ -1,3 +1,9 @@
 node_modules
 dist
 .DS_Store
+
+# The Portfolio Engine's WASM module: built by `npm run build:wasm`, and the two
+# libraries it composes, put in place by scripts/engine-deps.mjs.
+src/portfolio-engine/engine-pkg
+engine/vendor
+engine/target

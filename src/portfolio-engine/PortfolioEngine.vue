@@ -8,8 +8,9 @@ import PortfolioSection from './PortfolioSection.vue';
 import RebalancingSection from './RebalancingSection.vue';
 import InvestmentsSection from './InvestmentsSection.vue';
 import ResultsSection from './ResultsSection.vue';
-import { run, rebalancing, history, selection, investments, labelOf, changed, ui } from './store.js';
-import { ASSETS } from './mockData.js';
+import { run, rebalancing, history, selection, investments, labelOf, changed, ui, runState, blocked } from './store.js';
+import { ASSETS } from './allocation.js';
+import { importFiles, imported } from './imports.js';
 import { planRows, salarySpan } from './plan.js';
 
 // The four steps fold to a one-line summary each. They start open; Run folds them all, so the results come
@@ -19,22 +20,41 @@ const open = reactive({ data: true, portfolio: true, rebalancing: true, investme
 const toggle = (id) => { open[id] = !open[id]; };
 
 // Bringing data in, before the steps, as Run comes after them. How to get data opens at the region Select
-// Assets shows. TODO(engine): read the picked files into Select Assets.
+// Assets shows. The files are read here, in this tab, by the engine's `xfina` half: each one is identified,
+// parsed and filed under the asset it belongs to (imports.js), and Select Assets shows what came of it.
 const fileInput = ref(null);
 const pickFiles = () => fileInput.value.click();
+const lastImport = ref(null);
+const onFiles = async (event) => {
+  const files = [...(event.target.files || [])];
+  // Clear the input, so importing the same file again still fires a change.
+  event.target.value = '';
+  if (!files.length) return;
+  lastImport.value = await importFiles(files);
+};
 
 // A run saves one result per ticked strategy, then shows Results.
-const runBacktest = () => {
-  run();
+const runBacktest = async () => {
+  await run();
+  if (runState.error) return;
   Object.keys(open).forEach((k) => { open[k] = false; });
   nextTick(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }));
 };
 
 // What a folded step shows in one line.
 const total = computed(() => ASSETS.reduce((n, a) => n + Number(a.weight || 0), 0));
-const years = computed(() => ((new Date(selection.period.to) - new Date(selection.period.from)) / (365.25 * 864e5)).toFixed(1));
+const years = computed(() => (selection.period.from ? ((new Date(selection.period.to) - new Date(selection.period.from)) / (365.25 * 864e5)).toFixed(1) : null));
+// The colour of the import notice follows what the last import came to.
+const importTone = computed(() => {
+  if (imported.busy) return 'border-border bg-muted/40';
+  if (lastImport.value?.errors.length) return 'border-status-critical/50 bg-status-critical/10';
+  if (lastImport.value?.read) return 'border-status-good/50 bg-status-good/10';
+  return 'border-border';
+});
 const SUMMARY = computed(() => ({
-  data: `${selection.series.length} assets · ${selection.period.from} → ${selection.period.to} · ${years.value} years`,
+  data: selection.series.length
+    ? `${selection.series.length} assets · ${selection.period.from} → ${selection.period.to} · ${years.value} years`
+    : 'No data imported yet',
   portfolio: ASSETS.map((a) => `${a.name} ${a.weight}%`).join(' · '),
   investments: (() => {
     const rows = planRows(investments), r0 = rows[0], r1 = rows.at(-1), lakh = (x) => `₹${(x / 1e5).toFixed(x >= 1e6 ? 0 : 1)} L`;
@@ -63,32 +83,38 @@ const SECTIONS = [
       Bring your own data: everything runs in your browser, and nothing is uploaded.
     </template>
 
-    <!-- One row before step 1: the design-preview notice, then where the data comes from (as Run sits after
-         step 4). The notice takes the room left; on a narrow screen the buttons go below it. -->
+    <!-- One row before step 1: what the last import came to, then where the data comes from (as Run sits
+         after step 4). The notice takes the room left; on a narrow screen the buttons go below it. -->
     <div class="flex flex-wrap items-center gap-3">
-      <!-- Until xfingine is connected, the whole tool is a design preview -->
-      <div class="flex min-h-11 min-w-0 flex-1 basis-96 flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-status-warning/50 bg-status-warning/10 px-4 py-2 text-sm">
-        <span class="rounded bg-status-warning/20 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-status-warning-text">Mock UI</span>
-        <span>A design preview: the engine isn't connected yet, so every figure in the results is illustrative.</span>
+      <div class="flex min-h-11 min-w-0 flex-1 basis-96 flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-4 py-2 text-sm" :class="importTone">
+        <span v-if="imported.busy">Reading your files…</span>
+        <template v-else-if="lastImport">
+          <span v-if="lastImport.read">{{ lastImport.read }} file{{ lastImport.read > 1 ? 's' : '' }} read.</span>
+          <span v-if="lastImport.errors.length" class="text-status-critical-text">{{ lastImport.errors.length }} could not be read: {{ lastImport.errors[0].message }}</span>
+          <span v-else-if="!lastImport.read">Nothing was read.</span>
+        </template>
+        <span v-else>Import the files you downloaded: they are read in this tab, by the same parsers Xfina uses, and nothing is uploaded.</span>
       </div>
       <div class="flex shrink-0 flex-wrap justify-end gap-3 ml-auto">
         <a :href="ui.region === 'provided' ? '/portfolio-engine/get-data/' : `/portfolio-engine/get-data/#equity/${ui.region}`" class="no-underline">
           <Button variant="outline" size="lg"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
         </a>
-        <Button size="lg" class="min-w-40 px-8" @click="pickFiles"><Upload class="h-4 w-4 mr-2" />Import</Button>
-        <input ref="fileInput" type="file" accept=".csv,.xls,.xlsx,.txt,.json" multiple class="sr-only" />
+        <Button size="lg" class="min-w-40 px-8" :disabled="imported.busy" @click="pickFiles"><Upload class="h-4 w-4 mr-2" />Import</Button>
+        <input ref="fileInput" type="file" accept=".csv,.xls,.xlsx,.xlsm,.txt,.json" multiple class="sr-only" @change="onFiles" />
       </div>
     </div>
 
     <template v-for="(s, i) in SECTIONS" :key="s.id">
       <!-- Run, enabled once a setting differs from the last run; then a rule setting the setup apart from the runs
            it produced -->
-      <div v-if="s.id === 'results'" class="flex items-center justify-end gap-4">
-        <p class="text-sm text-muted-foreground">{{ changed.any ? (history.entries.length ? 'Settings changed since the last run.' : '') : 'Nothing changed since the last run.' }}</p>
+      <div v-if="s.id === 'results'" class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+        <p class="min-w-0 flex-1 text-sm sm:text-right" :class="runState.error ? 'text-status-critical-text' : 'text-muted-foreground'">
+          {{ runState.error || blocked || (changed.any ? (history.entries.length ? 'Settings changed since the last run.' : '') : 'Nothing changed since the last run.') }}
+        </p>
         <Button
-          size="lg" class="min-w-40 px-8" :disabled="!changed.any" @click="runBacktest"
-          :title="!changed.any ? 'Change a setting above to run again' : rebalancing.ticked.length > 1 ? `Backtest the ${rebalancing.ticked.length} ticked strategies` : 'Backtest the ticked strategy'"
-        ><Play class="h-4 w-4 mr-2" />Run</Button>
+          size="lg" class="min-w-40 px-8 shrink-0" :disabled="!!blocked || runState.busy || (!changed.any && !runState.error)" @click="runBacktest"
+          :title="blocked || (runState.busy ? 'Running' : !changed.any ? 'Change a setting above to run again' : rebalancing.ticked.length > 1 ? `Backtest the ${rebalancing.ticked.length} ticked strategies` : 'Backtest the ticked strategy')"
+        ><Play class="h-4 w-4 mr-2" />{{ runState.busy ? 'Running…' : 'Run' }}</Button>
       </div>
       <hr v-if="s.id === 'results'" class="border-border" />
       <section :id="s.id" class="space-y-4 scroll-mt-8" :class="!s.results && !open[s.id] && '!space-y-0'">

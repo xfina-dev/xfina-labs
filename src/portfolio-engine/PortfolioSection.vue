@@ -6,7 +6,7 @@ import {
 import { tone } from './tone.js';
 import { ref, computed, nextTick } from 'vue';
 import { Check, GripVertical } from 'lucide-vue-next';
-import { ASSETS } from './mockData.js';
+import { ASSETS } from './allocation.js';
 import AllocationDonut from './AllocationDonut.vue';
 import { selection } from './store.js';
 

@@ -12,25 +12,26 @@ import DriftChart from './DriftChart.vue';
 import TxChart from './TxChart.vue';
 import WaterfallChart from './WaterfallChart.vue';
 import ReturnsChart from './ReturnsChart.vue';
-import { ASSETS, allocation } from './mockData.js';
+import { ASSETS } from './allocation.js';
 import { planRows, salarySpan } from './plan.js';
 import { downloadCsv, downloadJson, downloadPng } from './exportFiles.js';
-import { history, MAX_COMPARE, remove, toggleCompare, clearAll, run, STRATEGIES, ui } from './store.js';
-import { results, yearly, monthly, transactions, tradesBy, invested, investedToday, toToday, monthOf, inr, pct, START_YEAR, MONTHS } from './resultsData.js';
+import { history, MAX_COMPARE, remove, toggleCompare, clearAll, run as runEngine, runState, blocked, resultOf, runOf, isTrimmed, STRATEGIES, ASSUMPTIONS, ui } from './store.js';
+import { versions } from './engine.js';
+import { yearly, monthly, transactions, tradesBy, weightRows, valueIn, investedLine, monthOf as labelOfMonth, inr, pct } from './runResults.js';
 
 // Results in three parts: the history of every run (newest first; up to six ticked for comparison, the latest
 // six by default), a fixed comparison of the ticked ones, and the detail of one, where the toggles are. With
-// one ticked there is nothing to compare, so only the detail shows. Figures are a design mock (resultsData.js):
-// in the mock they depend only on the strategy.
-// A first visit starts with one run of the defaults, so Results has something to show. Run once the steps
-// above have mounted, so the run records their choices.
-onMounted(() => { if (!history.entries.length) run(); });
+// one ticked there is nothing to compare, so only the detail shows.
+// Every figure is the engine's: each entry carries the result for its strategy, and the entries of one run
+// share the run-level figures (the months, the contributions, the inflation) in the store.
+// A first visit with data already picked starts with one run, so Results has something to show; with nothing
+// imported there is nothing to run, and the empty state says what to do.
+onMounted(() => { if (!history.entries.length && !blocked.value) runEngine(); });
 
 // Clear all asks once, in place, before deleting every saved run.
 const confirmClear = ref(false);
 const clearHistory = () => { clearAll(); confirmClear.value = false; };
 
-const resultOf = (e) => results.find((r) => r.id === e.strategy);
 const times = (a, b) => `${(a / b).toFixed(2)}×`;
 const when = (iso) => new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
@@ -51,9 +52,23 @@ const sorted = computed(() => {
 });
 const ariaSort = (key) => (sort.value.key !== key ? 'none' : sort.value.dir > 0 ? 'ascending' : 'descending');
 
+// The run-level figures the selected result belongs to, and the month labels and span taken from them.
 const compared = computed(() => history.entries.filter((e) => history.compare.includes(e.key)));
 const entry = computed(() => history.entries.find((e) => e.key === history.selected) ?? compared.value[0] ?? history.entries[0] ?? null);
 const res = computed(() => (entry.value ? resultOf(entry.value) : null));
+const runData = computed(() => runOf(entry.value));
+const MONTHS = computed(() => runData.value?.months ?? 0);
+const START_YEAR = computed(() => runData.value?.startYear ?? 0);
+const monthOf = (m) => labelOfMonth(runData.value, m);
+// A result whose detail was dropped to keep the history inside this browser's storage: the figures are all
+// there, the month-by-month arrays are not.
+const trimmed = computed(() => isTrimmed(entry.value));
+// The assets this run held, with their own targets, not the allocation as the steps above stand now: an older
+// result describes its own run. Colours follow the live allocation where the name is still there, so the legend
+// and the charts match what is on screen.
+const runAssets = computed(() => (runData.value?.assets ?? []).map((a, i) => ({
+  ...a, color: ASSETS.find((x) => x.name === a.name)?.color ?? `chart-${(i % 16) + 1}`,
+})));
 const select = (e) => { history.selected = e.key; };
 // Opening a result (a History row, or View in Comparison) switches to the Result tab and brings it into view.
 // Result first (where a run lands), then Comparison, then History (where runs are managed).
@@ -114,7 +129,7 @@ function groupsFor(t) {
       ['CAGR · the portfolio', (r) => (t ? r.twrReal : r.twr), pct, 'high'],
     ] },
     { title: 'Risks', highlight: true, rows: [
-      ['Volatility', (r) => r.vol, (v) => `${pct(v)} a year`, 'low'],
+      ['Volatility', (r) => (t ? r.volReal : r.vol), (v) => `${pct(v)} a year`, 'low'],
       ['Max drawdown', (r) => (t ? r.mddReal : r.mdd), pct, 'high'],
       ['Sharpe', (r) => (t ? r.sharpeReal : r.sharpe), (v) => v.toFixed(2), 'high'],
       ['Sortino', (r) => (t ? r.sortinoReal : r.sortino), (v) => v.toFixed(2), 'high'],
@@ -141,7 +156,7 @@ function isBest(row, e) {
   return show(val(resultOf(e))) === show(best);
 }
 // A result's value line in the chosen unit (today's rupees for Real).
-const valueIn = (r) => (today.value ? r.value.map((v, m) => v * toToday(m)) : r.value);
+const valueOf = (r) => valueIn(runData.value, r, today.value);
 
 // --- Run settings: everything the selected result was run with ------------------------------------------------
 const settings = computed(() => entry.value?.settings ?? null);
@@ -229,32 +244,26 @@ const waterfall = computed(() => {
 const show = ref('Growth');
 const view = ref('Chart');
 const step = ref('Yearly');
-const valueLine = computed(() => valueIn(res.value));
-const investedLine = computed(() => (today.value ? investedToday : invested));
-const yearRows = computed(() => yearly(res.value, today.value));
-const monthRows = computed(() => monthly(res.value, today.value));
+const valueLine = computed(() => valueOf(res.value));
+const investedTotals = computed(() => investedLine(runData.value, today.value));
+const yearRows = computed(() => yearly(runData.value, res.value, today.value));
+const monthRows = computed(() => monthly(runData.value, res.value, today.value));
 const episodes = computed(() => (today.value ? res.value.episodesReal : res.value.episodes));
 const months = (a, b) => (b === null ? '—' : `${b - a} mo`);
 
-const txRows = computed(() => tradesBy(res.value, ASSETS, today.value, step.value === 'Yearly'));
+const txRows = computed(() => tradesBy(runData.value, res.value, runAssets.value, today.value, step.value === 'Yearly'));
 const ddView = ref('Chart');
 
 // Allocation and drift: month by month, or each year's end (the last point is the run's last month).
 const allocView = ref('Chart');
 const allocStep = ref('Yearly');
-// Mock: how far the weights wander depends on the strategy (buy and hold furthest), until the engine returns them.
-const DRIFT_SIZE = { hold: 1.2, calendar: 0.45, threshold: 0.5, perpetual: 0.56 };
-const allocMonthly = computed(() => allocation(MONTHS, DRIFT_SIZE[res.value.id] ?? 1));
-const YEAR_ENDS = [...Array.from({ length: Math.floor(MONTHS / 12) }, (_, k) => 12 * k + 11), ...(MONTHS % 12 ? [MONTHS - 1] : [])];
-const allocRows = computed(() => (allocStep.value === 'Monthly'
-  ? allocMonthly.value.map((w, m) => ({ label: monthOf(m), w }))
-  : YEAR_ENDS.map((m) => ({ label: String(START_YEAR + Math.floor(m / 12)), w: allocMonthly.value[m] }))));
+// The weights the run actually had, month by month, as the engine returned them.
+const allocRows = computed(() => weightRows(runData.value, res.value, allocStep.value));
 // Drift: each asset's weight less its target (positive when overweight), and the total drift, the sum of the
 // overweights (equal to the sum of the underweights). Perpetual sells on the total; Threshold on each asset.
 const allocShow = ref('Allocation');
 const driftRows = computed(() => {
-  const sum = ASSETS.reduce((a, x) => a + Number(x.weight || 0), 0) || 1;
-  const target = ASSETS.map((a) => Number(a.weight || 0) / sum);
+  const target = runAssets.value.map((a) => a.target);
   return allocRows.value.map((r) => {
     const drift = r.w.map((w, k) => w - target[k]);
     return { label: r.label, drift, total: drift.reduce((a, d) => a + Math.max(0, d), 0) };
@@ -270,9 +279,9 @@ const driftLimits = computed(() => {
 const driftHidden = ref([]);
 const driftTotal = ref(true);
 const toggleDrift = (name) => { const h = driftHidden.value; driftHidden.value = h.includes(name) ? h.filter((n) => n !== name) : [...h, name]; };
-const driftOnlyTotal = computed(() => driftTotal.value && driftHidden.value.length === ASSETS.length);
+const driftOnlyTotal = computed(() => driftTotal.value && driftHidden.value.length === runAssets.value.length);
 const driftAll = computed(() => driftTotal.value && !driftHidden.value.length);
-const showDriftTotalOnly = () => { driftTotal.value = true; driftHidden.value = ASSETS.map((a) => a.name); };
+const showDriftTotalOnly = () => { driftTotal.value = true; driftHidden.value = runAssets.value.map((a) => a.name); };
 const showDriftAll = () => { driftTotal.value = true; driftHidden.value = []; };
 const signed = (x) => `${x > 0.0005 ? '+' : x < -0.0005 ? '−' : ''}${Math.abs(x * 100).toFixed(1)}%`;
 // --- Exports -------------------------------------------------------------------------------------------------
@@ -306,16 +315,16 @@ function exportGrowth() {
 function exportDrawdown() {
   if (ddView.value === 'Chart') return downloadPng(ddBox.value, `${fileBase.value}-drawdown.png`, pngTitle('Drawdown'));
   downloadCsv(`${fileBase.value}-drawdowns.csv`, [['rank', 'peak', 'trough', 'recovered', 'depth_pct', 'months_peak_to_trough', 'months_to_recover'],
-    ...episodes.value.map((d, i) => [i + 1, monthOf(d.peak), monthOf(d.trough), d.recovered === null ? '' : monthOf(d.recovered), percent(d.depth), d.trough - d.peak, d.recovered === null ? '' : d.recovered - d.trough])]);
+    ...episodes.value.map((d, i) => [i + 1, monthOf(d.peak), monthOf(d.trough), d.recovered == null ? '' : monthOf(d.recovered), percent(d.depth), d.trough - d.peak, d.recovered == null ? '' : d.recovered - d.trough])]);
 }
 function exportAllocation() {
   const name = `${runBase.value}-${allocShow.value.toLowerCase()}-${allocStep.value.toLowerCase()}`;
   if (allocView.value === 'Chart') return downloadPng(alBox.value, `${name}.png`, pngTitle(`${allocShow.value === 'Drift' ? 'Drift' : 'Allocation'} over time, ${allocStep.value.toLowerCase()}`));
   const period = allocStep.value === 'Yearly' ? 'year_end' : 'month';
   if (allocShow.value === 'Drift') {
-    return downloadCsv(`${name}.csv`, [[period, 'total_drift_pct', ...ASSETS.map((a) => `${a.name}_pct`)], ...driftRows.value.map((r) => [r.label, percent(r.total), ...r.drift.map(percent)])]);
+    return downloadCsv(`${name}.csv`, [[period, 'total_drift_pct', ...runAssets.value.map((a) => `${a.name}_pct`)], ...driftRows.value.map((r) => [r.label, percent(r.total), ...r.drift.map(percent)])]);
   }
-  downloadCsv(`${name}.csv`, [[period, ...ASSETS.map((a) => `${a.name}_pct`)], ['target', ...ASSETS.map((a) => a.weight)], ...allocRows.value.map((r) => [r.label, ...r.w.map(percent)])]);
+  downloadCsv(`${name}.csv`, [[period, ...runAssets.value.map((a) => `${a.name}_pct`)], ['target', ...runAssets.value.map((a) => percent(a.target))], ...allocRows.value.map((r) => [r.label, ...r.w.map(percent)])]);
 }
 // Everything about the selected result: what it was run with, every figure in both units, the yearly and
 // monthly rows, the drawdowns, and every transaction.
@@ -323,13 +332,20 @@ function exportResult() {
   const r = res.value, e = entry.value;
   const figures = (t) => groupsFor(t).map((g) => ({ group: g.title, rows: g.rows.map(([label, val]) => ({ label, value: val(r) })) }));
   const both = (f) => ({ nominal: f(false), real: f(true) });
+  const rd = runData.value;
   downloadJson(`${runBase.value}.json`, {
-    result: e.label, strategy: e.strategy, period: e.period, ranAt: e.at, settings: e.settings ?? null, note: 'Design mock: the figures are illustrative.',
+    result: e.label, strategy: e.strategy, period: e.period, ranAt: e.at, settings: e.settings ?? null,
+    engine: { ...versions },
+    run: {
+      months: rd.months, start: rd.start, end: rd.end,
+      inflation: rd.inflation, inflationFrom: rd.inflationFrom, riskFree: rd.riskFree,
+      assumptions: ASSUMPTIONS, assets: rd.assets,
+    },
     figures: both(figures),
-    yearly: both((t) => yearly(r, t)),
-    monthly: both((t) => monthly(r, t)),
-    drawdowns: both((t) => (t ? r.episodesReal : r.episodes).map((d) => ({ peak: monthOf(d.peak), trough: monthOf(d.trough), recovered: d.recovered === null ? null : monthOf(d.recovered), depth: d.depth }))),
-    transactions: both((t) => transactions(r, ASSETS, t)),
+    yearly: both((t) => yearly(rd, r, t)),
+    monthly: both((t) => monthly(rd, r, t)),
+    drawdowns: both((t) => (t ? r.episodesReal : r.episodes).map((d) => ({ peak: monthOf(d.peak), trough: monthOf(d.trough), recovered: d.recovered == null ? null : monthOf(d.recovered), depth: d.depth }))),
+    transactions: both((t) => transactions(rd, r, t)),
   });
 }
 </script>
@@ -378,7 +394,7 @@ function exportResult() {
         <CardTitle class="text-xl">History</CardTitle>
         <CardDescription>
           Every run is kept in this browser. Tick up to {{ MAX_COMPARE }} to compare; a run's new results are ticked and yours stay as you left them. Click a row to open its result.
-          <span class="block text-xs">Design mock: the figures are illustrative.</span>
+          <span class="block text-xs">Every figure comes from the engine, run on the files you imported.</span>
         </CardDescription>
         </div>
         <div v-if="history.entries.length" class="flex shrink-0 items-center gap-2">
@@ -391,7 +407,7 @@ function exportResult() {
         </div>
       </CardHeader>
       <CardContent>
-        <p v-if="!history.entries.length" class="text-sm text-muted-foreground">No runs yet. Pick your choices above and press Run.</p>
+        <p v-if="!history.entries.length" class="text-sm text-muted-foreground">{{ blocked || 'No runs yet. Pick your choices above and press Run.' }}</p>
         <!-- Fixed widths, so switching unit (11.3% to 5.0%) doesn't move the columns -->
         <Table v-else class="table-fixed min-w-[66rem]">
           <colgroup><col class="w-10" /><col /><col class="w-52" /><col class="w-32" /><col class="w-24" /><col class="w-36" /><col class="w-36" /><col class="w-16" /></colgroup>
@@ -510,6 +526,10 @@ function exportResult() {
 
     <!-- Detail: one result, with the toggles -->
     <template v-if="ui.tab === 'result' && res">
+      <!-- The figures survive a reload; the month-by-month detail of an older run may not have fitted -->
+      <div v-if="trimmed" class="rounded-md border border-status-warning/50 bg-status-warning/10 px-4 py-2 text-sm">
+        This run's month-by-month detail was dropped to keep the history inside this browser's storage. Its figures are intact; run it again to get the charts and transactions back.
+      </div>
       <!-- Everything this result was run with, and the whole result as JSON -->
       <Card class="bg-card border-border shadow-sm">
         <CardHeader class="flex flex-row flex-wrap items-start justify-between gap-4 space-y-0 pb-4">
@@ -554,7 +574,8 @@ function exportResult() {
                 <div class="flex justify-between gap-3"><dt class="text-muted-foreground">Investment day</dt><dd>{{ settings.investments.investDay }}</dd></div>
                 <div class="flex justify-between gap-3"><dt class="text-muted-foreground">Contributions</dt><dd class="font-mono text-xs">{{ settings.investments.startMonth }} → {{ settings.investments.endMonth }}</dd></div>
                 <!-- What the tax figures assume; the mock does not ask for it yet -->
-                <div class="flex justify-between gap-3" title="Long-term capital gains on lots held over a year; what the tax figures in Returns and risks assume"><dt class="text-muted-foreground">Tax on gains</dt><dd>12.5% LTCG, assumed</dd></div>
+                <div class="flex justify-between gap-3" title="Long-term capital gains on lots held over a year, short-term on lots sold inside one; what the tax figures in Returns and risks assume"><dt class="text-muted-foreground">Tax on gains</dt><dd>{{ ASSUMPTIONS.ltcgRate }}% LTCG, {{ ASSUMPTIONS.stcgRate }}% STCG</dd></div>
+                <div v-if="runData" class="flex justify-between gap-3" :title="runData.inflationFrom === 'cpi' ? 'From the inflation series picked in Select Assets, over this run\'s own period' : 'No inflation series was picked, so a flat rate is assumed'"><dt class="text-muted-foreground">Inflation</dt><dd class="tabular-nums">{{ pct(runData.inflation) }} a year, {{ runData.inflationFrom === 'cpi' ? 'from CPI' : 'assumed' }}</dd></div>
               </dl>
             </section>
             <section>
@@ -639,7 +660,7 @@ function exportResult() {
           <div class="relative min-h-72" style="aspect-ratio: 640 / 244">
             <div ref="igBox" class="absolute inset-0 flex flex-col overflow-auto">
               <template v-if="show === 'Growth' && view === 'Chart' && step === 'Monthly'">
-                <FitChart v-slot="{ h }"><ValueChart :h="h" :value="valueLine" :invested="investedLine" :markers="res.rebalances" :start-year="START_YEAR" /></FitChart>
+                <FitChart v-slot="{ h }"><ValueChart :h="h" :value="valueLine" :invested="investedTotals" :markers="res.rebalances" :start-year="START_YEAR" /></FitChart>
                 <div class="flex shrink-0 flex-wrap gap-4 text-xs mt-2">
                   <span><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" style="background:hsl(var(--chart-1))" />Portfolio value</span>
                   <span><i class="inline-block w-2.5 h-0.5 align-middle mr-1.5 bg-muted-foreground" />Invested</span>
@@ -677,7 +698,7 @@ function exportResult() {
               <template v-else-if="view === 'Chart'">
                 <FitChart v-slot="{ h }"><TxChart :h="h" :rows="txRows" /></FitChart>
                 <div class="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
-                  <span v-for="a in ASSETS" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
+                  <span v-for="a in runAssets" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
                   <span class="text-muted-foreground">Above the line: bought · below: sold to rebalance</span>
                 </div>
               </template>
@@ -722,7 +743,7 @@ function exportResult() {
                 <!-- The legend switches each line on and off -->
                 <div class="flex shrink-0 flex-wrap items-center gap-x-1 gap-y-1 text-xs mt-2">
                   <button type="button" class="rounded px-1.5 py-0.5 font-medium hover:bg-muted" :class="!driftTotal && 'opacity-40 line-through'" :aria-pressed="driftTotal" @click="driftTotal = !driftTotal"><i class="inline-block w-3 h-0.5 align-middle mr-1.5 bg-foreground" />Total drift</button>
-                  <button v-for="a in ASSETS" :key="a.name" type="button" class="rounded px-1.5 py-0.5 hover:bg-muted" :class="driftHidden.includes(a.name) && 'opacity-40 line-through'" :aria-pressed="!driftHidden.includes(a.name)" @click="toggleDrift(a.name)"><i class="inline-block w-3 h-0.5 align-middle mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</button>
+                  <button v-for="a in runAssets" :key="a.name" type="button" class="rounded px-1.5 py-0.5 hover:bg-muted" :class="driftHidden.includes(a.name) && 'opacity-40 line-through'" :aria-pressed="!driftHidden.includes(a.name)" @click="toggleDrift(a.name)"><i class="inline-block w-3 h-0.5 align-middle mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</button>
                   <span class="mx-1 text-muted-foreground" data-export-skip>·</span>
                   <button type="button" data-export-skip class="rounded px-1.5 py-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent" :disabled="driftOnlyTotal" @click="showDriftTotalOnly">Total only</button>
                   <button type="button" data-export-skip class="rounded px-1.5 py-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent" :disabled="driftAll" @click="showDriftAll">Show all</button>
@@ -733,38 +754,38 @@ function exportResult() {
                   <TableRow>
                     <TableHead>{{ allocStep === 'Yearly' ? 'Year end' : 'Month' }}</TableHead>
                     <TableHead class="text-right whitespace-nowrap">Total drift</TableHead>
-                    <TableHead v-for="a in ASSETS" :key="a.name" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
+                    <TableHead v-for="a in runAssets" :key="a.name" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow v-for="r in driftRows" :key="r.label">
                     <TableCell class="font-mono text-xs whitespace-nowrap">{{ r.label }}</TableCell>
                     <TableCell class="text-right tabular-nums font-semibold" :class="driftLimits.length && settings.strategy.id === 'perpetual' && r.total > driftLimits[0].value && 'text-status-critical-text'">{{ pct(r.total) }}</TableCell>
-                    <TableCell v-for="(a, k) in ASSETS" :key="a.name" class="text-right tabular-nums" :class="Math.abs(r.drift[k]) < 0.0005 && 'text-muted-foreground'">{{ signed(r.drift[k]) }}</TableCell>
+                    <TableCell v-for="(a, k) in runAssets" :key="a.name" class="text-right tabular-nums" :class="Math.abs(r.drift[k]) < 0.0005 && 'text-muted-foreground'">{{ signed(r.drift[k]) }}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
               <template v-else-if="allocView === 'Chart'">
                 <FitChart v-slot="{ h }"><AllocationChart :h="h" :points="allocRows.map((r) => r.w)" :start-year="START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" /></FitChart>
                 <div class="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
-                  <span v-for="a in ASSETS" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
+                  <span v-for="a in runAssets" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
                 </div>
               </template>
               <Table v-else container-class="h-full">
                 <TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_hsl(var(--border))]">
                   <TableRow>
                     <TableHead>{{ allocStep === 'Yearly' ? 'Year end' : 'Month' }}</TableHead>
-                    <TableHead v-for="a in ASSETS" :key="a.name" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
+                    <TableHead v-for="a in runAssets" :key="a.name" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow class="text-muted-foreground">
                     <TableCell>Target</TableCell>
-                    <TableCell v-for="a in ASSETS" :key="a.name" class="text-right tabular-nums">{{ a.weight }}%</TableCell>
+                    <TableCell v-for="a in runAssets" :key="a.name" class="text-right tabular-nums">{{ pct(a.target) }}</TableCell>
                   </TableRow>
                   <TableRow v-for="r in allocRows" :key="r.label">
                     <TableCell class="font-mono text-xs whitespace-nowrap">{{ r.label }}</TableCell>
-                    <TableCell v-for="(a, k) in ASSETS" :key="a.name" class="text-right tabular-nums">{{ pct(r.w[k]) }}</TableCell>
+                    <TableCell v-for="(a, k) in runAssets" :key="a.name" class="text-right tabular-nums">{{ pct(r.w[k]) }}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>

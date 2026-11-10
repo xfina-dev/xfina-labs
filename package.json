@@ -4,9 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run build:wasm && vite",
+    "build": "npm run build:wasm && vite build",
     "preview": "vite preview",
+    "build:wasm": "node scripts/engine-deps.mjs && wasm-pack build engine --release --target web --out-dir ../src/portfolio-engine/engine-pkg --out-name engine",
+    "engine:deps": "node scripts/engine-deps.mjs",
+    "test:engine": "cargo test --manifest-path engine/Cargo.toml",
     "build:tree": "node scripts/build-tree.mjs"
   },
   "dependencies": {

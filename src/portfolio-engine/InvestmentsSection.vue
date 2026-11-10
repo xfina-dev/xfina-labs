@@ -20,14 +20,15 @@ const lumpsum = num('lumpsum'), salaryStart = num('salaryStart'), salaryEnd = nu
 const salaryGrowth = computed({ get: () => (plan.salaryGrowth === '' ? '' : Math.round(plan.salaryGrowth * 100) / 100), set: (v) => { plan.salaryGrowth = v === '' ? '' : Number(v); } });
 const rateStart = num('rateStart'), rateEnd = num('rateEnd');
 
-// The run's months bound the contributions (Select Assets sets the run).
-const runFirst = computed(() => selection.period.from.slice(0, 7));
-const runLast = computed(() => selection.period.to.slice(0, 7));
+// The run's months bound the contributions (Select Assets sets the run). Until something is imported there is
+// no run, so the fields are left unbounded rather than bounded by nothing.
+const runFirst = computed(() => selection.period.from?.slice(0, 7) ?? null);
+const runLast = computed(() => selection.period.to?.slice(0, 7) ?? null);
 const ordinal = (d) => `${d}${d % 10 === 1 && d !== 11 ? 'st' : d % 10 === 2 && d !== 12 ? 'nd' : d % 10 === 3 && d !== 13 ? 'rd' : 'th'}`;
 // Investment day: the first or last working day of the month, or a day of the month (1st to 31st).
-// TODO(engine): if the chosen day is a holiday for transactions, the investment happens on the next working
-// day, at the price of the previous close. A day the month does not have (the 31st in a 30-day month,
-// the 29th to 31st in February) still needs a rule; the likely one is the month's last day.
+// A day with no published price (a holiday, a weekend) buys at the next published one, so a month is never
+// lost; a day the month does not have (the 31st of a 30-day month, the 29th to 31st of February) is that
+// month's last day. Both are the engine's own rules -- see InvestDay in engine/src/data.rs.
 const DAY_GROUPS = [
   { label: 'Working day', options: ['First working day', 'Last working day'] },
   { label: 'Day of month', options: Array.from({ length: 31 }, (_, i) => ordinal(i + 1)) },

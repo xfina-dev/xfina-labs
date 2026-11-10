@@ -4,7 +4,7 @@ Experimental finance tools at [labs.xfina.dev](https://labs.xfina.dev). Static, 
 
 | Tool | Path | Status |
 |---|---|---|
-| Portfolio Engine: multi-asset portfolio backtesting (bring your own data) | `/portfolio-engine/` | design mock |
+| Portfolio Engine: multi-asset portfolio backtesting (bring your own data) | `/portfolio-engine/` | live |
 | Data guide: where to download each dataset and the file format | `/portfolio-engine/get-data/` | design mock |
 
 ## Stack and theme
@@ -13,12 +13,56 @@ Vue 3 + Tailwind 3, on [xfina-ui](https://github.com/xfina-dev/xfina-ui): the th
 
 Labs keeps only its own composition: `src/components/AppShell.vue` (xfina-ui's header with the tool picker, the page, the family cards) and `PrivacyDialog.vue`, the consent dialog for its analytics, which the header's privacy button opens.
 
+## The Portfolio Engine's WASM module
+
+`engine/` is a Rust crate, built to WebAssembly, that does both halves of a run in the browser:
+
+- **Reading the data** is [`xfina`](https://github.com/xfina-dev/xfina): hand it a file's bytes and it works out
+  which publisher's download it is -- AMFI NAV history, an NSE index or security archive, MCX spot, an iShares
+  or SPDR sheet, Tiingo, WSJ, MSCI, Nasdaq, Yahoo -- and reads it into a price series. One file per call: a
+  dataset that arrives in pieces comes back as one series per piece.
+- **The computation** is [`xfingine`](https://github.com/xfina-dev/xfingine): data in, arithmetic, data out.
+
+Neither library depends on the other, and that stays true. Putting the two together is the application's job,
+so the combined module lives here and nowhere else. The page imports it, reads the user's files in the tab,
+and runs the backtest there; nothing is uploaded.
+
+Inside the crate:
+
+| Path | What it is |
+|---|---|
+| `engine/src/lib.rs` | The WASM surface: `readFile`, `run`, `dropFile`, `fileCsv`, `formats`, `version`. Parsed series stay in a session store, so a twenty-year history crosses the boundary once. |
+| `engine/src/data.rs` | Stitching a dataset's files into one history, converting a dollar series to rupees, and sampling it onto the run's monthly grid. |
+| `engine/src/portfolio/` | The engine boundary: the plan, the month-by-month simulation with lots and tax, and the metrics. |
+
+**The engine boundary is temporary.** `engine/src/portfolio/` is the stand-in for `xfingine`'s portfolio engine
+API ([xfina-dev/xfingine#15](https://github.com/xfina-dev/xfingine/issues/15), with the scenarios in #14). It is
+data-agnostic on purpose: it takes sampled monthly prices and plain numbers, exactly as that API will. When #15
+publishes, `portfolio::run` keeps its signature and its body becomes a call into `xfingine::portfolio`;
+`plan.rs`, `sim.rs` and `metrics.rs` are deleted rather than rewritten, and nothing outside that module changes.
+
+Both libraries come in as path dependencies under `engine/vendor/`, which `scripts/engine-deps.mjs` fills: a
+symlink to a sibling checkout when there is one, a shallow clone otherwise. They are not crates.io versions
+because both surfaces are ahead of their releases. Point `engine/Cargo.toml` at published versions once they
+are out, and that script and the vendor directory go with them.
+
 ## Develop
 
+Building the page builds the WASM module first, so a checkout needs a Rust toolchain with the
+`wasm32-unknown-unknown` target and [`wasm-pack`](https://wasm-pack.github.io/wasm-pack/installer/):
+
 ```bash
+rustup target add wasm32-unknown-unknown
+cargo install wasm-pack
 npm install
 npm run dev
 ```
+
+| Script | What it does |
+|---|---|
+| `npm run dev` / `npm run build` | Builds the WASM module, then Vite |
+| `npm run build:wasm` | The module on its own, into `src/portfolio-engine/engine-pkg/` (gitignored) |
+| `npm run test:engine` | The crate's tests: the simulation against arithmetic done by hand, and the whole composition end to end |
 
 ## Deploy
 

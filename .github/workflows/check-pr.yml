@@ -18,7 +18,21 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: engine
+      - uses: jetli/wasm-pack-action@v0.4.0
       - run: npm ci
+      # The Portfolio Engine's WASM module composes xfina and xfingine; this puts
+      # both where engine/Cargo.toml expects them (a clone here, a sibling
+      # checkout on a developer's machine).
+      - run: npm run engine:deps
+      - name: Test the engine
+        run: npm run test:engine
+      # Builds the WASM module first, then the site.
       - run: npm run build
       - name: Check the Worker config
         run: npx wrangler deploy --dry-run

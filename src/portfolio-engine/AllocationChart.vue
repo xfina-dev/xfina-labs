@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { ASSETS } from './mockData.js';
+import { ASSETS } from './allocation.js';
 
 // Each asset's share of the portfolio over time, stacked to 100%: one point per month or per year.
 const props = defineProps({

@@ -7,43 +7,15 @@ import { tone } from './tone.js';
 import { CLASSES, REGIONS, nodes, findDataset } from './guide.js';
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watchEffect, toRef } from 'vue';
 import { selection, ui } from './store.js';
-import { Check, Download } from 'lucide-vue-next';
+import { imported, seriesFor, handlesOf, removeFile } from './imports.js';
+import { Check, Download, X } from 'lucide-vue-next';
 
-const END = '2026-09-21';
-
-// --- Files ---------------------------------------------------------------------------------------
-// A series is read from one or more files, as the source publishes them: NSE Indices one year per file,
-// NSE and AMFI at most five years per file, most other sources the full history in one. Illustrative.
-const iso = (d) => d.toISOString().slice(0, 10);
-const addYears = (s, n) => { const d = new Date(`${s}T00:00:00Z`); d.setUTCFullYear(d.getUTCFullYear() + n); d.setUTCDate(d.getUTCDate() - 1); return iso(d); };
-const nextDay = (s) => { const d = new Date(`${s}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + 1); return iso(d); };
-const tradingRows = (from, to) => Math.round(((new Date(to) - new Date(from)) / 864e5) * (250 / 365));
-function pieces(from, to, years) {
-  const out = [];
-  for (let a = from; a <= to; a = nextDay(out.at(-1)[1])) out.push([a, addYears(a, years) < to ? addYears(a, years) : to]);
-  return out;
-}
-const dmy = (s, sep = '') => s.split('-').reverse().join(sep);
-const file = (name, from, to, extra = {}) => ({ name, from, to, rows: tradingRows(from, to), status: 'ok', ...extra });
-const nseIndices = (index, from, to = END) => pieces(from, to, 1).map(([a, b]) => file(`${index}_Historical_TR_${dmy(a)}to${dmy(b)}.csv`, a, b));
-const nse = (symbol, from, to = END) => pieces(from, to, 5).map(([a, b]) => file(`${dmy(a, '-')}-TO-${dmy(b, '-')}-${symbol}-EQ-N.csv`, a, b));
-const amfi = (scheme, from, to = END) => pieces(from, to, 5).map(([a, b]) => file(`${scheme} NAV_${a}_to_${b}.xlsx`, a, b));
-const one = (name, from, to = END, extra) => [file(name, from, to, extra)];
-
-// --- Series --------------------------------------------------------------------------------------
-// Each series says what its values are (basis) and whether they include income (ret), as the get-data
-// page does. Series are kept apart, never merged: a run uses one per asset (see chosen).
-// A series spans its valid files; an invalid one is listed but not used.
-const span = (files) => { const ok = files.filter((f) => f.status !== 'err'); return { from: ok.map((f) => f.from).sort()[0], to: ok.map((f) => f.to).sort().at(-1) }; };
-const series = (type, ret, basis) => (name, files, extra = {}) => ({ name, type, ret, basis, files, ...span(files), ccy: 'INR', ...extra });
-const ix = series('Index', 'Total return', 'Index level');
-const etf = series('ETF', 'Total return', 'Market price');
-const mf = series('MF', 'Total return', 'NAV');
-
-const NASDAQ_UCITS_CHECKS = [
-  ['warn', '3 gaps longer than 5 trading days (2010-02, 2015-08, 2020-03). Values carried forward; no return is created on those days.'],
-  ['warn', '1 day-over-day move of +14.2% on 2020-03-24. Plausible; check it against your source.'],
-];
+// --- Series ----------------------------------------------------------------------------------------
+// Every series on this page is real: an imported one is what `xfina` read from the files the user
+// picked (see imports.js, which puts a dataset's pieces back together), and a provided one is a file
+// Xfina Data publishes. A series says what its values are (basis) and whether they include income
+// (ret), as the get-data page does. Series are kept apart, never merged: a run uses one per asset
+// (see chosen).
 
 // Xfina Data's published series, as its metadata.json described them on 2026-10-07. The page reads the
 // live metadata.json on load (see onMounted) and keeps this copy if that fails.
@@ -56,39 +28,15 @@ const PUBLISHED = {
 };
 const provided = (id, name, type, basis, note) => reactive({ id, name, type, basis, ret: null, note, origin: 'provided', ...PUBLISHED[id] });
 
-// The series a user has imported, by asset (illustrative). Keys are region|class|asset, as in the catalogue.
-const IMPORTED = {
-  'india|equity|Nifty 50': [
-    ix('Nifty 50 TRI', nseIndices('NIFTY 50', '1999-06-30')),
-    etf('NIFTYBEES', nse('NIFTYBEES', '2002-01-08')),
-    mf('Nifty 50 index fund (Direct)', amfi('ICICI Prudential Nifty 50 Index Fund - Direct Plan', '2013-01-01')),
-  ],
-  'india|equity|Nifty Next 50': [
-    ix('Nifty Next 50 TRI', nseIndices('NIFTY NEXT 50', '2002-11-08')),
-    etf('JUNIORBEES', [
-      ...nse('JUNIORBEES', '2003-02-21', '2018-02-20'),
-      file('Quote-Equity-JUNIORBEES-EQ-21-02-2018-21-02-2023.csv', '2018-02-21', '2023-02-20', { status: 'err', rows: 0, checks: [['err', 'Prices are in rupees per unit before a 1:10 unit split and in rupees after it, with no split recorded: the series would show a 90% fall on 2018-11-12. Replace it with NSE\'s security-wise archive for the same dates.']] }),
-      ...nse('JUNIORBEES', '2023-02-21'),
-    ]),
-  ],
-  'india|equity|Nifty Midcap 150': [ix('Nifty Midcap 150 TRI', nseIndices('NIFTY MIDCAP 150', '2005-04-01'))],
-  'india|debt|Short duration': [mf('Liquid fund', amfi('UTI Liquid Fund - Regular Plan - Growth', '2006-04-01'))],
-  'us|equity|S&P 500': [
-    ix('S&P 500 TR', one('SP500TR_1988-01-04_to_2026-09-21.yfinance.csv', '1988-01-04'), { ccy: 'USD' }),
-    etf('S&P 500 UCITS ETF (Irish)', one('iShares-Core-SP-500-UCITS-ETF-USD-Acc_fund.xls', '2010-05-19', END, { status: 'warn', checks: [['warn', 'NAV missing on 4 London business days in 2011. Values carried forward.']] }), { ccy: 'USD', basis: 'NAV' }),
-  ],
-  'us|equity|Nasdaq 100': [
-    ix('Nasdaq 100 TR', one('EODHist_19990304-20260921_XNDX.xlsx', '1999-03-04'), { ccy: 'USD' }),
-    ix('Nasdaq 100 (price)', one('EODHist_19850131-20260921_NDX.xlsx', '1985-01-31'), { ccy: 'USD', ret: 'Price only' }),
-    etf('Nasdaq 100 UCITS ETF (Irish)', one('iShares-Nasdaq-100-UCITS-ETF-USD-Acc_fund.xls', '2010-01-04', END, { status: 'warn', checks: NASDAQ_UCITS_CHECKS }), { ccy: 'USD', basis: 'NAV' }),
-  ],
-  'us|debt|Short duration': [etf('Treasury 0–1 year ETF', one('iShares-0-1-Year-Treasury-Bond-ETF_fund.xls', '2007-01-05'), { ccy: 'USD', basis: 'NAV + Dividends' })],
-  'global|equity|MSCI World': [ix('MSCI World NR', one('990100 - MSCI World Index - FULL - 1998-12-31 - 2026-09-21 - Monthly.xlsx', '1998-12-31'), { ccy: 'USD' })],
-};
+// The data's end: the latest date any imported series reaches, which is what the timeline and the
+// "ends early" marks are measured against. With nothing imported yet there is no data, so today
+// stands in and the timeline simply has nothing on it.
+const today = new Date().toISOString().slice(0, 10);
+const END = computed(() => {
+  const ends = Object.values(imported.byAsset).flatMap((list) => list.map((s) => s.to)).filter(Boolean);
+  return ends.sort().at(-1) || today;
+});
 
-// The assets come from the same catalogue as the get-data page (tree.json), so every asset it shows a
-// source for is listed here, in the same order: equity, then debt, then gold. `since` is the earliest
-// start any of its datasets has.
 // What each tab covers: where the underlying assets are, and the currency their series come in.
 const NOTES = {
   india: 'Assets in India: indexes, ETFs and mutual funds, all in rupees.',
@@ -102,7 +50,9 @@ const catalogue = REGIONS.map((r) => ({
     key: `${r.id}|${c.id}|${asset}`,
     name: assetName(c.id, asset),
     since: nodes.filter((n) => n.region === r.id && n.class === c.id && n.asset === asset).flatMap((n) => n.instruments.map((i) => i.inception)).filter(Boolean).sort()[0],
-    series: IMPORTED[`${r.id}|${c.id}|${asset}`] || [],
+    // Read through to the imported store, so a file imported above this step
+    // shows up here without the catalogue being rebuilt.
+    get series() { return seriesFor(`${r.id}|${c.id}|${asset}`); },
   }))),
 }));
 
@@ -174,10 +124,18 @@ const choose = (a, s) => {
 const RUN = computed(() => overlap([...assetsOf(false), ...assetsOf(true)].map(chosen).filter(Boolean)));
 
 // What a run records from this step: the series each asset uses, the reference series and the period.
+// An imported pick carries the engine's handles for the files behind it and the currency they are
+// quoted in; a provided one carries the published path the run fetches it from. The run reads those,
+// and the results show the rest.
 watchEffect(() => {
-  const used = (provided) => sections.flatMap((x) => x.assets.filter((a) => !!a.provided === provided && chosen(a)).map((a) => ({ tab: x.title, asset: a.name, series: chosen(a).name, type: chosen(a).type })));
-  selection.series = used(false);
-  selection.reference = used(true);
+  const picks = (provided) => sections.flatMap((x) => x.assets.filter((a) => !!a.provided === provided && chosen(a)).map((a) => {
+    const s = chosen(a);
+    return provided
+      ? { tab: x.title, asset: a.name, series: s.name, type: s.type, id: s.id, path: s.path }
+      : { tab: x.title, asset: a.name, series: s.name, type: s.type, files: handlesOf(s), ccy: s.ccy };
+  }));
+  selection.series = picks(false);
+  selection.reference = picks(true);
   if (RUN.value.from) selection.period = { from: RUN.value.from, to: RUN.value.to };
 });
 const covers = (s) => spans(RUN.value)(s);
@@ -195,7 +153,7 @@ const checksOf = (f) => f.checks || [['ok', `${f.rows.toLocaleString('en-IN')} r
 const region = toRef(ui, 'region');
 const regions = sections;
 // A series that stops before the data's end shows where; one that runs to the end needs no end date.
-const endsEarly = (x) => x.frequency !== 'monthly' && shownEnd(x) < END;
+const endsEarly = (x) => x.frequency !== 'monthly' && shownEnd(x) < END.value;
 const current = computed(() => regions.find((s) => s.id === region.value));
 const ready = (sec) => sec.assets.filter((a) => chosen(a)).length;
 const importable = sections.filter((s) => s.id !== 'provided').flatMap((s) => s.assets);
@@ -205,32 +163,43 @@ const assetsUsed = computed(() => importable.filter((a) => chosen(a)).length);
 // The most history an asset can have: from its earliest dataset's start to the data's end.
 // An imported asset's start comes from the catalogue; a reference asset's from its earliest series.
 const sinceOf = (a) => a.since ?? a.series.map(startOf).sort()[0];
-const yearsSince = (d) => ((new Date(END) - new Date(d)) / (365.25 * 864e5)).toFixed(1);
+const yearsSince = (d) => ((new Date(END.value) - new Date(d)) / (365.25 * 864e5)).toFixed(1);
 // The run period box's timeline: from the earliest start among the picked asset series (reference series are
 // left out, their decades of history would squash the bar) to the data's end, with the run's window marked.
 const TIMELINE = computed(() => {
   const used = importable.map(chosen).filter(Boolean);
   if (!used.length || !RUN.value.from) return null;
-  const lo = new Date(used.map(startOf).sort()[0]), hi = new Date(END), span = hi - lo;
+  const lo = new Date(used.map(startOf).sort()[0]), hi = new Date(END.value), span = hi - lo;
   const at = (d) => Math.max(0, Math.min(100, ((new Date(d) - lo) / span) * 100));
-  return { from: used.map(startOf).sort()[0], to: END, left: at(RUN.value.from), width: at(RUN.value.to) - at(RUN.value.from) };
+  return { from: used.map(startOf).sort()[0], to: END.value, left: at(RUN.value.from), width: at(RUN.value.to) - at(RUN.value.from) };
 });
 const share = (n) => `${(n / importable.length) * 100}%`;
 const runYears = computed(() => (RUN.value.from ? ((new Date(RUN.value.to) - new Date(RUN.value.from)) / (365.25 * 864e5)).toFixed(1) : null));
 
 // What was picked in How to get data (saved in this browser by that page: dataset id → source), shown under each
 // asset as To download until its file is imported. Read again when this page comes back into view, so picks made
-// in another tab show up. TODO(engine): an imported file that matches a pick replaces its row.
+// in another tab show up. A pick whose dataset has since been imported drops off the list: its series is in the
+// table above it, which is the row it was waiting to become.
 const GUIDE_STORE = 'xfina_labs_guide_selection_v4';
 const guidePicks = ref({});
 const readGuide = () => { try { guidePicks.value = JSON.parse(localStorage.getItem(GUIDE_STORE) || '{}') || {}; } catch { guidePicks.value = {}; } };
 onMounted(() => { readGuide(); addEventListener('focus', readGuide); addEventListener('storage', readGuide); });
 onBeforeUnmount(() => { removeEventListener('focus', readGuide); removeEventListener('storage', readGuide); });
+// Whether a picked dataset is already in: an imported series of that asset naming the same instrument.
+const norm = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+function haveIt(assetKey, dataset) {
+  const want = [norm(dataset.code), norm(dataset.name)].filter(Boolean);
+  return seriesFor(assetKey).some((s) => {
+    const got = norm(s.name);
+    return want.some((w) => got === w || got.includes(w) || w.includes(got));
+  });
+}
 const wanted = computed(() => {
   const byAsset = {};
   for (const [id, how] of Object.entries(guidePicks.value)) {
     const d = findDataset(id);
-    if (d) (byAsset[`${d.region}|${d.cls}|${d.asset}`] ||= []).push({ ...d, how });
+    const key = d && `${d.region}|${d.cls}|${d.asset}`;
+    if (d && !haveIt(key, d)) (byAsset[key] ||= []).push({ ...d, how });
   }
   return byAsset;
 });
@@ -247,6 +216,11 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
 
 const detail = ref(null);
 const open = (a, s) => { detail.value = { a, s }; };
+// Removing the last file of a series removes the series, so the dialog closes with it.
+const forget = (a, s, f) => {
+  removeFile(a.key, s.key, f.id);
+  if (!s.files.length) detail.value = null;
+};
 
 </script>
 
@@ -352,6 +326,18 @@ const open = (a, s) => { detail.value = { a, s }; };
           </TableBody>
         </Table>
 
+        <!-- Read, but not recognised as any asset in the catalogue. Listed rather than dropped: the file
+             parsed, so what it holds is known, and saying so beats a silent nothing. -->
+        <div v-if="imported.unmatched.length" class="space-y-2 rounded-md border border-status-warning/50 bg-status-warning/10 p-3">
+          <div class="text-sm font-medium">{{ imported.unmatched.length }} file{{ imported.unmatched.length > 1 ? 's' : '' }} read, but not matched to an asset</div>
+          <ul class="space-y-1">
+            <li v-for="u in imported.unmatched" :key="u.id" class="flex flex-wrap items-baseline gap-x-2 text-xs">
+              <span class="font-mono break-all">{{ u.filename }}</span>
+              <span class="text-muted-foreground">{{ u.publisher }}<template v-if="u.code"> · {{ u.code }}</template><template v-if="u.from"> · {{ u.from }} → {{ u.to }} · {{ u.rows.toLocaleString('en-IN') }} rows</template></span>
+            </li>
+          </ul>
+          <p class="text-xs text-muted-foreground">The file holds price history, but nothing in it names an instrument this catalogue lists. Check it is the dataset you meant, and that the publisher's own filename was kept.</p>
+        </div>
       </CardContent>
     </Card>
 
@@ -451,6 +437,11 @@ const open = (a, s) => { detail.value = { a, s }; };
             <div class="flex flex-wrap items-center gap-2">
               <span class="font-mono text-xs break-all" :class="f.status === 'err' && 'line-through text-muted-foreground'">{{ f.name }}</span>
               <Badge :variant="tone(STATE[f.status][0])">{{ STATE[f.status][1] }}</Badge>
+              <!-- A file can be taken back out: an invalid one has to be, before its series can be used -->
+              <button
+                type="button" class="ml-auto grid place-items-center h-6 w-6 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                :title="`Remove ${f.name} from this series`" @click="forget(detail.a, detail.s, f)"
+              ><X class="h-3.5 w-3.5" /></button>
             </div>
             <div class="font-mono text-xs text-muted-foreground">{{ f.from }} → {{ f.to }}<template v-if="f.rows"> · {{ f.rows.toLocaleString('en-IN') }} rows</template></div>
             <ul class="space-y-1">
