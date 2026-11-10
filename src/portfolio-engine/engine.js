@@ -11,23 +11,37 @@
 // parsed series stay inside the module, and nothing is uploaded.
 import init, { readFile as wasmReadFile, dropFile, clearFiles, fileCsv, run as wasmRun, version } from './engine-pkg/engine.js';
 
+/// What the module was built from, for the footer and the exported JSON, and
+/// for telling a stored reading of a file apart from what this build would
+/// make of it. Filled once the module loads; until then the page has not
+/// needed it.
+export const versions = { engine: null, xfina: null, xfingine: null, engineApi: null, parserRevision: null };
+
 let loading = null;
+let ready = false;
 // The module is a megabyte of WebAssembly, so it is fetched on first use rather
-// than with the page: importing a file or pressing Run is what needs it.
+// than with the page. Nothing loads it to draw: the import table and the run
+// history come back from storage on their own (imports.js, store.js), and the
+// module is fetched when a file's bytes have to be parsed -- an import, or a
+// run that needs a series it does not hold.
 export function engineReady() {
-  loading ||= init().then(() => version());
+  // The versions are filled here, not by each caller: anything that waits for
+  // the module can then ask what it is, and `versions` is never half-set.
+  loading ||= init().then(() => {
+    ready = true;
+    Object.assign(versions, version());
+    return versions;
+  });
   return loading;
 }
+/// Whether the module is loaded, for the few calls that are pointless before it
+/// is: there is nothing to clear in a module that was never started.
+export const engineLoaded = () => ready;
 
-/// What the module was built from, for the footer and the exported JSON.
-export const versions = { engine: null, xfina: null, xfingine: null, engineApi: null };
-engineReady().then((v) => Object.assign(versions, v)).catch(() => {});
-
-/// Reads one file. Resolves to the module's report, or to `{ error }`.
-export async function readFile(file) {
+/// Reads one file's bytes. Resolves to the module's report, or to `{ error }`.
+export async function readBytes(bytes, filename, modifiedTimestamp) {
   await engineReady();
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  return wasmReadFile(bytes, { filename: file.name, modifiedTimestamp: Math.round(file.lastModified / 1000) });
+  return wasmReadFile(bytes, { filename, modifiedTimestamp });
 }
 
 export { dropFile, clearFiles, fileCsv };

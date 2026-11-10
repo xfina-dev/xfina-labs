@@ -1,14 +1,14 @@
 <script setup>
 import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge,
+  Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge,
   Dialog, DialogScrollContent, DialogDescription, DialogHeader, DialogTitle,
 } from 'xfina-ui';
 import { tone } from './tone.js';
 import { CLASSES, REGIONS, nodes, findDataset } from './guide.js';
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watchEffect, toRef } from 'vue';
-import { selection, ui } from './store.js';
-import { imported, seriesFor, handlesOf, removeFile } from './imports.js';
-import { Check, Download, X } from 'lucide-vue-next';
+import { selection, ui, picks } from './store.js';
+import { imported, seriesFor, fileIdsOf, removeFile, clearImports } from './imports.js';
+import { Check, Download, Trash2, X } from 'lucide-vue-next';
 
 // --- Series ----------------------------------------------------------------------------------------
 // Every series on this page is real: an imported one is what `xfina` read from the files the user
@@ -26,7 +26,7 @@ const PUBLISHED = {
   'in-cpi': { path: 'v1/inflation/in-cpi.csv', frequency: 'monthly', rows: 164, first: '2013-01', last: '2026-08' },
   'in-cpi-imf': { path: 'v1/inflation/in-cpi-imf.csv', frequency: 'monthly', rows: 835, first: '1957-01', last: '2026-07' },
 };
-const provided = (id, name, type, basis, note) => reactive({ id, name, type, basis, ret: null, note, origin: 'provided', ...PUBLISHED[id] });
+const provided = (id, name, type, basis, note) => reactive({ id, key: `provided|${id}`, name, type, basis, ret: null, note, origin: 'provided', ...PUBLISHED[id] });
 
 // The data's end: the latest date any imported series reaches, which is what the timeline and the
 // "ends early" marks are measured against. With nothing imported yet there is no data, so today
@@ -99,25 +99,35 @@ const problem = (s) => s.files.find((f) => f.status === 'err')?.checks?.[0]?.[1]
 // is carried forward, so it never ends a run early.
 function overlap(used) {
   const from = used.map(startOf).sort().at(-1), to = used.filter((s) => s.frequency !== 'monthly').map(endOf).sort()[0];
-  return { from, to, first: used.find((s) => startOf(s) === from), last: used.find((s) => s.frequency !== 'monthly' && endOf(s) === to) };
+  // Picks can share no dates at all -- a fund whose history ended before another's began -- and then there is
+  // no period, rather than one that runs backwards.
+  const ok = !!from && !!to && from <= to;
+  return { from, to, ok, first: used.find((s) => startOf(s) === from), last: used.find((s) => s.frequency !== 'monthly' && endOf(s) === to) };
 }
 const spans = (range) => (s) => startOf(s) <= range.from && (s.frequency === 'monthly' || endOf(s) >= range.to);
 
 // The user picks the series each asset uses, or none: clicking the picked one again unpicks it, and the
 // asset is left out of the run. Until the user touches an asset, an imported one uses its first valid
 // series and a provided one the first that covers what the imported picks share.
-const picked = reactive({}); // asset key (region|class|asset) → series index, or null for none
-const own = (a) => { const s = a.series[picked[a.key] ?? -1]; return s && !invalid(s) ? s : null; };
+// asset key (region|class|asset) → the key of the series it uses, or null for none. By key and not by
+// position: the list is rebuilt on every import and on every visit, and a position means nothing across either.
+const picked = picks;
+const own = (a) => { const s = a.series.find((x) => x.key === picked[a.key]); return s && !invalid(s) ? s : null; };
 const unpicked = (a) => picked[a.key] === null;
 const assetsOf = (provided) => sections.flatMap((x) => x.assets).filter((a) => !!a.provided === provided);
 const BASE = computed(() => overlap(assetsOf(false).filter((a) => !unpicked(a)).map((a) => own(a) || a.series.find((x) => !invalid(x))).filter(Boolean)));
-const chosen = (a) => (unpicked(a) ? null : own(a) || (a.provided ? a.series.find(spans(BASE.value)) || a.series[0] : a.series.find((x) => !invalid(x))) || null);
+// A reference asset the user has not chosen for takes the series that covers what the imported picks share.
+// When none of them reaches that far back -- an index with a century of history, against a rate sheet that
+// starts in 2020 -- it takes the one with the longest history rather than the first in the list, which is the
+// shortest. Picking the shortest would quietly cut a hundred-year run down to six.
+const longest = (a) => [...a.series].sort((x, y) => String(startOf(x)).localeCompare(String(startOf(y))))[0];
+const chosen = (a) => (unpicked(a) ? null : own(a) || (a.provided ? a.series.find(spans(BASE.value)) || longest(a) : a.series.find((x) => !invalid(x))) || null);
 const isChosen = (a, s) => chosen(a) === s;
 // A reference asset (USD/INR, inflation) always has one series picked: every run needs it, so picking
 // another switches to it, but the picked one cannot be cleared.
 const choose = (a, s) => {
   if (invalid(s)) return;
-  if (isChosen(a, s)) { if (!a.provided) picked[a.key] = null; } else picked[a.key] = a.series.indexOf(s);
+  if (isChosen(a, s)) { if (!a.provided) picked[a.key] = null; } else picked[a.key] = s.key;
 };
 
 // The run covers the dates every picked series shares, provided ones included, so the shortest sets it.
@@ -128,15 +138,15 @@ const RUN = computed(() => overlap([...assetsOf(false), ...assetsOf(true)].map(c
 // quoted in; a provided one carries the published path the run fetches it from. The run reads those,
 // and the results show the rest.
 watchEffect(() => {
-  const picks = (provided) => sections.flatMap((x) => x.assets.filter((a) => !!a.provided === provided && chosen(a)).map((a) => {
+  const chosenIn = (provided) => sections.flatMap((x) => x.assets.filter((a) => !!a.provided === provided && chosen(a)).map((a) => {
     const s = chosen(a);
     return provided
       ? { tab: x.title, asset: a.name, series: s.name, type: s.type, id: s.id, path: s.path }
-      : { tab: x.title, asset: a.name, series: s.name, type: s.type, files: handlesOf(s), ccy: s.ccy };
+      : { tab: x.title, asset: a.name, series: s.name, type: s.type, files: fileIdsOf(s), ccy: s.ccy };
   }));
-  selection.series = picks(false);
-  selection.reference = picks(true);
-  if (RUN.value.from) selection.period = { from: RUN.value.from, to: RUN.value.to };
+  selection.series = chosenIn(false);
+  selection.reference = chosenIn(true);
+  selection.period = RUN.value.ok ? { from: RUN.value.from, to: RUN.value.to } : { from: null, to: null };
 });
 const covers = (s) => spans(RUN.value)(s);
 const tickTitle = (a, s) => {
@@ -168,13 +178,13 @@ const yearsSince = (d) => ((new Date(END.value) - new Date(d)) / (365.25 * 864e5
 // left out, their decades of history would squash the bar) to the data's end, with the run's window marked.
 const TIMELINE = computed(() => {
   const used = importable.map(chosen).filter(Boolean);
-  if (!used.length || !RUN.value.from) return null;
+  if (!used.length || !RUN.value.ok) return null;
   const lo = new Date(used.map(startOf).sort()[0]), hi = new Date(END.value), span = hi - lo;
   const at = (d) => Math.max(0, Math.min(100, ((new Date(d) - lo) / span) * 100));
   return { from: used.map(startOf).sort()[0], to: END.value, left: at(RUN.value.from), width: at(RUN.value.to) - at(RUN.value.from) };
 });
 const share = (n) => `${(n / importable.length) * 100}%`;
-const runYears = computed(() => (RUN.value.from ? ((new Date(RUN.value.to) - new Date(RUN.value.from)) / (365.25 * 864e5)).toFixed(1) : null));
+const runYears = computed(() => (RUN.value.ok ? ((new Date(RUN.value.to) - new Date(RUN.value.from)) / (365.25 * 864e5)).toFixed(1) : null));
 
 // What was picked in How to get data (saved in this browser by that page: dataset id → source), shown under each
 // asset as To download until its file is imported. Read again when this page comes back into view, so picks made
@@ -216,11 +226,16 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
 
 const detail = ref(null);
 const open = (a, s) => { detail.value = { a, s }; };
-// Removing the last file of a series removes the series, so the dialog closes with it.
-const forget = (a, s, f) => {
-  removeFile(a.key, s.key, f.id);
-  if (!s.files.length) detail.value = null;
+// Removing the last file of a series removes the series, so the dialog closes with it. The file goes from
+// this browser too, not just from the table.
+const forget = async (a, s, f) => {
+  await removeFile(f.id);
+  if (!seriesFor(a.key).some((x) => x.key === s.key)) detail.value = null;
 };
+// Clearing asks once, in place: it deletes every imported file from this browser.
+const confirmClear = ref(false);
+const clearStored = async () => { await clearImports(); confirmClear.value = false; };
+const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
 </script>
 
@@ -273,7 +288,7 @@ const forget = (a, s, f) => {
               <!-- Nothing loaded for this asset yet -->
               <TableRow v-else-if="r.kind === 'empty'" class="hover:bg-transparent">
                 <TableCell />
-                <TableCell colspan="4" class="text-muted-foreground">No series yet</TableCell>
+                <TableCell colspan="4" class="text-muted-foreground">{{ !imported.loaded ? 'Reading your imports…' : imported.refreshing ? 'Checking your imports against this version…' : 'No series yet' }}</TableCell>
               </TableRow>
 
               <!-- Series -->
@@ -350,7 +365,7 @@ const forget = (a, s, f) => {
       <CardContent class="space-y-6">
         <section class="space-y-3">
           <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Run period</div>
-          <template v-if="RUN.from">
+          <template v-if="RUN.ok">
             <div class="flex flex-wrap items-baseline gap-x-2">
               <span class="text-3xl font-semibold tabular-nums">{{ runYears }}</span><span class="text-sm">years</span>
               <span class="font-mono text-xs text-muted-foreground">{{ RUN.from }} → {{ RUN.to }}</span>
@@ -366,6 +381,9 @@ const forget = (a, s, f) => {
               Limited by <span class="font-medium text-foreground">{{ RUN.first.name }}</span>, which starts {{ RUN.from }}. Nothing is extrapolated: a run uses only the dates every picked series covers.
             </p>
           </template>
+          <p v-else-if="RUN.from && RUN.to" class="text-sm text-status-critical-text">
+            Your picks share no dates: <span class="font-medium">{{ RUN.first?.name }}</span> starts {{ RUN.from }}, after <span class="font-medium">{{ RUN.last?.name }}</span> ends {{ RUN.to }}. Leave one of them out, or import more of its history.
+          </p>
           <p v-else class="text-sm text-muted-foreground">Pick a series to set the run.</p>
         </section>
 
@@ -391,6 +409,29 @@ const forget = (a, s, f) => {
           The first valid series is picked by default; click a picked one again to leave its asset out of the run. A series with an invalid file (red) can't be picked until it's fixed. Files are read and checked in your browser; nothing leaves it.
         </p>
 
+        <!-- What this browser is holding. Imported files are kept here so a reload changes nothing; they are
+             this browser's alone, and this is where they are let go of. -->
+        <section v-if="imported.storage.files || imported.storageError" class="space-y-2 border-t pt-4">
+          <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Stored in this browser</div>
+          <div class="flex flex-wrap items-baseline gap-x-2">
+            <span class="text-3xl font-semibold tabular-nums">{{ imported.storage.files }}</span><span class="text-sm">files</span>
+            <span class="text-sm text-muted-foreground">{{ mb(imported.storage.stored) }}<template v-if="imported.storage.quota"> of about {{ mb(imported.storage.quota) }} this browser allows</template></span>
+          </div>
+          <p v-if="imported.storageError" class="text-xs text-status-critical-text">{{ imported.storageError }}</p>
+          <p class="text-xs text-muted-foreground">
+            Your imports stay here, so reloading the page changes nothing. They never leave this browser.
+            <template v-if="!imported.persisted"> This browser may clear them if it runs short of space.</template>
+          </p>
+          <div class="flex flex-wrap items-center gap-2">
+            <template v-if="confirmClear">
+              <span class="text-sm">Delete all {{ imported.storage.files }} imported files?</span>
+              <Button size="sm" variant="destructive" @click="clearStored">Delete</Button>
+              <Button size="sm" variant="outline" @click="confirmClear = false">Cancel</Button>
+            </template>
+            <Button v-else size="sm" variant="outline" @click="confirmClear = true"><Trash2 class="h-4 w-4 mr-2" />Clear imported files</Button>
+          </div>
+        </section>
+
 
       </CardContent>
     </Card>
@@ -402,7 +443,7 @@ const forget = (a, s, f) => {
       <DialogHeader>
         <DialogTitle>{{ detail.s.name }}</DialogTitle>
         <DialogDescription>
-          {{ detail.a.name }} · {{ detail.s.type }} · {{ detail.s.ret || 'no returns' }} · {{ detail.s.basis }}<template v-if="detail.s.ccy"> · {{ detail.s.ccy }}</template>
+          {{ detail.a.name }} · {{ detail.s.type }} · {{ detail.s.ret || 'no returns' }} · {{ detail.s.basis }}<template v-if="detail.s.ccy"> · <span :title="detail.s.ccyAssumed ? 'The file does not say which currency it is in; this one comes from where the asset is. A series in dollars is converted with the USD/INR series before a run.' : 'The currency the file states'">{{ detail.s.ccy }}<template v-if="detail.s.ccyAssumed"> (assumed)</template></span></template>
           · {{ shownStart(detail.s) }} → {{ shownEnd(detail.s) }}
         </DialogDescription>
       </DialogHeader>

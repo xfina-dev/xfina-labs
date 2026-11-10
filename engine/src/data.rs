@@ -57,6 +57,9 @@ impl Daily {
         let mut out = BTreeMap::new();
         for series in parts {
             let field = value_field(series);
+            // Rows are ascending by date and then by time, so for a publisher
+            // that polls (MCX) the last write for a date is that day's last
+            // reading, which is its close.
             for row in &series.rows {
                 if let Some(v) = row.get(field).and_then(|d| d.to_f64()) {
                     if v > 0.0 {

@@ -7,6 +7,17 @@ import { reactive, watch, computed } from 'vue';
 import { ASSETS } from './allocation.js';
 import { DEFAULT_PLAN, salarySpan } from './plan.js';
 import { runBacktest, referencePoints } from './engine.js';
+import { resident } from './imports.js';
+
+// What the four steps were set to last time. Imports are kept in IndexedDB (vault.js) because they are
+// megabytes; the settings on top of them are a few hundred bytes, so they live here. Together they are what
+// "reloading changes nothing" means: the same files, the same picks, the same weights, the same plan.
+const SETTINGS_KEY = 'xfina_labs_portfolio_engine_settings_v1';
+const savedSettings = (() => { try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; } catch { return {}; } })();
+
+// Which series each asset uses: asset key → series key, or null for an asset left out. Written by Select
+// Assets, kept here so it survives a reload with the imports it refers to.
+export const picks = reactive(savedSettings.picks ?? {});
 
 export const STRATEGIES = [
   { id: 'hold', name: 'No rebalancing (buy and hold)', desc: 'Set weights once, never trade. Shows how far the portfolio drifts.' },
@@ -16,7 +27,7 @@ export const STRATEGIES = [
 ];
 
 // Step 3: which strategies a run includes (Perpetual by default, at least one), and each one's settings.
-export const rebalancing = reactive({
+export const rebalancing = reactive(savedSettings.rebalancing ?? {
   ticked: ['perpetual'],
   calendar: { frequency: 'Annual', month: 'January' },
   threshold: { bandType: 'Absolute', bandAll: 5, rangeOwn: {} },
@@ -32,7 +43,7 @@ export const toggleTicked = (id) => {
 const thisMonth = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; })();
 // Step 4's plan (plan.js): the lumpsum, salary and savings rate with their curves, the investment day and the
 // contribution months. The end starts at this month and comes back to the run's last month.
-export const investments = reactive({ ...DEFAULT_PLAN, endMonth: thisMonth });
+export const investments = reactive(savedSettings.investments ?? { ...DEFAULT_PLAN, endMonth: thisMonth });
 // The period comes from the data: Select Assets sets it to the dates every picked series shares, and until
 // something is imported there is nothing to run.
 export const selection = reactive({ series: [], reference: [], period: { from: null, to: null } }); // [{ tab, asset, series, type, files, ccy }]
@@ -41,6 +52,9 @@ export const selection = reactive({ series: [], reference: [], period: { from: n
 // (the two short-duration debts) the region comes first. An asset keeps its weight, colour and place while it
 // stays picked; a newly picked one joins at the end with the next free colour, at the mock's default weight
 // for the default picks and 0 otherwise. Synchronous, so the first run already sees the allocation.
+// What each asset was given last time, by asset key, so a reload comes back to the allocation that was set
+// rather than to the defaults.
+const SAVED = new Map((savedSettings.allocation ?? []).map((a) => [a.key, a]));
 const DEFAULT_WEIGHTS = {
   'India|Nifty 50': 25, 'India|Nifty Next 50': 10, 'India|Nifty Midcap 150': 10, 'India|Debt · Short duration': 10,
   'US|S&P 500': 15, 'US|Nasdaq 100': 15, 'US|Debt · Short duration': 5, 'Global|MSCI World': 10,
@@ -55,7 +69,10 @@ watch(() => selection.series.map((x) => `${x.tab}|${x.asset}|${x.type}`).join(),
   const free = Array.from({ length: 16 }, (_, k) => `chart-${k + 1}`).filter((c) => !kept.some((a) => a.color === c));
   const next = [
     ...kept,
-    ...added.map((x, k) => ({ key: `${x.tab}|${x.asset}`, weight: DEFAULT_WEIGHTS[`${x.tab}|${x.asset}`] ?? 0, color: free[k] ?? 'chart-16' })),
+    ...added.map((x, k) => {
+      const key = `${x.tab}|${x.asset}`, was = SAVED.get(key);
+      return { key, weight: was?.weight ?? DEFAULT_WEIGHTS[key] ?? 0, color: was?.color ?? free[k] ?? 'chart-16' };
+    }),
   ].map((a) => {
     const x = picks.find((y) => `${y.tab}|${y.asset}` === a.key);
     return { ...a, name: shared(x) ? `${x.tab} · ${x.asset}` : x.asset, type: x.type };
@@ -69,7 +86,7 @@ const monthOfDate = (d) => d.slice(0, 7);
 // Until the user sets a contribution month themselves, the window simply is the run: importing more history
 // widens it, and the months never stick to a period that has since moved. Once a month is theirs it stays
 // theirs, and is only brought back inside the run when the run no longer covers it.
-let autoMonths = true;
+let autoMonths = savedSettings.autoMonths ?? true;
 let syncing = false;
 const clamp = (m, lo, hi) => (m < lo ? lo : m > hi ? hi : m);
 watch(() => [selection.period.from, selection.period.to], ([from, to]) => {
@@ -140,7 +157,22 @@ export const isTrimmed = (entry) => !!entry?.trimmed;
 
 // Which Results tab is showing: History, Comparison or Result; and which region Select Assets shows, which
 // How to get data opens at. Not saved: a visit opens on the result, and on India.
-export const ui = reactive({ tab: 'result', region: 'india' });
+export const ui = reactive({ tab: 'result', region: savedSettings.region ?? 'india' });
+
+// Everything the steps are set to, saved as it changes. Small enough for localStorage, and separate from the
+// history, so clearing the runs does not clear the setup or the other way round.
+watch([picks, ASSETS, investments, rebalancing, () => ui.region], () => {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+      picks,
+      allocation: ASSETS.map((a) => ({ key: a.key, weight: a.weight, color: a.color })),
+      investments,
+      rebalancing,
+      region: ui.region,
+      autoMonths,
+    }));
+  } catch { /* the settings last this visit only */ }
+}, { deep: true });
 
 // What changed since the last run, step by step: each step's settings now, against the same settings recorded
 // with the newest run (the entries a run adds share its time). Run is only needed when something differs.
@@ -238,10 +270,19 @@ export async function run() {
   runState.busy = true;
   try {
     const { fx, cpi } = await reference().catch(() => ({ fx: [], cpi: [] }));
-    const assets = ASSETS.filter((a) => Number(a.weight) > 0).map((a) => {
-      const picked = selection.series.find((x) => `${x.tab}|${x.asset}` === a.key);
-      return { name: a.name, weight: num(a.weight), files: picked?.files ?? [], currency: picked?.ccy ?? 'INR' };
-    });
+    const picks = ASSETS.filter((a) => Number(a.weight) > 0).map((a) => ({
+      asset: a,
+      picked: selection.series.find((x) => `${x.tab}|${x.asset}` === a.key),
+    }));
+    // The engine's handles do not outlive the tab, but the imports do: this puts the bytes of just the files
+    // this run needs back into the module, parsing only what is not already there.
+    const handles = await resident(picks.flatMap(({ picked }) => picked?.files ?? []));
+    const assets = picks.map(({ asset, picked }) => ({
+      name: asset.name,
+      weight: num(asset.weight),
+      files: (picked?.files ?? []).map((id) => handles.get(id)).filter(Boolean),
+      currency: picked?.ccy ?? 'INR',
+    }));
     const strategies = rebalancing.ticked.map((id) => strategyOf(id, rebalancing[id]));
     const out = await runBacktest({
       assets,

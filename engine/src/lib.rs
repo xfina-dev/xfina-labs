@@ -25,6 +25,7 @@ use wasm_bindgen::prelude::*;
 
 use xfina::models::{ParseRequest, PriceSeries, ValidationStatus};
 
+pub mod checks;
 pub mod data;
 pub mod portfolio;
 
@@ -81,7 +82,11 @@ struct FileReport {
     name: Option<String>,
     /// `index`, `etf`, `mutual_fund`, `listed_security`, `commodity_spot`.
     kind: Option<String>,
-    currency: String,
+    /// ISO 4217, or absent. Several publishers quote more than one market and
+    /// print no currency at all (Tiingo, WSJ, Yahoo), and a guess here would be
+    /// a guess the caller could not see: the page infers one from the asset the
+    /// file matched and says that it did.
+    currency: Option<String>,
     /// The column that is this series' value, and what it means.
     headline: String,
     basis: String,
@@ -142,6 +147,9 @@ pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
     };
 
     let coverage = series.coverage();
+    // The column a run reads this file at, which is the publisher's adjusted
+    // twin of its headline where it prints one: see data::value_field.
+    let headline = data::value_field(&series);
     let mut checks: Vec<(String, String)> = Vec::new();
 
     // A file with no values at all cannot be used; everything else is a note.
@@ -218,19 +226,31 @@ pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
         }
     }
 
+    // What the numbers themselves say: an unrecorded split, a move worth a
+    // second look, a date the file gives two values for. `xfina` checks a file
+    // against what it declares; this checks the series against what a backtest
+    // can use. See checks.rs for why a split matters so much here.
+    for finding in checks::jumps(&series, headline) {
+        if finding.level == "err" {
+            status = "err";
+        } else if status == "ok" {
+            status = "warn";
+        }
+        checks.push((finding.level.into(), finding.message));
+    }
+
     if checks.is_empty() {
         checks.push((
             "ok".into(),
             format!(
-                "{} rows, sorted, no duplicate dates, all values positive.",
-                coverage.rows
+                "{} rows with a value, {} to {}. No unrecorded split, no implausible move, one value a day.",
+                coverage.rows,
+                coverage.first.map(|d| d.to_string()).unwrap_or_default(),
+                coverage.last.map(|d| d.to_string()).unwrap_or_default(),
             ),
         ));
     }
 
-    // The column a run reads this file at, which is the publisher's adjusted
-    // twin of its headline where it prints one: see data::value_field.
-    let headline = data::value_field(&series);
     let report = FileReport {
         id: String::new(), // filled below, once the series is stored
         filename: options.filename.clone(),
@@ -242,7 +262,7 @@ pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
             .kind
             .and_then(|k| serde_json::to_value(k).ok())
             .and_then(|v| v.as_str().map(|s| s.to_string())),
-        currency: series.currency.clone().unwrap_or_else(|| "INR".into()),
+        currency: series.currency.clone(),
         headline: headline.as_str().to_string(),
         basis: data::basis_of(headline).to_string(),
         ret: if data::includes_income(headline) {
@@ -334,12 +354,25 @@ pub fn formats() -> Result<JsValue, JsValue> {
     to_js(&serde_json::json!(xfina::formats()))
 }
 
+/// How this module reads and checks a file.
+///
+/// A caller keeps what a parse said so it can draw a table without loading a
+/// megabyte of WebAssembly, and that cache has to be invalidated when a file
+/// would be read or checked differently. The crate's own version does not
+/// change on a rebuild, so this does the job instead.
+///
+/// **Bump it whenever a file would come back different**: a new or changed
+/// parser, a different column chosen as the value, a new check, a changed
+/// threshold. Never for a change that only affects running a backtest.
+pub const PARSER_REVISION: u32 = 3;
+
 /// The versions actually running: this module, and the two libraries it
 /// composes.
 #[wasm_bindgen]
 pub fn version() -> Result<JsValue, JsValue> {
     to_js(&serde_json::json!({
         "engine": env!("CARGO_PKG_VERSION"),
+        "parserRevision": PARSER_REVISION,
         "xfina": xfina::version(),
         // Until xfina-dev/xfingine#15 lands, the portfolio simulation is this
         // crate's own stand-in behind the same boundary; the page says so.

@@ -27,6 +27,13 @@ Neither library depends on the other, and that stays true. Putting the two toget
 so the combined module lives here and nowhere else. The page imports it, reads the user's files in the tab,
 and runs the backtest there; nothing is uploaded.
 
+Imports are kept in this browser, not in the page's memory: `src/portfolio-engine/vault.js` keeps each file's
+metadata and its raw bytes in two IndexedDB stores. A reload draws the import table and the run history from the
+metadata alone, so it never loads the WebAssembly module to show a table; the bytes go into the module only when
+a run needs a series it does not already hold. A stored reading is a cache of what a parse said, keyed by
+`PARSER_REVISION` in `engine/src/lib.rs` -- bump that whenever a file would come back read or checked
+differently, and every stored file is read again on the next visit.
+
 Inside the crate:
 
 | Path | What it is |
@@ -34,6 +41,7 @@ Inside the crate:
 | `engine/src/lib.rs` | The WASM surface: `readFile`, `run`, `dropFile`, `fileCsv`, `formats`, `version`. Parsed series stay in a session store, so a twenty-year history crosses the boundary once. |
 | `engine/src/data.rs` | Stitching a dataset's files into one history, converting a dollar series to rupees, and sampling it onto the run's monthly grid. |
 | `engine/src/portfolio/` | The engine boundary: the plan, the month-by-month simulation with lots and tax, and the metrics. |
+| `engine/src/checks.rs` | What a file has to survive before a run will use it: an unrecorded split above all. |
 
 **The engine boundary is temporary.** `engine/src/portfolio/` is the stand-in for `xfingine`'s portfolio engine
 API ([xfina-dev/xfingine#15](https://github.com/xfina-dev/xfingine/issues/15), with the scenarios in #14). It is

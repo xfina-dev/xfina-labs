@@ -1,4 +1,5 @@
-// The files a user has imported, and which asset each one belongs to.
+// The files a user has imported, which asset each one belongs to, and what
+// keeps them between visits.
 //
 // A dataset usually arrives in pieces, because that is how the publishers serve
 // it: a year of NSE index history per download, at most five years of AMFI
@@ -7,16 +8,37 @@
 // page's side: files that report the same instrument from the same publisher
 // are one series, and a series belongs to one asset in the catalogue.
 //
+// Imports are kept in this browser (vault.js, IndexedDB), in two halves: what
+// the table shows, and the files themselves. A reload reads the first and draws
+// the table; the bytes go into the WASM module only when a run needs the parsed
+// series. That is why `load` never touches the engine and `resident` does.
+//
 // Nothing is uploaded. The bytes go to the WASM module in this tab, the parsed
-// series stay inside it, and this module keeps only what the table shows.
+// series stay inside it, and IndexedDB is this browser's alone.
 import { reactive } from 'vue';
-import { readFile, dropFile } from './engine.js';
+import { readBytes, dropFile, clearFiles, engineLoaded, engineReady, versions } from './engine.js';
+import * as vault from './vault.js';
 import { nodes } from './guide.js';
 
 // key `region|class|asset` → [series]. A series is
-// `{ key, name, type, ret, basis, ccy, origin, files: [...], ids: [...], from, to }`,
-// the same shape Select Assets reads, with `ids` the engine's handles.
-export const imported = reactive({ byAsset: {}, unmatched: [], busy: false });
+// `{ key, name, type, ret, basis, ccy, origin, files: [...], from, to }`,
+// the same shape Select Assets reads. A file's `id` is its content's, stable
+// across visits; the engine's own handle for it lives in `RESIDENT`.
+export const imported = reactive({
+  byAsset: {},
+  unmatched: [],
+  busy: false,
+  // Whether what is stored has been read back yet, so the table can say
+  // "restoring" rather than "nothing imported" for the moment it takes.
+  loaded: false,
+  storage: { files: 0, stored: 0, used: null, quota: null },
+  // Set when the browser refused a write: the imports already in are untouched,
+  // and the page says so rather than losing them quietly.
+  storageError: null,
+  persisted: false,
+  // Re-reading stored files because this build reads them differently.
+  refreshing: false,
+});
 
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const words = (s) => norm(s).split(' ').filter(Boolean);
@@ -72,7 +94,21 @@ export function matchAsset(report) {
 
 // The type badge the table shows, from what the file itself said.
 const TYPE = { index: 'Index', etf: 'ETF', mutual_fund: 'MF', listed_security: 'ETF', commodity_spot: 'Spot' };
-const typeOf = (report) => TYPE[report.kind] ?? (report.headline === 'nav' ? 'MF' : report.headline.startsWith('total') ? 'Index' : 'Price');
+const typeOf = (report) => TYPE[report.kind] ?? (report.headline === 'nav' ? 'MF' : String(report.headline).startsWith('total') ? 'Index' : 'Price');
+
+// What currency a series is in.
+//
+// Most publishers print it, or only ever quote one market, and then it is
+// theirs. Tiingo, WSJ and Yahoo quote several and print none, so it comes from
+// the asset the file matched instead: the catalogue's India assets are in
+// rupees and its US and Global ones in dollars, which is what those tabs say.
+// An inferred currency is marked, and Select Assets shows it, because the
+// difference decides whether a series is converted before a run.
+function currencyOf(report, assetKey) {
+  if (report.currency) return { ccy: report.currency, assumed: false };
+  const region = String(assetKey || '').split('|')[0];
+  return { ccy: region === 'india' ? 'INR' : 'USD', assumed: true };
+}
 
 // Which series a file joins: the same instrument from the same publisher. A
 // file that names nothing identifiable (several publishers put nothing in the
@@ -80,116 +116,268 @@ const typeOf = (report) => TYPE[report.kind] ?? (report.headline === 'nav' ? 'MF
 // joining somebody else's history.
 const seriesKey = (report) => `${report.source}|${norm(report.code) || norm(report.name) || report.filename}`;
 
+// --- Residency -------------------------------------------------------------
+// A file's id is its content's and outlives the tab; the engine's handle for it
+// does not, because the module starts empty on every load. This is the map
+// between them, and it is empty until something asks for a parsed series.
+const RESIDENT = new Map(); // file id → the engine's handle
+
+/// Puts the given files' bytes into the engine, parsing only what is not
+/// already there, and returns `id → handle` for all of them.
+///
+/// This is the only path that needs the WASM module, so it is the only one that
+/// waits for it. A file whose bytes have gone (a cleared store, an eviction) is
+/// reported rather than silently left out of a run.
+export async function resident(ids) {
+  const missing = [...new Set(ids)].filter((id) => !RESIDENT.has(id));
+  const gone = [];
+  for (const id of missing) {
+    const bytes = await vault.bytesOf(id);
+    const record = RECORDS.get(id);
+    if (!bytes) { gone.push(record?.filename ?? id); continue; }
+    const report = await readBytes(bytes, record?.filename ?? null, record?.modified ?? null);
+    if (report?.error) { gone.push(record?.filename ?? id); continue; }
+    RESIDENT.set(id, report.id);
+    // The stored report is a drawing cache, not the truth: the truth is the
+    // bytes. A parser newer than the one that first read this file may read it
+    // differently, so what it says now replaces what was stored.
+    if (record && record.engineVersion !== versionTag()) {
+      report.filename = record.filename;
+      const next = { ...record, report, engineVersion: versionTag() };
+      RECORDS.set(id, next);
+      vault.patch(next).catch(() => {});
+      refile();
+    }
+  }
+  if (gone.length) throw new Error(`${gone.join(', ')}: the stored file could not be read back. Import it again.`);
+  return new Map(ids.map((id) => [id, RESIDENT.get(id)]));
+}
+
+// What read a file, so a report stored by an older parser can be spotted.
+const versionTag = () => `${versions.engine ?? '?'}/${versions.xfina ?? '?'}/r${versions.parserRevision ?? '?'}`;
+
+// --- The imports themselves --------------------------------------------------
+// Every import's metadata by id, which is what the table is built from.
+const RECORDS = new Map();
+
+/// Reads back what this browser has stored and draws it.
+///
+/// Deliberately free of the engine: a reload shows the whole table, and the run
+/// history with it, without a megabyte of WebAssembly being fetched to do it.
+export async function load() {
+  try {
+    for (const record of await vault.allImports()) RECORDS.set(record.id, record);
+    refile();
+    imported.persisted = await vault.persist();
+    await refreshUsage();
+  } finally {
+    imported.loaded = true;
+  }
+  // A stored report is a drawing cache. If this build reads or checks files
+  // differently from the one that filled it, the cache is re-made from the
+  // bytes -- which does need the engine, but only on the first visit after an
+  // upgrade, and only once the table is already on screen. A file that a new
+  // check now rejects must not sit there looking fine.
+  if ([...RECORDS.values()].some((r) => r.engineVersion !== versionTag())) refreshStale();
+}
+
+/// Re-reads the files whose stored report came from a different build.
+async function refreshStale() {
+  imported.refreshing = true;
+  try {
+    await engineReady();
+    // Asked once, before the loop: reading the first file fills `versions`, and
+    // a tag that changed halfway would make every later file look up to date.
+    const tag = versionTag();
+    for (const record of [...RECORDS.values()]) {
+      if (record.engineVersion === tag) continue;
+      const bytes = await vault.bytesOf(record.id);
+      if (!bytes) continue;
+      const report = await readBytes(bytes, record.filename, record.modified);
+      if (report?.error) continue;
+      report.filename = record.filename;
+      const next = { ...record, report, engineVersion: tag };
+      RECORDS.set(record.id, next);
+      RESIDENT.set(record.id, report.id);
+      await vault.patch(next);
+    }
+    refile();
+  } catch { /* the files are still there; the table just shows the older reading */ } finally {
+    imported.refreshing = false;
+  }
+}
+
+async function refreshUsage() {
+  imported.storage = await vault.usage();
+}
+
 /// Reads the picked files and files them under their assets.
 ///
 /// Returns a summary for the page to show: how many files were read, how many
-/// could not be, and anything that parsed but matched no asset.
+/// were already in, how many could not be read, and anything that parsed but
+/// matched no asset.
 export async function importFiles(files) {
   imported.busy = true;
+  imported.storageError = null;
   const errors = [];
   let read = 0;
+  let already = 0;
   try {
     for (const file of files) {
+      let bytes;
+      try {
+        bytes = new Uint8Array(await file.arrayBuffer());
+      } catch (e) {
+        errors.push({ name: file.name, message: String(e?.message || e) });
+        continue;
+      }
+      const id = await vault.fileId(bytes);
+      // The same bytes twice is the same file, whatever it was called the
+      // second time: nothing to parse and nothing to store.
+      if (RECORDS.has(id)) { already += 1; continue; }
+
       let report;
       try {
-        report = await readFile(file);
+        report = await readBytes(bytes, file.name, Math.round(file.lastModified / 1000));
       } catch (e) {
         errors.push({ name: file.name, message: String(e?.message || e) });
         continue;
       }
       if (report?.error) {
+        // A file the parsers do not recognise is not stored: there is nothing
+        // to show about it and nothing a run could do with it.
         errors.push({ name: file.name, message: report.error.message, kind: report.error.kind });
         continue;
       }
       report.filename ||= file.name;
+      RESIDENT.set(id, report.id);
+      const record = {
+        id,
+        filename: file.name,
+        size: file.size,
+        modified: Math.round(file.lastModified / 1000),
+        savedAt: Date.now(),
+        engineVersion: versionTag(),
+        report,
+      };
+      RECORDS.set(id, record);
       read += 1;
-      place(report);
+      try {
+        await vault.put(record, bytes);
+      } catch (e) {
+        // Out of room: this file still works for this visit, and everything
+        // already stored is untouched. The page says so rather than pretending.
+        imported.storageError = e instanceof vault.StorageFull
+          ? 'This browser is out of storage, so new imports last only for this visit. Clear some imports, or free space, to keep them.'
+          : `This browser would not store the import: ${String(e?.message || e)}`;
+      }
     }
+    refile();
+    await refreshUsage();
   } finally {
     imported.busy = false;
   }
-  return { read, errors, unmatched: imported.unmatched.length };
+  return { read, already, errors, unmatched: imported.unmatched.length };
 }
 
-function place(report) {
-  const match = matchAsset(report);
-  if (!match) {
-    imported.unmatched.push({
-      id: report.id,
-      filename: report.filename,
-      publisher: report.publisher,
-      code: report.code || report.name || null,
+// Rebuilds the table from the records. One path, whether a record has just been
+// imported or has just been read back from storage, so the two can never draw
+// differently.
+function refile() {
+  const byAsset = {};
+  const unmatched = [];
+  // Newest wins for a filename within a series, so a corrected re-download
+  // replaces the file it corrects.
+  for (const record of [...RECORDS.values()].sort((a, b) => (a.savedAt ?? 0) - (b.savedAt ?? 0))) {
+    const report = record.report;
+    const match = matchAsset(report);
+    if (!match) {
+      unmatched.push({
+        id: record.id,
+        filename: record.filename,
+        publisher: report.publisher,
+        code: report.code || report.name || null,
+        from: report.from,
+        to: report.to,
+        rows: report.rows,
+      });
+      continue;
+    }
+    const list = (byAsset[match.assetKey] ||= []);
+    const key = seriesKey(report);
+    let series = list.find((s) => s.key === key);
+    if (!series) {
+      const currency = currencyOf(report, match.assetKey);
+      series = {
+        key,
+        name: report.name || report.code || record.filename,
+        type: typeOf(report),
+        ret: report.ret,
+        basis: report.basis,
+        ccy: currency.ccy,
+        ccyAssumed: currency.assumed,
+        source: report.source,
+        publisher: report.publisher,
+        origin: 'imported',
+        matchedBy: match.how,
+        files: [],
+        from: null,
+        to: null,
+      };
+      list.push(series);
+    }
+    const entry = {
+      id: record.id,
+      name: record.filename,
+      size: record.size,
       from: report.from,
       to: report.to,
       rows: report.rows,
-    });
-    return;
+      status: report.status,
+      checks: report.checks,
+    };
+    const same = series.files.findIndex((f) => f.name === entry.name);
+    if (same >= 0) series.files.splice(same, 1, entry);
+    else series.files.push(entry);
   }
-  const list = (imported.byAsset[match.assetKey] ||= []);
-  const key = seriesKey(report);
-  let series = list.find((s) => s.key === key);
-  if (!series) {
-    series = reactive({
-      key,
-      name: report.name || report.code || report.filename,
-      type: typeOf(report),
-      ret: report.ret,
-      basis: report.basis,
-      ccy: report.currency,
-      source: report.source,
-      publisher: report.publisher,
-      origin: 'imported',
-      matchedBy: match.how,
-      files: [],
-      from: null,
-      to: null,
-    });
-    list.push(series);
+  for (const list of Object.values(byAsset)) {
+    for (const series of list) {
+      series.files.sort((a, b) => String(a.from).localeCompare(String(b.from)));
+      const ok = series.files.filter((f) => f.status !== 'err');
+      series.from = ok.map((f) => f.from).sort()[0] ?? null;
+      series.to = ok.map((f) => f.to).sort().at(-1) ?? null;
+    }
   }
-  // Importing the same file again replaces it rather than doubling its rows.
-  const existing = series.files.findIndex((f) => f.name === report.filename);
-  const entry = {
-    id: report.id,
-    name: report.filename,
-    from: report.from,
-    to: report.to,
-    rows: report.rows,
-    status: report.status,
-    checks: report.checks,
-  };
-  if (existing >= 0) {
-    dropFile(series.files[existing].id);
-    series.files.splice(existing, 1, entry);
-  } else {
-    series.files.push(entry);
-  }
-  series.files.sort((a, b) => String(a.from).localeCompare(String(b.from)));
-  respan(series);
+  imported.byAsset = byAsset;
+  imported.unmatched = unmatched;
 }
 
-// A series spans its valid files; an invalid one is listed but not used.
-function respan(series) {
-  const ok = series.files.filter((f) => f.status !== 'err');
-  series.from = ok.map((f) => f.from).sort()[0] ?? null;
-  series.to = ok.map((f) => f.to).sort().at(-1) ?? null;
+/// Removes one file: from the table, from the engine, and from this browser.
+export async function removeFile(fileId) {
+  const record = RECORDS.get(fileId);
+  if (!record) return;
+  RECORDS.delete(fileId);
+  const handle = RESIDENT.get(fileId);
+  if (handle) { dropFile(handle); RESIDENT.delete(fileId); }
+  refile();
+  await vault.remove(fileId);
+  await refreshUsage();
 }
 
-/// Removes one file, or a whole series, and tells the engine to forget it.
-export function removeFile(assetKey, seriesKey_, fileId) {
-  const list = imported.byAsset[assetKey] || [];
-  const series = list.find((s) => s.key === seriesKey_);
-  if (!series) return;
-  const i = series.files.findIndex((f) => f.id === fileId);
-  if (i < 0) return;
-  dropFile(fileId);
-  series.files.splice(i, 1);
-  if (!series.files.length) list.splice(list.indexOf(series), 1);
-  else respan(series);
-  if (!list.length) delete imported.byAsset[assetKey];
+/// Removes every import, from the table, the engine and this browser alike.
+export async function clearImports() {
+  RECORDS.clear();
+  RESIDENT.clear();
+  // Nothing to clear in a module that was never started, and asking would load it.
+  if (engineLoaded()) clearFiles();
+  refile();
+  imported.storageError = null;
+  await vault.clear();
+  await refreshUsage();
 }
 
-/// The engine handles of every valid file behind a series, which is what a run
-/// passes for that asset.
-export const handlesOf = (series) => series.files.filter((f) => f.status !== 'err').map((f) => f.id);
+/// The ids of every valid file behind a series, which is what a run resolves to
+/// engine handles with `resident`.
+export const fileIdsOf = (series) => series.files.filter((f) => f.status !== 'err').map((f) => f.id);
 
 export const seriesFor = (assetKey) => imported.byAsset[assetKey] || [];
