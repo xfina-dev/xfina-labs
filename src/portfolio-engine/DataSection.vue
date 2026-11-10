@@ -61,11 +61,11 @@ const sections = [
   {
     id: 'provided', title: 'Reference', note: null, // has a link, so the template writes it
     assets: [
-      { name: 'USD/INR', provided: true, series: [
+      { key: 'reference|fx', name: 'USD/INR', provided: true, series: [
         provided('sbi-forex-card-usd', 'SBI forex card', 'FX', 'TT rate', 'TT buy and TT sell: what SBI charges to convert between rupees and dollars on a forex card. Preferred: it is what a transfer actually costs.'),
         provided('bis-usd-inr', 'BIS USD/INR', 'FX', 'Reference rate', 'A reference rate from the Bank for International Settlements, rupees per dollar on each business day. The long history, for runs that start before SBI\'s sheets.'),
       ] },
-      { name: 'Inflation', provided: true, series: [
+      { key: 'reference|cpi', name: 'Inflation', provided: true, series: [
         provided('in-cpi', 'MoSPI CPI', 'CPI', 'Index level', 'India\'s official consumer price index, all-India combined, 2024 = 100. Preferred: MoSPI\'s own figures.'),
         provided('in-cpi-imf', 'IMF CPI', 'CPI', 'Index level', 'India\'s CPI as the IMF publishes it, on the same 2024 = 100 base. The long history, for runs that start before 2013.'),
       ] },
@@ -106,9 +106,9 @@ const spans = (range) => (s) => startOf(s) <= range.from && (s.frequency === 'mo
 // The user picks the series each asset uses, or none: clicking the picked one again unpicks it, and the
 // asset is left out of the run. Until the user touches an asset, an imported one uses its first valid
 // series and a provided one the first that covers what the imported picks share.
-const picked = reactive({}); // asset name → series index, or null for none
-const own = (a) => { const s = a.series[picked[a.name] ?? -1]; return s && !invalid(s) ? s : null; };
-const unpicked = (a) => picked[a.name] === null;
+const picked = reactive({}); // asset key (region|class|asset) → series index, or null for none
+const own = (a) => { const s = a.series[picked[a.key] ?? -1]; return s && !invalid(s) ? s : null; };
+const unpicked = (a) => picked[a.key] === null;
 const assetsOf = (provided) => sections.flatMap((x) => x.assets).filter((a) => !!a.provided === provided);
 const BASE = computed(() => overlap(assetsOf(false).filter((a) => !unpicked(a)).map((a) => own(a) || a.series.find((x) => !invalid(x))).filter(Boolean)));
 const chosen = (a) => (unpicked(a) ? null : own(a) || (a.provided ? a.series.find(spans(BASE.value)) || a.series[0] : a.series.find((x) => !invalid(x))) || null);
@@ -117,7 +117,7 @@ const isChosen = (a, s) => chosen(a) === s;
 // another switches to it, but the picked one cannot be cleared.
 const choose = (a, s) => {
   if (invalid(s)) return;
-  if (isChosen(a, s)) { if (!a.provided) picked[a.name] = null; } else picked[a.name] = a.series.indexOf(s);
+  if (isChosen(a, s)) { if (!a.provided) picked[a.key] = null; } else picked[a.key] = a.series.indexOf(s);
 };
 
 // The run covers the dates every picked series shares, provided ones included, so the shortest sets it.
@@ -208,10 +208,10 @@ const wantedCount = computed(() => Object.values(wanted.value).reduce((n, w) => 
 const wantedIn = (sec) => sec.assets.reduce((n, a) => n + wantedOf(a).length, 0);
 
 const rows = computed(() => current.value.assets.flatMap((a) => [
-  { kind: 'asset', key: `a:${a.name}`, a },
-  ...a.series.map((s) => ({ kind: 'series', key: `r:${a.name}:${s.name}`, a, s })),
-  ...wantedOf(a).map((d) => ({ kind: 'wanted', key: `w:${a.name}:${d.id}`, a, d })),
-  ...(a.series.length || wantedOf(a).length ? [] : [{ kind: 'empty', key: `e:${a.name}`, a }]),
+  { kind: 'asset', key: `a:${a.key}`, a },
+  ...a.series.map((s) => ({ kind: 'series', key: `r:${a.key}:${s.name}`, a, s })),
+  ...wantedOf(a).map((d) => ({ kind: 'wanted', key: `w:${a.key}:${d.id}`, a, d })),
+  ...(a.series.length || wantedOf(a).length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
 ]));
 
 const detail = ref(null);
