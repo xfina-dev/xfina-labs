@@ -34,6 +34,11 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- Checking whether a stored reading of a file is still current no longer loads
+  the WebAssembly module to ask. It is answered against the build the page last
+  saw, so a reload stays free of the engine, which was the point of keeping the
+  metadata apart from the bytes; a build that reads files differently is noticed
+  the first time the module loads for some other reason.
 - Unticking an asset in one region unticked it in the others. `Gold` is an asset
   in India, the US and Global alike, and the pick was kept under its name.
 - A reference series that covers none of the run no longer falls back to the

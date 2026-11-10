@@ -129,6 +129,8 @@ const RESIDENT = new Map(); // file id → the engine's handle
 /// waits for it. A file whose bytes have gone (a cleared store, an eviction) is
 /// reported rather than silently left out of a run.
 export async function resident(ids) {
+  await engineReady();
+  syncBuild();
   const missing = [...new Set(ids)].filter((id) => !RESIDENT.has(id));
   const gone = [];
   for (const id of missing) {
@@ -153,8 +155,28 @@ export async function resident(ids) {
   return new Map(ids.map((id) => [id, RESIDENT.get(id)]));
 }
 
-// What read a file, so a report stored by an older parser can be spotted.
+// What read a file, so a report stored by an older parser can be spotted. The
+// parser revision is the part that matters: it is bumped whenever a file would
+// come back read or checked differently (PARSER_REVISION in engine/src/lib.rs).
+//
+// Only the loaded module can say what it is, and a reload must not load it just
+// to ask -- drawing the table without the engine is the whole point of keeping
+// the metadata apart. So the last answer it gave is remembered here, and a
+// reload compares the stored readings against that, which costs nothing. A
+// build that would answer differently is noticed the first time the module is
+// loaded for some other reason, and the stored readings are re-made then.
+const BUILD_KEY = 'xfina_labs_portfolio_engine_build';
 const versionTag = () => `${versions.engine ?? '?'}/${versions.xfina ?? '?'}/r${versions.parserRevision ?? '?'}`;
+const rememberedTag = () => { try { return localStorage.getItem(BUILD_KEY); } catch { return null; } };
+
+/// Called whenever the module is up: notes what this build calls itself, and
+/// re-reads the stored files when that is not what read them.
+function syncBuild() {
+  const tag = versionTag();
+  if (rememberedTag() === tag) return;
+  try { localStorage.setItem(BUILD_KEY, tag); } catch { /* this visit only */ }
+  if ([...RECORDS.values()].some((r) => r.engineVersion !== tag)) refreshStale(tag);
+}
 
 // --- The imports themselves --------------------------------------------------
 // Every import's metadata by id, which is what the table is built from.
@@ -173,22 +195,23 @@ export async function load() {
   } finally {
     imported.loaded = true;
   }
-  // A stored report is a drawing cache. If this build reads or checks files
-  // differently from the one that filled it, the cache is re-made from the
-  // bytes -- which does need the engine, but only on the first visit after an
-  // upgrade, and only once the table is already on screen. A file that a new
-  // check now rejects must not sit there looking fine.
-  if ([...RECORDS.values()].some((r) => r.engineVersion !== versionTag())) refreshStale();
+  // A stored report is a drawing cache, and a reload draws from it without
+  // going near the engine. Whether this build would read those files the same
+  // way is answered against the build the page last saw, so asking costs
+  // nothing; a record older than that is re-read now, because a file a new
+  // check rejects must not sit there looking fine.
+  const tag = rememberedTag();
+  if (tag && [...RECORDS.values()].some((r) => r.engineVersion !== tag)) refreshStale(tag);
 }
 
 /// Re-reads the files whose stored report came from a different build.
-async function refreshStale() {
+async function refreshStale(expected) {
   imported.refreshing = true;
   try {
     await engineReady();
-    // Asked once, before the loop: reading the first file fills `versions`, and
-    // a tag that changed halfway would make every later file look up to date.
+    // The module's own answer wins over what was remembered of it.
     const tag = versionTag();
+    if (tag !== expected) { try { localStorage.setItem(BUILD_KEY, tag); } catch { /* this visit only */ } }
     for (const record of [...RECORDS.values()]) {
       if (record.engineVersion === tag) continue;
       const bytes = await vault.bytesOf(record.id);
@@ -239,6 +262,7 @@ export async function importFiles(files) {
       let report;
       try {
         report = await readBytes(bytes, file.name, Math.round(file.lastModified / 1000));
+        syncBuild();
       } catch (e) {
         errors.push({ name: file.name, message: String(e?.message || e) });
         continue;
