@@ -72,6 +72,17 @@ npm run dev
 | `npm run build:wasm` | The module on its own, into `src/portfolio-engine/engine-pkg/` (gitignored) |
 | `npm run test:engine` | The crate's tests: the simulation against arithmetic done by hand, and the whole composition end to end |
 
+Two development tools read a folder of downloads the way the browser does, which is quicker than importing
+them to find out whether they are any good:
+
+```bash
+# What each file is, and what the pieces stitch into
+cargo run --manifest-path engine/Cargo.toml --example check_dir -- ~/Downloads/nse
+
+# The same instrument from two folders, compared where they overlap
+cargo run --manifest-path engine/Cargo.toml --example compare_dirs -- <a> <b>
+```
+
 ## Deploy
 
 Cloudflare, as an assets-only Worker (same pattern as xsteer; all new xfina projects use Cloudflare, only sakthipriyan.com stays on GitHub Pages). One site, one deployment: tools are paths, not separate projects.
