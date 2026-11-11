@@ -17,7 +17,7 @@ import { planRows, salarySpan } from './plan.js';
 import { downloadCsv, downloadJson, downloadPng } from './exportFiles.js';
 import { history, MAX_COMPARE, remove, toggleCompare, clearAll, run as runEngine, runState, blocked, resultOf, runOf, isTrimmed, STRATEGIES, ASSUMPTIONS, ui } from './store.js';
 import { versions } from './engine.js';
-import { yearly, monthly, transactions, tradesBy, weightRows, valueIn, investedLine, monthOf as labelOfMonth, inr, pct } from './runResults.js';
+import { yearly, monthly, transactions, tradesBy, weightRows, startYearOf, driftRows as driftOf, valueIn, investedLine, monthOf as labelOfMonth, inr, pct } from './runResults.js';
 
 // Results in three parts: the history of every run (newest first; up to six ticked for comparison, the latest
 // six by default), a fixed comparison of the ticked ones, and the detail of one, where the toggles are. With
@@ -32,7 +32,8 @@ onMounted(() => { if (!history.entries.length && !blocked.value) runEngine(); })
 const confirmClear = ref(false);
 const clearHistory = () => { clearAll(); confirmClear.value = false; };
 
-const times = (a, b) => `${(a / b).toFixed(2)}×`;
+// A multiple of what went in; a year before the first rupee has nothing to be a multiple of.
+const times = (a, b) => (b > 0 ? `${(a / b).toFixed(2)}×` : '—');
 const when = (iso) => new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 // The history sorts by any column (newest run first by default); sorting only changes the listing.
@@ -257,18 +258,25 @@ const ddView = ref('Chart');
 // Allocation and drift: month by month, or each year's end (the last point is the run's last month).
 const allocView = ref('Chart');
 const allocStep = ref('Yearly');
-// The weights the run actually had, month by month, as the engine returned them.
+// The weights the run actually had, month by month, as the engine returned them -- from the first month it held
+// something, since there is no allocation to show before the first rupee goes in (runResults.js).
 const allocRows = computed(() => weightRows(runData.value, res.value, allocStep.value));
-// Drift: each asset's weight less its target (positive when overweight), and the total drift, the sum of the
-// overweights (equal to the sum of the underweights). Perpetual sells on the total; Threshold on each asset.
-const allocShow = ref('Allocation');
-const driftRows = computed(() => {
-  const target = runAssets.value.map((a) => a.target);
-  return allocRows.value.map((r) => {
-    const drift = r.w.map((w, k) => w - target[k]);
-    return { label: r.label, drift, total: drift.reduce((a, d) => a + Math.max(0, d), 0) };
-  });
+// The axis counts from the first row shown, not from the run's first month, as they can differ.
+const ALLOC_START_YEAR = computed(() => startYearOf(allocRows.value, START_YEAR.value));
+// Why the series starts late, when it does. The run's first month holds nothing exactly when the plan's first
+// rupee lands later, which is when weightRows leaves rows out, and the month it does land in is the one to
+// name -- not the first row's own month, as a year-end row stands for the end of its year.
+const allocNote = computed(() => {
+  const value = res.value.value;
+  if (!value.length || value[0] > 0) return '';
+  const held = value.findIndex((v) => v > 0);
+  if (held < 0) return 'Nothing was ever invested over this run, so there is no allocation to show.';
+  return `Starts ${labelOfMonth(runData.value, held)}: nothing was invested before it.`;
 });
+// Drift from the targets, shaped in runResults.js so one definition of total drift serves the chart, the table
+// and the CSV alike.
+const allocShow = ref('Allocation');
+const driftRows = computed(() => driftOf(allocRows.value, runAssets.value.map((a) => a.target)));
 const driftLimits = computed(() => {
   const st = settings.value?.strategy;
   if (st?.id === 'perpetual') return [{ value: st.maxDrift / 100, label: `Starts selling: ${st.maxDrift}%`, tone: 'critical' }, { value: st.minDrift / 100, label: `Stops at: ${st.minDrift}%`, tone: 'good', below: true }];
@@ -307,7 +315,7 @@ function exportGrowth() {
   if (show.value === 'Growth') {
     const rows = step.value === 'Yearly' ? yearRows.value : monthRows.value;
     return downloadCsv(`${name}.csv`, [[step.value === 'Yearly' ? 'year' : 'month', 'contribution', 'sold_to_rebalance', 'invested', 'growth', 'value', 'multiple'],
-      ...rows.map((y) => [y.year ?? y.month, rupees(y.contribution), rupees(y.sold), rupees(y.invested), rupees(y.growth), rupees(y.value), (y.value / y.invested).toFixed(2)])]);
+      ...rows.map((y) => [y.year ?? y.month, rupees(y.contribution), rupees(y.sold), rupees(y.invested), rupees(y.growth), rupees(y.value), y.invested > 0 ? (y.value / y.invested).toFixed(2) : ''])]);
   }
   downloadCsv(`${name}.csv`, [[step.value === 'Yearly' ? 'year' : 'month', 'asset', 'bought', 'sold', 'net'],
     ...txRows.value.flatMap((r) => r.assets.filter((a) => a.bought || a.sold).map((a) => [r.label, a.name, rupees(a.bought), rupees(a.sold), rupees(a.bought - a.sold)]))]);
@@ -725,7 +733,7 @@ function exportResult() {
 
       <Card class="bg-card border-border shadow-sm">
         <CardHeader class="flex flex-col gap-3 space-y-0 pb-4 md:flex-row md:items-start md:gap-6">
-          <div class="space-y-1.5 md:w-72 md:shrink-0"><CardTitle class="text-xl">Allocation and drift</CardTitle><CardDescription title="The same in either unit">Each asset's share, or drift from target.</CardDescription></div>
+          <div class="space-y-1.5 md:w-72 md:shrink-0"><CardTitle class="text-xl">Allocation and drift</CardTitle><CardDescription title="The same in either unit">Each asset's share, or drift from target.<br v-if="allocNote" /><span v-if="allocNote">{{ allocNote }}</span></CardDescription></div>
           <div class="flex flex-1 flex-wrap items-center gap-2">
             <Segmented v-model="allocView" :options="['Chart', 'Table']" />
             <Segmented v-model="allocStep" :options="['Yearly', 'Monthly']" />
@@ -739,7 +747,7 @@ function exportResult() {
           <div class="relative min-h-72" style="aspect-ratio: 640 / 244">
             <div ref="alBox" class="absolute inset-0 flex flex-col overflow-auto">
               <template v-if="allocShow === 'Drift' && allocView === 'Chart'">
-                <FitChart v-slot="{ h }"><DriftChart :h="h" :rows="driftRows" :start-year="START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" :limits="driftLimits" :hidden="driftHidden" :show-total="driftTotal" /></FitChart>
+                <FitChart v-slot="{ h }"><DriftChart :h="h" :rows="driftRows" :start-year="ALLOC_START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" :limits="driftLimits" :hidden="driftHidden" :show-total="driftTotal" /></FitChart>
                 <!-- The legend switches each line on and off -->
                 <div class="flex shrink-0 flex-wrap items-center gap-x-1 gap-y-1 text-xs mt-2">
                   <button type="button" class="rounded px-1.5 py-0.5 font-medium hover:bg-muted" :class="!driftTotal && 'opacity-40 line-through'" :aria-pressed="driftTotal" @click="driftTotal = !driftTotal"><i class="inline-block w-3 h-0.5 align-middle mr-1.5 bg-foreground" />Total drift</button>
@@ -766,7 +774,7 @@ function exportResult() {
                 </TableBody>
               </Table>
               <template v-else-if="allocView === 'Chart'">
-                <FitChart v-slot="{ h }"><AllocationChart :h="h" :points="allocRows.map((r) => r.w)" :start-year="START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" /></FitChart>
+                <FitChart v-slot="{ h }"><AllocationChart :h="h" :points="allocRows.map((r) => r.w)" :start-year="ALLOC_START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" /></FitChart>
                 <div class="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
                   <span v-for="a in runAssets" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
                 </div>

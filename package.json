@@ -10,6 +10,7 @@
     "build:wasm": "node scripts/engine-deps.mjs && wasm-pack build engine --release --target web --out-dir ../src/portfolio-engine/engine-pkg --out-name engine",
     "engine:deps": "node scripts/engine-deps.mjs",
     "test:engine": "cargo test --manifest-path engine/Cargo.toml",
+    "test:js": "node --test \"tests/*.test.mjs\"",
     "build:tree": "node scripts/build-tree.mjs"
   },
   "dependencies": {

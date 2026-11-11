@@ -309,3 +309,51 @@ fn a_fall_shows_up_as_a_drawdown_that_recovers() {
     assert_eq!(worst.recovered, Some(24), "it should recover in month 24");
     assert!(result.vol > 0.0);
 }
+
+/// A plan whose first contribution falls after the run's first year-end -- a
+/// savings rate starting at 0% with no lumpsum -- holds nothing until then, and
+/// the engine says so plainly: those months are worth nothing and their weights
+/// are all zero. The page must not read such a row as an allocation (see
+/// `weightRows` in src/portfolio-engine/runResults.js); this pins the engine
+/// side of it, so a later change cannot quietly start reporting something else.
+#[test]
+fn months_before_the_first_contribution_hold_nothing() {
+    let months = 24;
+    let first = 14; // the first month any money goes in, past the first year-end
+    let a = grid(months, 0.01, 100.0);
+    let b = grid(months, 0.005, 50.0);
+    let names = vec!["A".to_string(), "B".to_string()];
+    let targets = vec![0.6, 0.4];
+    let mut contribution = vec![0.0; months];
+    for c in contribution.iter_mut().skip(first) {
+        *c = 10_000.0;
+    }
+    let out = sim::simulate(
+        &SimInput {
+            buy: &[a.buy.clone(), b.buy.clone()],
+            mark: &[a.mark.clone(), b.mark.clone()],
+            names: &names,
+            targets: &targets,
+            contribution: &contribution,
+            months,
+            start_month_of_year: 1,
+            ltcg_rate: 12.5,
+            stcg_rate: 20.0,
+        },
+        &Strategy::Hold,
+    );
+
+    for m in 0..first {
+        assert_eq!(out.value[m], 0.0, "month {m} should hold nothing");
+        assert!(
+            out.weights[m].iter().all(|w| *w == 0.0),
+            "month {m} should have no weights at all, got {:?}",
+            out.weights[m]
+        );
+    }
+    for m in first..months {
+        assert!(out.value[m] > 0.0, "month {m} should hold something");
+        let sum: f64 = out.weights[m].iter().sum();
+        assert!((sum - 1.0).abs() < 1e-9, "month {m} weights sum to {sum}");
+    }
+}

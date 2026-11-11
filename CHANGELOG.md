@@ -34,6 +34,18 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- A plan whose first contribution falls after the run's first year-end -- a
+  savings rate starting at 0% with no lumpsum -- showed that year as an
+  allocation of nothing: every asset its whole target below target, and, because
+  total drift was taken as the sum of the overweights and nothing was overweight,
+  a total drift of 0%. The one row with no portfolio in it read as the
+  best-behaved row in the table, in the drift chart, the table and the CSV
+  alike. Allocation and drift now begin at the first month the portfolio held
+  something, and say which month that is; the x axis counts from there. Total
+  drift is now half the sum of the absolute drifts, the same figure whenever the
+  weights total 100% but one that cannot report a portfolio far from its targets
+  as being at them. A year before the first rupee also showed its multiple of
+  what went in as `NaN×`; it now shows nothing.
 - Checking whether a stored reading of a file is still current no longer loads
   the WebAssembly module to ask. It is answered against the build the page last
   saw, so a reload stays free of the engine, which was the point of keeping the

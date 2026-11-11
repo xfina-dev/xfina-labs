@@ -32,6 +32,9 @@ jobs:
       - run: npm run engine:deps
       - name: Test the engine
         run: npm run test:engine
+      # The results shaping, which runs in the browser rather than in the module.
+      - name: Test the results shaping
+        run: npm run test:js
       # Builds the WASM module first, then the site.
       - run: npm run build
       - name: Check the Worker config

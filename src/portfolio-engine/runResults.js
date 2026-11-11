@@ -92,7 +92,44 @@ export function tradesBy(run, res, assets, today, byYear) {
 
 // Each month's actual weights, or each year's end, for the allocation and drift
 // charts. The engine returns one row per month; this picks the rows shown.
+//
+// A month before the first rupee goes in holds nothing, so the engine returns a
+// row of zeros for it -- truthfully, but there is no allocation there to show,
+// and a zero row read as an allocation says every asset is 100% of its target
+// below target. Those leading months are left out, so the series starts at the
+// first month the portfolio actually held something. The rows that remain are
+// still consecutive, which is what the charts' month arithmetic needs; the
+// first row's label gives them the year to count from.
 export function weightRows(run, res, step) {
-  if (step === 'Monthly') return res.weights.map((w, m) => ({ label: monthOf(run, m), w }));
-  return yearEnds(run).map((m) => ({ label: String(yearOf(run, m)), w: res.weights[m] }));
+  const held = (m) => res.value[m] > 0;
+  const rows = step === 'Monthly'
+    ? res.weights.map((w, m) => ({ label: monthOf(run, m), month: m, w }))
+    : yearEnds(run).map((m) => ({ label: String(yearOf(run, m)), month: m, w: res.weights[m] }));
+  const first = rows.findIndex((r) => held(r.month));
+  // Nothing was ever held: there is no allocation to show at all.
+  if (first < 0) return [];
+  return first === 0 ? rows : rows.slice(first);
+}
+
+// The year the rows start in, for the charts' x axis: a year label or a
+// 'YYYY-MM' month both begin with it.
+export const startYearOf = (rows, fallback) => (rows.length ? Number(rows[0].label.slice(0, 4)) : fallback);
+
+// Drift: each asset's weight less its target (positive when overweight), and
+// the total drift, which is half the sum of the absolute drifts.
+//
+// For any row whose weights total 100% -- which is every row the portfolio
+// holds something in -- the half-sum is exactly the sum of the overweights,
+// equal to the sum of the underweights, and that is what Perpetual sells on
+// (Threshold goes asset by asset). It is written as the half-sum rather than as
+// the overweights so the figure does not depend on that invariant holding: a
+// row of weights that do not total 100% -- a portfolio holding nothing, say --
+// is far from its targets, and must not read as 0% drift, which would make the
+// one row with no allocation at all look like the best-behaved row in the
+// table.
+export function driftRows(rows, targets) {
+  return rows.map((r) => {
+    const drift = r.w.map((w, k) => w - (targets[k] ?? 0));
+    return { label: r.label, month: r.month, drift, total: drift.reduce((a, d) => a + Math.abs(d), 0) / 2 };
+  });
 }
