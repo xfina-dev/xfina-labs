@@ -19,6 +19,7 @@ import { reactive } from 'vue';
 import { readBytes, dropFile, clearFiles, engineLoaded, engineReady, versions } from './engine.js';
 import * as vault from './vault.js';
 import { nodes } from './guide.js';
+import * as matching from './matching.js';
 
 // key `region|class|asset` → [series]. A series is
 // `{ key, name, type, ret, basis, ccy, origin, files: [...], from, to }`,
@@ -40,57 +41,14 @@ export const imported = reactive({
   refreshing: false,
 });
 
-const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-const words = (s) => norm(s).split(' ').filter(Boolean);
+const norm = matching.norm;
+// The catalogue, flattened once: what an imported file is matched against
+// (matching.js, which takes it as an argument so it can be tested on its own).
+const CATALOGUE = matching.catalogue(nodes);
 
-// Every instrument in the catalogue, flattened once, with the asset it belongs
-// to: what an imported file is matched against.
-const INSTRUMENTS = nodes.flatMap((n) =>
-  n.instruments.map((i) => ({
-    assetKey: `${n.region}|${n.class}|${n.asset}`,
-    asset: n.asset,
-    vehicle: n.vehicle,
-    code: i.code ? norm(i.code) : null,
-    name: norm(i.name),
-    kind: i.kind,
-  })),
-);
-// An index file names the index, not an instrument, so the asset's own name is
-// a match too ("NIFTY 50" → Nifty 50).
-const ASSETS = [...new Map(nodes.map((n) => [`${n.region}|${n.class}|${n.asset}`, { assetKey: `${n.region}|${n.class}|${n.asset}`, asset: n.asset, name: norm(n.asset) }])).values()];
-
-// Which asset a parsed file belongs to.
-//
-// The publishers identify an instrument in their own terms -- a symbol, an AMFI
-// scheme name, an index name -- so the match is tried in order of how much it
-// proves: an exchange symbol or scheme code first, then the instrument's full
-// name, then the index's name against the asset's.
-export function matchAsset(report) {
-  const code = norm(report.code);
-  const name = norm(report.name || report.code);
-  if (code) {
-    const bySymbol = INSTRUMENTS.find((i) => i.code && i.code === code);
-    if (bySymbol) return { assetKey: bySymbol.assetKey, how: 'symbol' };
-  }
-  for (const text of [name, code]) {
-    if (!text) continue;
-    const byName = INSTRUMENTS.find((i) => i.name === text || i.name.includes(text) || text.includes(i.name));
-    if (byName) return { assetKey: byName.assetKey, how: 'name' };
-  }
-  // An index: match the asset's own name, longest first, so "Nifty Next 50"
-  // wins over "Nifty 50" for a file that names both.
-  const candidates = [...ASSETS].sort((a, b) => b.name.length - a.name.length);
-  for (const text of [name, code]) {
-    if (!text) continue;
-    const hit = candidates.find((a) => text === a.name || text.includes(a.name));
-    if (hit) return { assetKey: hit.assetKey, how: 'index name' };
-  }
-  // A last pass on words, for a file whose name carries the index with the
-  // publisher's own wording around it.
-  const bag = new Set([...words(name), ...words(code), ...words(report.filename)]);
-  const hit = candidates.find((a) => words(a.name).every((w) => bag.has(w)));
-  return hit ? { assetKey: hit.assetKey, how: 'filename' } : null;
-}
+/// Which asset a parsed file belongs to. See matching.js for the passes and for
+/// what a match does and does not decide.
+export const matchAsset = (report) => matching.matchAsset(report, CATALOGUE);
 
 // The type badge the table shows, from what the file itself said.
 const TYPE = { index: 'Index', etf: 'ETF', mutual_fund: 'MF', listed_security: 'ETF', commodity_spot: 'Spot' };
@@ -315,7 +273,10 @@ function refile() {
   for (const record of [...RECORDS.values()].sort((a, b) => (a.savedAt ?? 0) - (b.savedAt ?? 0))) {
     const report = record.report;
     const match = matchAsset(report);
-    if (!match) {
+    // No asset, or several that do not agree: either way the file is not filed,
+    // and an ambiguity says which entries it could have been rather than
+    // leaving the user to guess why a fund the catalogue lists was not taken.
+    if (!match || !match.assetKey) {
       unmatched.push({
         id: record.id,
         filename: record.filename,
@@ -324,6 +285,7 @@ function refile() {
         from: report.from,
         to: report.to,
         rows: report.rows,
+        ambiguous: match?.ambiguous ?? null,
       });
       continue;
     }

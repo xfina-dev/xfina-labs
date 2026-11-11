@@ -349,6 +349,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
             <li v-for="u in imported.unmatched" :key="u.id" class="flex flex-wrap items-baseline gap-x-2 text-xs">
               <span class="font-mono break-all">{{ u.filename }}</span>
               <span class="text-muted-foreground">{{ u.publisher }}<template v-if="u.code"> · {{ u.code }}</template><template v-if="u.from"> · {{ u.from }} → {{ u.to }} · {{ u.rows.toLocaleString('en-IN') }} rows</template></span>
+              <span v-if="u.ambiguous" class="basis-full text-muted-foreground">Could be {{ u.ambiguous.join(', or ') }} — they are different assets, so the file is not filed under either. Rename it to the one you meant.</span>
             </li>
           </ul>
           <p class="text-xs text-muted-foreground">The file holds price history, but nothing in it names an instrument this catalogue lists. Check it is the dataset you meant, and that the publisher's own filename was kept.</p>

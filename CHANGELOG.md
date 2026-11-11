@@ -34,6 +34,19 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- Three AMFI gilt NAV files read fine but landed in "not matched to an asset",
+  under a fund the catalogue lists. AMFI's export names the scheme
+  `ICICI Prudential Gilt Fund - Growth`; the catalogue spells it
+  `ICICI Prudential Gilt Fund - Regular Plan - Growth`. The missing qualifier is
+  in the middle, so neither name contains the other and no pass could see it. A
+  last pass now matches a scheme named with less than the catalogue spells out:
+  every word the file gives must appear in the entry, which leaves the fund's
+  Regular and Direct entries standing -- and since both are the same asset, the
+  asset is certain even though the plan is not. A match names an asset, never an
+  instrument, and every value a run reads comes from the file, so two plans
+  standing together cannot put the wrong NAVs into a backtest. Where candidates
+  do not agree on one asset, the file stays unmatched and Select Assets names
+  the entries it could have been, rather than silently taking the first.
 - The allocation and drift charts drew a saved result against whatever Select
   Assets happens to be set to now, rather than against the assets the run was
   made with. They read the live catalogue straight from `allocation.js` and
