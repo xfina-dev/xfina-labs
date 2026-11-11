@@ -46,6 +46,16 @@ export function nameFit(got, want) {
 }
 
 /// Flattens the catalogue tree once into what the passes below read.
+///
+/// An instrument is matched on every name it is published under, not only on
+/// the one the catalogue lists it by. Some entries are named descriptively --
+/// `NSE short-duration debt index (Liquid or 1D Rate)` -- while the file a user
+/// downloads calls itself `NIFTY 1D RATE INDEX`, which shares no identifying
+/// word with it, so no comparison of the two can succeed. Those other names are
+/// `aliases` on the instrument in tree.json, written by scripts/build-tree.mjs,
+/// and they go through exactly the same passes as the catalogue's own name: the
+/// next publisher who names something differently is a line of data, not a
+/// change here.
 export function catalogue(nodes) {
   const instruments = nodes.flatMap((n) =>
     n.instruments.map((i) => ({
@@ -55,6 +65,9 @@ export function catalogue(nodes) {
       code: i.code ? norm(i.code) : null,
       name: norm(i.name),
       label: i.name,
+      // Every name this instrument answers to, the catalogue's and the
+      // publishers', each with its words for the subset pass.
+      names: [i.name, ...(i.aliases ?? [])].map((text) => ({ name: norm(text), words: new Set(words(text)) })),
       words: new Set(words(i.name)),
       kind: i.kind,
     })),
@@ -104,7 +117,7 @@ export function matchAsset(report, cat) {
   // the name than the catalogue holds, or less.
   for (const text of [name, code]) {
     if (!text) continue;
-    const hit = tried(instruments.filter((i) => i.name === text || i.name.includes(text) || text.includes(i.name)), 'name');
+    const hit = tried(instruments.filter((i) => i.names.some((n) => nameFit(text, n.name) === 'exact')), 'name');
     if (hit) return hit;
   }
   // An index: match the asset's own name, longest first, so "Nifty Next 50"
@@ -132,7 +145,7 @@ export function matchAsset(report, cat) {
   // file stays unmatched and names them.
   const given = [...new Set(words(name))];
   if (given.length) {
-    const hit = tried(instruments.filter((i) => subsetOf(given, i.words)), 'scheme name');
+    const hit = tried(instruments.filter((i) => i.names.some((n) => subsetOf(given, n.words))), 'scheme name');
     if (hit) return hit;
   }
   return unsure;

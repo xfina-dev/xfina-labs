@@ -2297,6 +2297,9 @@
      "id": "etf-zgldus",
      "name": "Swisscanto (CH) Gold ETF (USD)",
      "code": "ZGLDUS",
+     "aliases": [
+      "ZGLDUS.SW"
+     ],
      "inception": "2009-01-16",
      "dateSource": "wsj",
      "ccy": "USD",
@@ -3012,6 +3015,9 @@
     {
      "id": "idx-nse-short-duration-debt-index-liquid-or-1d-rate",
      "name": "NSE short-duration debt index (Liquid or 1D Rate)",
+     "aliases": [
+      "NIFTY 1D RATE INDEX"
+     ],
      "inception": "2011-01-03",
      "dateSource": "nse",
      "ccy": "INR",
@@ -3036,6 +3042,9 @@
     {
      "id": "idx-nifty-10-yr-benchmark-g-sec-index",
      "name": "Nifty 10 yr Benchmark G-Sec Index",
+     "aliases": [
+      "NIFTY 10 YR BENCHMARK G-SEC"
+     ],
      "inception": "2011-01-03",
      "dateSource": "nse",
      "ccy": "INR",

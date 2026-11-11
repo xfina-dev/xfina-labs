@@ -310,7 +310,7 @@ const ETFS = [
   { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'iShares Gold ETF (CH)', code: 'CSGOLD', page: ishCh(261149, 'ishares-gold-ch-fund') },
   // ZGLDUS: the USD share class of the Swisscanto/ZKB Gold ETF, launched 2009-01-15; WSJ's file starts 2009-01-16 (checked 2026-10-02). No
   // issuer download (swissfunddata.ch and Swisscanto checked) and SIX's own page gives ~5 months; WSJ lists it.
-  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'Swisscanto (CH) Gold ETF (USD)', code: 'ZGLDUS', manual: '2009-01-16', manualSrc: 'wsj', src: 'wsj', wsj: 'etf/CH/XSWX/ZGLDUS' },
+  { cls: 'gold', region: 'global', asset: 'Gold', listing: 'switzerland', name: 'Swisscanto (CH) Gold ETF (USD)', code: 'ZGLDUS', aliases: ['ZGLDUS.SW'], manual: '2009-01-16', manualSrc: 'wsj', src: 'wsj', wsj: 'etf/CH/XSWX/ZGLDUS' },
   // Canada: Ontario trusts holding physical gold directly as trust property (not debt securities). PHYS is the oldest
   // currently-tradeable USD one (iShares' CGL is CAD only, from 2011). KILO.U and VALT.U (younger, cheaper) are
   // dropped: neither has a free download, and PHYS covers the same metal from 2010.
@@ -397,8 +397,13 @@ const INDICES = [
   { cls: 'gold', region: 'india', asset: 'Gold', name: 'MCX Spot Market Price: Gold (Ahmedabad)', how: 'mcxSpot', ccy: 'INR', since: '2005-06-06', src: 'mcx', ret: 'Spot price', links: [L('MCX Spot Market Price', 'https://www.mcxindia.com/market-data/spot-market-price')] },
   // Debt start dates: the first rows Historical Index Data (Fixed Income) returns for Nifty 1D Rate Index and Nifty 10 yr
   // Benchmark G-Sec, found by asking year by year on the page (2010 empty, 2011 from 3 Jan), on 2026-09-27.
-  { cls: 'debt', region: 'india', asset: 'Short duration', name: 'NSE short-duration debt index (Liquid or 1D Rate)', how: 'nseTri', ccy: 'INR', since: '2011-01-03', links: [L('NSE Indices historical data', NSE_HIST)] },
-  { cls: 'debt', region: 'india', asset: 'Long duration', name: 'Nifty 10 yr Benchmark G-Sec Index', how: 'nseTri', ccy: 'INR', since: '2011-01-03', links: [L('NSE Indices historical data', NSE_HIST)] },
+  // `aliases` are the other names the instrument is published under, which is what an imported file names
+  // itself: a download says NIFTY 1D RATE INDEX, and nothing in this entry's own descriptive name shares a word
+  // with it, so without the alias the file matches nothing (see matching.js). The G-Sec one is spelled out for
+  // the same reason even though its name happens to contain what NSE prints -- that is an accident of wording,
+  // and renaming the entry would break the match silently.
+  { cls: 'debt', region: 'india', asset: 'Short duration', name: 'NSE short-duration debt index (Liquid or 1D Rate)', aliases: ['NIFTY 1D RATE INDEX'], how: 'nseTri', ccy: 'INR', since: '2011-01-03', links: [L('NSE Indices historical data', NSE_HIST)] },
+  { cls: 'debt', region: 'india', asset: 'Long duration', name: 'Nifty 10 yr Benchmark G-Sec Index', aliases: ['NIFTY 10 YR BENCHMARK G-SEC'], how: 'nseTri', ccy: 'INR', since: '2011-01-03', links: [L('NSE Indices historical data', NSE_HIST)] },
 ];
 
 // ---------------------------------------------------------------- assemble
@@ -477,7 +482,7 @@ const etfInst = await pool(ETFS, 6, async (e) => {
   // US-listed fund (PHYS trades on NYSE too), with dividends and splits; it needs the user's own free token.
   const usListed = e.listing === 'us' || (e.cls === 'gold' && e.region === 'us') || e.code === 'PHYS';
   const alts = usListed && how !== 'tiingo' ? [{ how: 'tiingo', links: [L(`${e.code} on Tiingo`, tiingo(e.code))] }] : undefined;
-  return { e, inst: { id: `etf-${e.code.toLowerCase()}`, name: e.name, code: e.code, inception, dateSource, ccy: 'USD', returnType, how, kind: 'ETF', links, ...(alts ? { alts } : {}) } };
+  return { e, inst: { id: `etf-${e.code.toLowerCase()}`, name: e.name, code: e.code, ...(e.aliases ? { aliases: e.aliases } : {}), inception, dateSource, ccy: 'USD', returnType, how, kind: 'ETF', links, ...(alts ? { alts } : {}) } };
 });
 for (const { e, inst } of etfInst) {
   const n = node(e.cls, e.region, 'etf', e.listing, e.asset);
@@ -516,7 +521,7 @@ for (const f of FOREIGN) {
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 for (const i of INDICES) {
   const n = node(i.cls, i.region, 'index', null, i.asset);
-  n.instruments.push({ id: `idx-${slug(i.name)}`, name: i.name, inception: i.since || null, dateSource: i.since ? (i.src || 'nse') : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
+  n.instruments.push({ id: `idx-${slug(i.name)}`, name: i.name, ...(i.aliases ? { aliases: i.aliases } : {}), inception: i.since || null, dateSource: i.since ? (i.src || 'nse') : null, ccy: i.ccy, returnType: i.ret || 'Total return', how: i.how, kind: 'Index', links: i.links });
 }
 
 // Oldest first; instruments without a known date go last. Keep the top KEEP.

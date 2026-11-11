@@ -48,6 +48,19 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- An index published under a name the catalogue does not use went unmatched.
+  NSE calls its overnight-rate index `NIFTY 1D RATE INDEX`, which is what a
+  download says; the catalogue lists it descriptively as `NSE short-duration
+  debt index (Liquid or 1D Rate)`. The two share no identifying word, so every
+  pass failed and seventeen files of good history filed under nothing. An
+  instrument now carries `aliases` -- the other names it is published under --
+  written by `scripts/build-tree.mjs` and matched by exactly the same rules as
+  the catalogue's own name, so the next publisher whose naming differs is a line
+  of data rather than a change to the matcher. Three entries have them: the two
+  NSE debt indexes (the G-Sec one matched only because its name happens to
+  contain what NSE prints, which renaming it would have broken silently) and the
+  Swisscanto gold ETF, whose Yahoo symbol carries a market suffix (`ZGLDUS.SW`)
+  the catalogue's `ZGLDUS` did not match.
 - A file was refused outright when a publisher's own cross-check did not
   reconcile, which blocked the asset. iShares' 0–1 Year Treasury Bond ETF came
   back Invalid over 48 distributions of **zero**, declared through 2021–22 when

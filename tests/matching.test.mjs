@@ -137,3 +137,73 @@ test("'scheme' is the fit that cannot tell two plans apart, and says so by its n
   assert.ok(inception(plans[0]) < inception(plans[1]), 'Regular predates Direct');
   assert.ok('2006-04-02' < inception(plans[1]), 'a 2006 series cannot be the Direct plan');
 });
+
+// Regression (xfina-labs): an index published under a name the catalogue does
+// not use went unmatched. NSE's own name for its overnight-rate index is
+// `NIFTY 1D RATE INDEX`, which is what a download calls itself; the catalogue
+// lists it descriptively as `NSE short-duration debt index (Liquid or 1D Rate)`.
+// The two share no identifying word, so every pass failed -- correctly. The
+// publisher's name is now an `aliases` entry on the instrument, matched by the
+// same rules as the catalogue's own name.
+test('an index published under a name the catalogue does not use is still filed', () => {
+  const m = matchAsset({ code: 'NIFTY 1D RATE INDEX', name: null, filename: 'NIFTY 1D RATE INDEX_Historical_PR_01042011to31032012.csv' }, CAT);
+  assert.equal(m.assetKey, 'india|debt|Short duration');
+  // The entry it matched is the descriptive one, and nothing about the two
+  // names could have been compared without the alias.
+  const entry = CAT.instruments.find((i) => i.label === 'NSE short-duration debt index (Liquid or 1D Rate)');
+  assert.ok(entry, 'the catalogue still lists it under its descriptive name');
+  assert.equal(nameFit('NIFTY 1D RATE INDEX', entry.label), null, 'the names genuinely do not compare');
+  assert.ok(entry.names.some((n) => n.name === norm('NIFTY 1D RATE INDEX')), 'the publisher name is an alias');
+});
+
+test('every name a publisher was seen to print lands on its asset', () => {
+  // Taken from the sample downloads in xfina-labs-data, one per publisher and
+  // instrument, as `engine/examples/dump_names.rs` reports them. These are the
+  // round trip: what the file says, against what the catalogue lists.
+  const PRINTED = [
+    ['NIFTY 50', 'india|equity|Nifty 50'],
+    ['NIFTY NEXT 50', 'india|equity|Nifty Next 50'],
+    ['NIFTY MIDCAP 150', 'india|equity|Nifty Midcap 150'],
+    ['NIFTY SMALLCAP 250', 'india|equity|Nifty Smallcap 250'],
+    ['NIFTY 1D RATE INDEX', 'india|debt|Short duration'],
+    ['NIFTY 10 YR BENCHMARK G-SEC', 'india|debt|Long duration'],
+    ['GOLD AHMEDABAD', 'india|gold|Gold'],
+    ['NIFTYBEES', 'india|equity|Nifty 50'],
+    ['JUNIORBEES', 'india|equity|Nifty Next 50'],
+    ['GOLDBEES', 'india|gold|Gold'],
+    ['LICNETFGSC', 'india|debt|Long duration'],
+    ['GSPC', 'us|equity|S&P 500'],
+    ['SP500TR', 'us|equity|S&P 500'],
+    ['NDX', 'us|equity|Nasdaq 100'],
+    ['XNDX', 'us|equity|Nasdaq 100'],
+    ['VFINX', 'us|equity|S&P 500'],
+    ['SPY', 'us|equity|S&P 500'],
+    ['VOO', 'us|equity|S&P 500'],
+    ['QQQ', 'us|equity|Nasdaq 100'],
+    ['TLT', 'us|debt|Long duration'],
+    ['SHV', 'us|debt|Short duration'],
+    ['GLD', 'us|gold|Gold'],
+    ['ZGLDUS', 'global|gold|Gold'],
+    // Yahoo prints the listing's own symbol, suffixed with its market.
+    ['ZGLDUS.SW', 'global|gold|Gold'],
+    ['SGLD', 'global|gold|Gold'],
+    ['PHYS', 'global|gold|Gold'],
+  ];
+  for (const [printed, key] of PRINTED) {
+    const m = matchAsset({ code: printed, name: null, filename: `${printed}_x.csv` }, CAT);
+    assert.equal(m?.assetKey, key, `${printed} → ${JSON.stringify(m)}`);
+  }
+});
+
+test('an alias goes through the same rules as the name, not a comparison of its own', () => {
+  // A made-up catalogue: the entry's own name shares nothing with what the file
+  // says, and the alias is what carries it -- by the ordinary exact fit.
+  const cat = catalogue([
+    { region: 'india', class: 'debt', asset: 'Overnight', vehicle: 'index', instruments: [{ name: 'A descriptive label nobody publishes', aliases: ['ACME OVERNIGHT RATE'] }] },
+  ]);
+  assert.equal(matchAsset({ code: 'ACME OVERNIGHT RATE', name: null }, cat).how, 'name');
+  // And an alias narrows nothing it should not: a file naming neither is unmatched.
+  assert.equal(matchAsset({ code: 'Something else entirely', name: null }, cat), null);
+  // The subset pass reads aliases too, so a publisher printing less still fits.
+  assert.equal(matchAsset({ code: 'ACME OVERNIGHT', name: null }, cat).assetKey, 'india|debt|Overnight');
+});
