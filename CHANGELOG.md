@@ -32,6 +32,20 @@ live as soon as it lands; the dates below are when it did.
   than one value for. A publisher that polls, such as MCX, is not caught by the
   last of these: several readings a day is what its series is.
 
+### Changed
+
+- Select Assets no longer offers `Get` for a dataset whose site only serves its
+  data to a page on that site: those come down with the bookmark in How to get
+  data, so a link to a download section led nowhere. The `To download` badge and
+  the row stay, as the pick is still outstanding. The Download icon on a region's
+  tab now counts only what is left to fetch by hand, so it does not advertise a
+  download with nothing to click, and the footer line says "to bring down with
+  their bookmarks and import" when every outstanding pick comes that way. Which
+  sources those are is derived from the bookmarklets themselves
+  (`hasBookmarklet` in `bookmarklets.js`), not listed, so it stays right as
+  bookmarklets are added or removed: today AMFI, NSE, NSE Indices, MCX, Tiingo
+  and WSJ.
+
 ### Fixed
 
 - Select Assets went on showing `To download` for a fund whose files were

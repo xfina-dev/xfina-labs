@@ -8,6 +8,7 @@ import { CLASSES, REGIONS, nodes, findDataset } from './guide.js';
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watchEffect, toRef } from 'vue';
 import { selection, ui, picks } from './store.js';
 import { nameFit } from './matching.js';
+import { hasBookmarklet } from './bookmarklets.js';
 import { imported, seriesFor, fileIdsOf, removeFile, clearImports } from './imports.js';
 import { Check, Download, Trash2, X } from 'lucide-vue-next';
 
@@ -243,8 +244,16 @@ const wanted = computed(() => {
   return byAsset;
 });
 const wantedOf = (a) => wanted.value[a.key] || [];
+// Whether the site this dataset comes from has a bookmarklet (bookmarklets.js derives this from the builders
+// themselves). Those sites only serve their data to a page on the site, so there is no link to hand over: the
+// bookmark in How to get data is how the file arrives, and a "Get" pointing at a download section would send
+// the user looking for something that is not there. The row and its To download badge stay -- the pick is still
+// outstanding -- and only the download affordances go.
+const assisted = (d) => hasBookmarklet(d.how);
 const wantedCount = computed(() => Object.values(wanted.value).reduce((n, w) => n + w.length, 0));
-const wantedIn = (sec) => sec.assets.reduce((n, a) => n + wantedOf(a).length, 0);
+// What is left to fetch by hand, which is what a Download icon can honestly stand for.
+const wantedManual = computed(() => Object.values(wanted.value).reduce((n, w) => n + w.filter((d) => !assisted(d)).length, 0));
+const wantedIn = (sec) => sec.assets.reduce((n, a) => n + wantedOf(a).filter((d) => !assisted(d)).length, 0);
 
 const rows = computed(() => current.value.assets.flatMap((a) => [
   { kind: 'asset', key: `a:${a.key}`, a },
@@ -364,7 +373,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                 <TableCell class="whitespace-nowrap"><Badge :variant="tone(r.d.kind === 'ETF' || r.d.kind === 'MF' ? 'warn' : 'default')">{{ r.d.kind.toUpperCase() }}</Badge></TableCell>
                 <TableCell class="whitespace-nowrap font-mono text-xs text-muted-foreground" :title="r.d.inception ? 'Its history starts here' : ''">{{ r.d.inception || '—' }}</TableCell>
                 <TableCell class="text-right">
-                  <a href="/portfolio-engine/get-data/#download" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Where to download it, in How to get data">Get</a>
+                  <a v-if="!assisted(r.d)" href="/portfolio-engine/get-data/#download" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Where to download it, in How to get data">Get</a>
                 </TableCell>
               </TableRow>
             </template>
@@ -434,7 +443,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
             <span><i class="mr-1.5 inline-block h-2 w-2 rounded-sm bg-status-good/35" />Loaded, not used</span>
             <span><i class="mr-1.5 inline-block h-2 w-2 rounded-sm bg-muted" />Not loaded</span>
           </div>
-          <p v-if="wantedCount" class="text-xs text-muted-foreground"><Download class="mr-1 inline h-3 w-3" />{{ wantedCount }} dataset{{ wantedCount > 1 ? 's' : '' }} picked in <a href="/portfolio-engine/get-data/#download" class="underline underline-offset-4 hover:text-foreground">How to get data</a>, to download and import.</p>
+          <p v-if="wantedCount" class="text-xs text-muted-foreground"><Download v-if="wantedManual" class="mr-1 inline h-3 w-3" />{{ wantedCount }} dataset{{ wantedCount > 1 ? 's' : '' }} picked in <a href="/portfolio-engine/get-data/#download" class="underline underline-offset-4 hover:text-foreground">How to get data</a>, {{ wantedManual ? 'to download and import' : 'to bring down with their bookmarks and import' }}.</p>
         </section>
         <p class="text-xs text-muted-foreground">
           The first valid series is picked by default; click a picked one again to leave its asset out of the run. A series with an invalid file (red) can't be picked until it's fixed. Files are read and checked in your browser; nothing leaves it.

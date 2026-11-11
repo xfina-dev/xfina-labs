@@ -148,3 +148,21 @@ const BUILDERS = {
 
 // The bookmark for a site, or null if it has none for the datasets in `items`.
 export const bookmarkletFor = (site, items) => BUILDERS[site]?.(items) || null;
+
+/// Whether the site a dataset comes from has a bookmarklet at all, by its
+/// `how`.
+///
+/// Derived from BUILDERS rather than listed, so adding a site here is all it
+/// takes: a list written out somewhere else would quietly go stale, and the
+/// pages that ask this question would then offer a manual download for a site
+/// that no longer needs one, or stop offering one for a site that does.
+///
+/// The question is whether the site HAS a builder, not what the builder returns
+/// for the current selection: `bookmarkletFor` gives null when nothing in the
+/// selection applies to it (the NSE Indices one, with no supported index
+/// chosen), and that says nothing about how the data is got.
+export const hasBookmarklet = (how) => Boolean(BUILDERS[HOW[how]?.site]);
+
+/// Every `how` whose site has one. Exported for tests, so the derivation itself
+/// is what they check.
+export const bookmarkletHows = () => Object.keys(HOW).filter(hasBookmarklet);
