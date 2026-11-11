@@ -108,48 +108,19 @@ struct FileReport {
 /// archive, MCX spot, an iShares or SPDR sheet, Tiingo, WSJ, MSCI, Nasdaq or
 /// Yahoo. Returns `{ error: { kind, message } }` rather than throwing, so the
 /// caller branches on `kind`.
-#[wasm_bindgen(js_name = readFile)]
-pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
-    let options: ReadOptions = from_js(options)?;
-    let format = match options.as_format.as_deref() {
-        None => None,
-        Some(id) => Some(
-            xfina::detect::Format::from_id(id)
-                .ok_or_else(|| JsValue::from_str(&format!("Unknown format '{id}'")))?,
-        ),
-    };
-    let request = ParseRequest::new(bytes)
-        .with_filename(options.filename.as_deref())
-        .with_modified_timestamp(options.modified_timestamp)
-        .with_format(format);
-
-    let statement = match xfina::parse(request) {
-        Ok(statement) => statement,
-        Err(e) => {
-            return to_js(&serde_json::json!({
-                "error": { "kind": e.kind(), "message": e.to_string() }
-            }))
-        }
-    };
-
-    let series = match statement.data.series() {
-        Some(series) => series.clone(),
-        None => {
-            return to_js(&serde_json::json!({ "error": {
-                "kind": "unsupported",
-                "message": format!(
-                    "{} is a {} statement, not price history. The Portfolio Engine reads published price, NAV and index history.",
-                    options.filename.clone().unwrap_or_else(|| "This file".into()),
-                    statement.institution(),
-                ),
-            } }));
-        }
-    };
-
+/// How a file reads: whether a run can use it, and everything worth saying
+/// about it.
+///
+/// Separated from `readFile` so the judgement itself can be tested without a
+/// browser: what makes a file unusable, and what is only a note.
+pub fn assess(
+    series: &xfina::models::PriceSeries,
+    validation: &xfina::models::validation::ValidationReport,
+) -> (&'static str, Vec<(String, String)>) {
     let coverage = series.coverage();
     // The column a run reads this file at, which is the publisher's adjusted
     // twin of its headline where it prints one: see data::value_field.
-    let headline = data::value_field(&series);
+    let headline = data::value_field(series);
     let mut checks: Vec<(String, String)> = Vec::new();
 
     // A file with no values at all cannot be used; everything else is a note.
@@ -163,26 +134,46 @@ pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
         "ok"
     };
 
-    // What the parsers themselves found, in the page's words.
-    match statement.validation.overall {
-        ValidationStatus::Failed => {
-            status = "err";
-            checks.push((
-                "err".into(),
-                "A figure the file prints cannot be reproduced from its rows. Replace the file.".into(),
-            ));
+    // What the parsers' own cross-checks found.
+    //
+    // These reconcile a file against what it declares about itself: a summary
+    // sheet against the rows, a distribution list against the price history.
+    // They are worth showing, and they are not grounds for refusing the file.
+    // A backtest reads one thing here -- the value path -- and whether the
+    // publisher's own bookkeeping ties out says little about whether that path
+    // is sound: iShares' 0-1 Year Treasury file fails its distribution check
+    // only because the fund declared 48 distributions of zero through 2021-22,
+    // which a check that stores no zero amounts counts as missing, while its
+    // 4,998 NAVs over twenty years are exactly as published.
+    //
+    // So a failed check is a note with its own numbers in it, for the user to
+    // judge. What makes a file unusable is decided here instead, on the series
+    // a run would read: no values at all, or a scale break in the path itself
+    // (checks.rs).
+    if !matches!(validation.overall, ValidationStatus::Passed) {
+        if status == "ok" {
+            status = "warn";
         }
-        ValidationStatus::Warning => {
-            if status != "err" {
-                status = "warn";
-            }
-            checks.push((
-                "warn".into(),
-                "A derived cross-check did not reconcile exactly. Usually rounding; check it against your source."
-                    .into(),
-            ));
-        }
-        ValidationStatus::Passed => {}
+        let failed: Vec<String> = [
+            &validation.summary_level.declared,
+            &validation.summary_level.derived,
+        ]
+        .iter()
+        .flat_map(|group| group.checks.iter())
+        .filter(|c| !c.passed)
+        .map(describe_check)
+        .collect();
+        checks.push((
+            "warn".into(),
+            if failed.is_empty() {
+                "A cross-check against what the file declares did not reconcile. The values themselves are read as published.".into()
+            } else {
+                format!(
+                    "{} The values themselves are read as published; this is the publisher's own bookkeeping, not the price history.",
+                    failed.join(" "),
+                )
+            },
+        ));
     }
 
     // The gaps the series itself reports: longer than its frequency explains.
@@ -230,7 +221,7 @@ pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
     // second look, a date the file gives two values for. `xfina` checks a file
     // against what it declares; this checks the series against what a backtest
     // can use. See checks.rs for why a split matters so much here.
-    for finding in checks::jumps(&series, headline) {
+    for finding in checks::jumps(series, headline) {
         if finding.level == "err" {
             status = "err";
         } else if status == "ok" {
@@ -250,6 +241,75 @@ pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
             ),
         ));
     }
+    (status, checks)
+}
+
+/// One failed cross-check as a sentence, with the numbers it compared.
+///
+/// The parsers name their checks for machines (`distributions_match_ex_dividends`);
+/// this is that name in words, with what the file declared against what the rows
+/// came to, so the user can see how far out it is rather than being told only
+/// that something did not add up.
+fn describe_check(check: &xfina::models::validation::SummaryCheck) -> String {
+    let name = check.name.replace('_', " ");
+    let mut out = format!("{name}:");
+    match (check.declared, check.delta) {
+        (Some(declared), Some(delta)) => out.push_str(&format!(
+            " the file says {declared}, its rows give {} ({delta} out).",
+            check.computed
+        )),
+        (Some(declared), None) => {
+            out.push_str(&format!(" the file says {declared}, its rows give {}.", check.computed))
+        }
+        (None, _) => out.push_str(&format!(" its rows give {}.", check.computed)),
+    }
+    if let Some(note) = &check.note {
+        out.push_str(&format!(" ({note})"));
+    }
+    out
+}
+
+#[wasm_bindgen(js_name = readFile)]
+pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
+    let options: ReadOptions = from_js(options)?;
+    let format = match options.as_format.as_deref() {
+        None => None,
+        Some(id) => Some(
+            xfina::detect::Format::from_id(id)
+                .ok_or_else(|| JsValue::from_str(&format!("Unknown format '{id}'")))?,
+        ),
+    };
+    let request = ParseRequest::new(bytes)
+        .with_filename(options.filename.as_deref())
+        .with_modified_timestamp(options.modified_timestamp)
+        .with_format(format);
+
+    let statement = match xfina::parse(request) {
+        Ok(statement) => statement,
+        Err(e) => {
+            return to_js(&serde_json::json!({
+                "error": { "kind": e.kind(), "message": e.to_string() }
+            }))
+        }
+    };
+
+    let series = match statement.data.series() {
+        Some(series) => series.clone(),
+        None => {
+            return to_js(&serde_json::json!({ "error": {
+                "kind": "unsupported",
+                "message": format!(
+                    "{} is a {} statement, not price history. The Portfolio Engine reads published price, NAV and index history.",
+                    options.filename.clone().unwrap_or_else(|| "This file".into()),
+                    statement.institution(),
+                ),
+            } }));
+        }
+    };
+
+    let (status, checks) = assess(&series, &statement.validation);
+    let headline = data::value_field(&series);
+    let coverage = series.coverage();
 
     let report = FileReport {
         id: String::new(), // filled below, once the series is stored
@@ -364,7 +424,7 @@ pub fn formats() -> Result<JsValue, JsValue> {
 /// **Bump it whenever a file would come back different**: a new or changed
 /// parser, a different column chosen as the value, a new check, a changed
 /// threshold. Never for a change that only affects running a backtest.
-pub const PARSER_REVISION: u32 = 3;
+pub const PARSER_REVISION: u32 = 4;
 
 /// The versions actually running: this module, and the two libraries it
 /// composes.

@@ -48,6 +48,18 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- A file was refused outright when a publisher's own cross-check did not
+  reconcile, which blocked the asset. iShares' 0–1 Year Treasury Bond ETF came
+  back Invalid over 48 distributions of **zero**, declared through 2021–22 when
+  a fund of one-year treasuries paid nothing: its Distributions sheet lists them
+  as 0 and its price history prints 0 against the same dates, so the file is
+  exactly consistent -- but a zero is not stored as a dividend, so the check
+  counted them as missing. A backtest reads one thing from a file, the value
+  path, and whether the publisher's bookkeeping ties out says nothing about
+  whether that path is sound. Such a check is now a note carrying its own
+  numbers ("the file says 238, its rows give 190 (48 out)") for the user to
+  judge. What still makes a file unusable is decided on the series itself: no
+  values at all, or a scale break in the path (an unrecorded split).
 - Select Assets went on showing `To download` for a fund whose files were
   already imported. The badge kept its own copy of the name comparison, which
   still failed on AMFI's shortened scheme names after the matcher stopped doing
