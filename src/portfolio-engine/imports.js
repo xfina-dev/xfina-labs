@@ -297,6 +297,10 @@ function refile() {
       series = {
         key,
         name: report.name || report.code || record.filename,
+        // What the publisher called it, where it says: an exact handle for
+        // anything comparing a series against the catalogue (DataSection's
+        // "To download").
+        code: report.code ?? null,
         type: typeOf(report),
         ret: report.ret,
         basis: report.basis,

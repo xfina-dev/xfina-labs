@@ -11,7 +11,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { catalogue, matchAsset, norm } from '../src/portfolio-engine/matching.js';
+import { catalogue, matchAsset, nameFit, norm } from '../src/portfolio-engine/matching.js';
 
 const nodes = JSON.parse(readFileSync(new URL('../src/portfolio-engine/tree.json', import.meta.url), 'utf8')).nodes;
 const CAT = catalogue(nodes);
@@ -98,4 +98,42 @@ test('the other AMFI schemes in the sample folder are unaffected', () => {
 
 test('a file naming nothing the catalogue lists is still unmatched', () => {
   assert.equal(matchAsset({ code: 'ZZZ Imaginary Index', name: null, filename: 'zzz.csv' }, CAT), null);
+});
+
+// Regression (xfina-labs): the "To download" badge in Select Assets kept its own
+// copy of the name comparison, so after the matcher learned AMFI's shortened
+// scheme names the badge went on claiming the gilt files had not arrived. The
+// rule now has one home, and these pin what it answers for that row.
+test('a scheme the catalogue spells out more fully still counts as held', () => {
+  const file = 'ICICI Prudential Gilt Fund - Growth';
+  assert.equal(nameFit(file, 'ICICI Prudential Gilt Fund - Regular Plan - Growth'), 'scheme');
+  assert.equal(nameFit(file, 'ICICI Prudential Gilt Fund - Direct Plan - Growth'), 'scheme');
+  // A different fund of the same kind is not it, however much wording they share.
+  assert.equal(nameFit(file, 'Kotak Gilt Fund - Regular Plan - Growth'), null);
+  assert.equal(nameFit(file, 'HDFC Gilt Fund - Regular Plan - Growth Option'), null);
+});
+
+test('a name that spells out more around the entry is exact, not a guess', () => {
+  // The file carries the plan: one entry can be it, and only one.
+  assert.equal(nameFit('UTI Liquid Fund - Regular Plan - Growth Option', 'UTI - Liquid Fund - Regular Plan - Growth'), 'exact');
+  // The index's own name sits inside the TRI entry's, so a substring settles it.
+  assert.equal(nameFit('NIFTY 50', 'Nifty 50 TRI'), 'exact');
+  assert.equal(nameFit('', 'Anything'), null);
+  assert.equal(nameFit('Anything', ''), null);
+});
+
+test("'scheme' is the fit that cannot tell two plans apart, and says so by its name", () => {
+  // Both plans of one fund answer the same way, which is why the caller must
+  // settle it some other way (the inception date, or by leaving it unclaimed)
+  // rather than taking the first.
+  const plans = ['ICICI Prudential Gilt Fund - Regular Plan - Growth', 'ICICI Prudential Gilt Fund - Direct Plan - Growth'];
+  const fits = plans.map((p) => nameFit('ICICI Prudential Gilt Fund - Growth', p));
+  assert.deepEqual(fits, ['scheme', 'scheme']);
+  // The catalogue's own inception dates are what separates them: the Direct
+  // plan did not exist when the Regular plan's history starts.
+  const [regular, direct] = plans.map((p) => CAT.instruments.find((i) => i.name === norm(p)));
+  assert.ok(regular && direct);
+  const inception = (label) => nodes.flatMap((n) => n.instruments).find((i) => i.name === label).inception;
+  assert.ok(inception(plans[0]) < inception(plans[1]), 'Regular predates Direct');
+  assert.ok('2006-04-02' < inception(plans[1]), 'a 2006 series cannot be the Direct plan');
 });

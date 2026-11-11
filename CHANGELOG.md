@@ -34,6 +34,15 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- Select Assets went on showing `To download` for a fund whose files were
+  already imported. The badge kept its own copy of the name comparison, which
+  still failed on AMFI's shortened scheme names after the matcher stopped doing
+  so, so it claimed the gilt files had not arrived. There is now one rule, in
+  `matching.js`, and both callers use it. Where a file's name cannot tell two
+  plans of one fund apart, two things settle it: a fund has no NAVs before it
+  existed, so a series starting before a plan's inception is not that plan; and
+  if a file still fits two picked datasets, neither is counted as held and the
+  rows say why, rather than reporting data that may not be in hand.
 - Three AMFI gilt NAV files read fine but landed in "not matched to an asset",
   under a fund the catalogue lists. AMFI's export names the scheme
   `ICICI Prudential Gilt Fund - Growth`; the catalogue spells it

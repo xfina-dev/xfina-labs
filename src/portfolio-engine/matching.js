@@ -21,6 +21,30 @@
 export const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 export const words = (s) => norm(s).split(' ').filter(Boolean);
 
+// Every word of one name appears in the other's. AMFI's export names a scheme
+// with less than the catalogue spells out -- "ICICI Prudential Gilt Fund -
+// Growth" for "ICICI Prudential Gilt Fund - Regular Plan - Growth" -- and the
+// qualifier that differs sits in the middle, where no substring test can see
+// it. This is the one rule that catches that, and it is deliberately the only
+// copy of it: the same comparison written twice is what let the catalogue and
+// the guide disagree about whether a file was in hand.
+const subsetOf = (give, have) => give.length > 0 && give.every((w) => have.has(w));
+
+/// How an imported series' name sits against a catalogue entry's:
+///
+/// - `'exact'`: the same name, or one spells out more around the other. Two
+///   entries cannot both be it.
+/// - `'scheme'`: every word the file gives appears in the entry. This is the
+///   AMFI case above, and it CANNOT tell two plans of one fund apart: the file
+///   names the scheme, and both plans share it.
+/// - `null`: different instruments.
+export function nameFit(got, want) {
+  const g = norm(got), w = norm(want);
+  if (!g || !w) return null;
+  if (g === w || g.includes(w) || w.includes(g)) return 'exact';
+  return subsetOf(words(g), new Set(words(w))) ? 'scheme' : null;
+}
+
 /// Flattens the catalogue tree once into what the passes below read.
 export function catalogue(nodes) {
   const instruments = nodes.flatMap((n) =>
@@ -108,7 +132,7 @@ export function matchAsset(report, cat) {
   // file stays unmatched and names them.
   const given = [...new Set(words(name))];
   if (given.length) {
-    const hit = tried(instruments.filter((i) => given.every((w) => i.words.has(w))), 'scheme name');
+    const hit = tried(instruments.filter((i) => subsetOf(given, i.words)), 'scheme name');
     if (hit) return hit;
   }
   return unsure;
