@@ -747,7 +747,7 @@ function exportResult() {
           <div class="relative min-h-72" style="aspect-ratio: 640 / 244">
             <div ref="alBox" class="absolute inset-0 flex flex-col overflow-auto">
               <template v-if="allocShow === 'Drift' && allocView === 'Chart'">
-                <FitChart v-slot="{ h }"><DriftChart :h="h" :rows="driftRows" :start-year="ALLOC_START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" :limits="driftLimits" :hidden="driftHidden" :show-total="driftTotal" /></FitChart>
+                <FitChart v-slot="{ h }"><DriftChart :h="h" :rows="driftRows" :assets="runAssets" :start-year="ALLOC_START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" :limits="driftLimits" :hidden="driftHidden" :show-total="driftTotal" /></FitChart>
                 <!-- The legend switches each line on and off -->
                 <div class="flex shrink-0 flex-wrap items-center gap-x-1 gap-y-1 text-xs mt-2">
                   <button type="button" class="rounded px-1.5 py-0.5 font-medium hover:bg-muted" :class="!driftTotal && 'opacity-40 line-through'" :aria-pressed="driftTotal" @click="driftTotal = !driftTotal"><i class="inline-block w-3 h-0.5 align-middle mr-1.5 bg-foreground" />Total drift</button>
@@ -774,7 +774,7 @@ function exportResult() {
                 </TableBody>
               </Table>
               <template v-else-if="allocView === 'Chart'">
-                <FitChart v-slot="{ h }"><AllocationChart :h="h" :points="allocRows.map((r) => r.w)" :start-year="ALLOC_START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" /></FitChart>
+                <FitChart v-slot="{ h }"><AllocationChart :h="h" :points="allocRows.map((r) => r.w)" :assets="runAssets" :start-year="ALLOC_START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" /></FitChart>
                 <div class="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
                   <span v-for="a in runAssets" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
                 </div>

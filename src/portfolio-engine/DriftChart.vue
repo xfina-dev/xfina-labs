@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { ASSETS } from './allocation.js';
+import { finite, seriesMismatch } from './chartSeries.js';
 
 // Drift from the targets over time: each asset's weight less its target as a thin line (above zero when
 // overweight), and the total drift, the sum of the overweights, as the filled area. Dashed lines mark the
@@ -9,6 +9,10 @@ import { ASSETS } from './allocation.js';
 const props = defineProps({
   h: { type: Number, default: 220 }, // viewBox height: FitChart sets it to fill the room the chart has
   rows: { type: Array, required: true }, // [{ drift: [per asset], total }]
+  // The assets of the run being drawn, in the order its drift rows are in: a stored result is charted as it
+  // was run, never as Select Assets happens to be set now.
+  // Defaulted rather than required so a caller that forgets it gets the mismatch note below, not a crash.
+  assets: { type: Array, default: () => [] }, // [{ name, color }]
   startYear: { type: Number, required: true },
   step: { type: Number, default: 1 }, // months per point
   limits: { type: Array, default: () => [] }, // [{ value, label, tone: 'critical' | 'good', below? }]: label above its line, or below
@@ -18,9 +22,12 @@ const props = defineProps({
 
 const W = 640, L = 44, R = 0, T = 8, B = 22;
 const n = computed(() => props.rows.length);
+// A row carries one drift per asset of the run that produced it; if it does not, the chart would be fiction.
+const mismatch = computed(() => seriesMismatch(props.rows.map((r) => r.drift.length), props.assets));
 // The axis runs in round steps (1, 2, 5 or 10%), at most six of them, from the lowest drift to the highest.
-const shown = computed(() => ASSETS.map((a, k) => (props.hidden.includes(a.name) ? -1 : k)).filter((k) => k >= 0));
-const visible = computed(() => props.rows.flatMap((r) => [...shown.value.map((k) => r.drift[k]), ...(props.showTotal ? [r.total] : [])]));
+const shown = computed(() => props.assets.map((a, k) => (props.hidden.includes(a.name) ? -1 : k)).filter((k) => k >= 0));
+const visible = computed(() => finite(props.rows
+  .flatMap((r) => [...shown.value.map((k) => r.drift[k]), ...(props.showTotal ? [r.total] : [])])));
 const top = computed(() => Math.max(0.02, ...visible.value, ...props.limits.map((l) => l.value)) * 1.08);
 const bottom = computed(() => Math.min(-0.02, ...visible.value, ...props.limits.map((l) => l.value)) * 1.08);
 const tick = computed(() => [0.01, 0.02, 0.05, 0.1].find((t) => (top.value - bottom.value) / t <= 6) ?? 0.2);
@@ -31,7 +38,7 @@ const sy = (v) => T + ((hi.value - v) / (hi.value - lo.value)) * (props.h - T - 
 const path = (vals) => vals.map((v, i) => `${i ? 'L' : 'M'}${sx(i).toFixed(1)} ${sy(v).toFixed(1)}`).join('');
 const total = computed(() => path(props.rows.map((r) => r.total)));
 const area = computed(() => `${total.value}L${sx(n.value - 1)} ${sy(0)}L${sx(0)} ${sy(0)}Z`);
-const lines = computed(() => shown.value.map((k) => ({ color: ASSETS[k].color, d: path(props.rows.map((r) => r.drift[k])) })));
+const lines = computed(() => shown.value.map((k) => ({ color: props.assets[k].color, d: path(props.rows.map((r) => r.drift[k])) })));
 const ticks = computed(() => Array.from({ length: Math.round((hi.value - lo.value) / tick.value) + 1 }, (_, k) => {
   const v = lo.value + k * tick.value;
   return { y: sy(v), label: `${v > 0.0005 ? '+' : v < -0.0005 ? '−' : ''}${Math.abs(v * 100).toFixed(0)}%` };
@@ -41,6 +48,8 @@ const years = computed(() => [0, 1, 2, 3, 4].map((k) => ({ x: L + (k / 4) * (W -
 
 <template>
   <svg :viewBox="`0 0 ${W} ${h}`" class="block h-full w-full" role="img" aria-label="Drift from the target allocation over time">
+    <text v-if="mismatch" :x="W / 2" :y="h / 2" text-anchor="middle" class="fill-status-critical-text text-[11px]">{{ mismatch }}</text>
+    <template v-else>
     <g v-for="t in ticks" :key="t.label">
       <line :x1="L" :x2="W - R" :y1="t.y" :y2="t.y" class="stroke-border" />
       <text :x="0" :y="t.y + 3" class="fill-muted-foreground text-[10px]">{{ t.label }}</text>
@@ -54,5 +63,6 @@ const years = computed(() => [0, 1, 2, 3, 4].map((k) => ({ x: L + (k / 4) * (W -
       <text :x="W - R" :y="sy(l.value) + (l.below ? 12 : -4)" text-anchor="end" class="text-[10px] font-medium" :class="l.tone === 'good' ? 'fill-status-good-text' : 'fill-status-critical-text'">{{ l.label }}</text>
     </g>
     <text v-for="(y, k) in years" :key="k" :x="y.x" :y="h - 4" :text-anchor="k === 4 ? 'end' : k === 0 ? 'start' : 'middle'" class="fill-muted-foreground text-[10px]">{{ y.y }}</text>
+    </template>
   </svg>
 </template>

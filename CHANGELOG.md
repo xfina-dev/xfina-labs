@@ -34,6 +34,17 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- The allocation and drift charts drew a saved result against whatever Select
+  Assets happens to be set to now, rather than against the assets the run was
+  made with. They read the live catalogue straight from `allocation.js` and
+  indexed each row by it. While the two agreed, nothing showed; once imports
+  persisted, a stored run could be viewed against a different selection -- after
+  a reload, or just by ticking an asset without running again. With fewer picks
+  than the run had, a series went missing and the colours shifted; with more,
+  every row was read past its end, and one undefined value turned the whole
+  scale into `NaN`, so the drift chart drew nothing at all. Both charts now take
+  the run's own assets, in the order its rows are in, and a chart handed series
+  that do not line up says so on its face instead of coming up blank.
 - A plan whose first contribution falls after the run's first year-end -- a
   savings rate starting at 0% with no lumpsum -- showed that year as an
   allocation of nothing: every asset its whole target below target, and, because
