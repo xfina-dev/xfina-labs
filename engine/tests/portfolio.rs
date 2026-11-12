@@ -69,6 +69,7 @@ fn one_asset_one_lumpsum_compounds_exactly() {
         buy: &buy,
         mark: &mark,
         names: &names,
+        ids: &names,
         targets: &targets,
         contribution: &contribution,
         months,
@@ -118,6 +119,7 @@ fn buy_and_hold_drifts_and_rebalancing_does_not() {
         buy: &buy,
         mark: &mark,
         names: &names,
+        ids: &names,
         targets: &targets,
         contribution: &contribution,
         months,
@@ -174,6 +176,7 @@ fn perpetual_steers_new_money_to_the_underweight() {
         buy: &buy,
         mark: &mark,
         names: &names,
+        ids: &names,
         targets: &targets,
         contribution: &contribution,
         months,
@@ -224,6 +227,7 @@ fn calendar_trades_only_in_its_month() {
         buy: &buy,
         mark: &mark,
         names: &names,
+        ids: &names,
         targets: &targets,
         contribution: &contribution,
         months,
@@ -282,6 +286,7 @@ fn a_fall_shows_up_as_a_drawdown_that_recovers() {
         buy: &buy,
         mark: &mark,
         names: &names,
+        ids: &names,
         targets: &targets,
         contribution: &contribution,
         months,
@@ -333,6 +338,7 @@ fn months_before_the_first_contribution_hold_nothing() {
             buy: &[a.buy.clone(), b.buy.clone()],
             mark: &[a.mark.clone(), b.mark.clone()],
             names: &names,
+            ids: &names,
             targets: &targets,
             contribution: &contribution,
             months,
@@ -356,4 +362,86 @@ fn months_before_the_first_contribution_hold_nothing() {
         let sum: f64 = out.weights[m].iter().sum();
         assert!((sum - 1.0).abs() < 1e-9, "month {m} weights sum to {sum}");
     }
+}
+
+/// An own band belongs to the asset it was set on.
+///
+/// Regression: `band_for` took a band by its position in the map, and only when
+/// exactly one was set -- so a second own range made both assets fall back to
+/// the shared band, and a single one applied to whichever asset sorted first.
+/// With two assets of the same name in a run (Gold is an asset in India, the US
+/// and Global alike) the page could not tell them apart either. Bands are now
+/// keyed by the asset's id, which is its region and name together.
+#[test]
+fn an_own_band_moves_only_its_own_asset() {
+    use std::collections::BTreeMap;
+    use xfina_labs_engine::portfolio::model::Band;
+
+    let months = 18;
+    // India gold climbs; US gold sits still. Equal targets, so after a few
+    // months the first is well over its target and the second well under.
+    let a = grid(months, 0.05, 100.0);
+    let b = grid(months, 0.0, 100.0);
+    let names = vec!["Gold".to_string(), "Gold".to_string()];
+    let ids = vec!["in:Gold".to_string(), "us:Gold".to_string()];
+    let targets = vec![0.5, 0.5];
+    let mut contribution = vec![0.0; months];
+    contribution[0] = 1_000_000.0;
+
+    // Bands wide enough that nothing is ever outside them.
+    let wide = |keys: &[&str]| {
+        let mut m = BTreeMap::new();
+        for k in keys {
+            m.insert((*k).to_string(), Band { lo: 0.0, hi: 100.0 });
+        }
+        m
+    };
+
+    let run = |range_own: BTreeMap<String, Band>| {
+        let input = SimInput {
+            buy: &[a.buy.clone(), b.buy.clone()],
+            mark: &[a.mark.clone(), b.mark.clone()],
+            names: &names,
+            ids: &ids,
+            targets: &targets,
+            contribution: &contribution,
+            months,
+            start_month_of_year: 1,
+            ltcg_rate: 12.5,
+            stcg_rate: 20.0,
+        };
+        sim::simulate(
+            &input,
+            &Strategy::Threshold {
+                band_type: "Absolute".into(),
+                band_all: 5.0,
+                range_own,
+            },
+        )
+        .trades
+    };
+
+    // The shared ±5 band is breached by this drift.
+    let shared = run(BTreeMap::new());
+    assert!(shared > 0, "the shared band should have been breached");
+
+    // Both assets given a band of their own: nothing is outside, so nothing
+    // trades. This is what the old lookup could not do -- with two own ranges
+    // set it applied neither, and both assets silently kept the shared band.
+    assert_eq!(run(wide(&["in:Gold", "us:Gold"])), 0, "two own bands must both apply");
+
+    // A band on the US asset alone leaves the India asset on the shared band,
+    // which its drift still breaches. The old lookup took the single band by
+    // position and applied it to the India asset instead, suppressing exactly
+    // the trades that should happen.
+    assert_eq!(
+        run(wide(&["us:Gold"])), shared,
+        "a band set on one asset must not be applied to the other"
+    );
+
+    // And a band belonging to an asset this run does not hold changes nothing.
+    assert_eq!(
+        run(wide(&["gl:Gold"])), shared,
+        "a band for another asset must not be applied here"
+    );
 }

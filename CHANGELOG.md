@@ -34,6 +34,29 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- An asset is identified by its region and its name together -- `in:Gold`,
+  `us:Short duration` -- rather than by its name. Three of the catalogue's
+  assets share a name across regions, so a name was never an identity, and
+  identity was being taken from a label that exists to be read. One helper
+  (`identity.js`) produces it and every map, `:key`, band override, drift series
+  and CSV heading goes through it; the page still shows `Gold`, with the region
+  tab and the chart colour giving the context. Nothing stored changes format, so
+  files and run history already in a browser read back unchanged, and a run
+  saved before assets carried an id falls back to its name and charts as it did.
+
+### Fixed
+
+- A band of its own, set on one asset under Threshold rebalancing, was applied
+  to the wrong asset -- and only when exactly one asset had one. The engine took
+  a band by its position in the map it arrived in, so a second own band made
+  both assets fall back to the shared band, and a single one was applied to
+  whichever asset sorted first. Bands are now looked up by the asset's id, so
+  one belongs to the asset it was set on, several work together, and one left
+  over from an asset that is no longer picked is dropped instead of appearing to
+  do something.
+
+### Changed
+
 - Select Assets no longer offers `Get` for a dataset whose site only serves its
   data to a page on that site: those come down with the bookmark in How to get
   data, so a link to a download section led nowhere. The `To download` badge and

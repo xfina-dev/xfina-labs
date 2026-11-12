@@ -70,6 +70,13 @@ pub struct Period {
 #[serde(rename_all = "camelCase")]
 pub struct AssetRequest {
     pub name: String,
+    /// What identifies this asset, region and name together (`in:Gold`). Three
+    /// of the catalogue's assets share a name across regions, so a name is not
+    /// an identity: see src/portfolio-engine/identity.js. Optional only so a
+    /// caller that has no id still runs; everything keyed by it then falls back
+    /// to the name.
+    #[serde(default)]
+    pub id: Option<String>,
     /// Percent of the portfolio. Weights are normalised, so a mix that totals
     /// 99 or 101 still runs.
     pub weight: f64,
@@ -198,6 +205,9 @@ pub struct RunResult {
 #[serde(rename_all = "camelCase")]
 pub struct AssetOut {
     pub name: String,
+    /// The id the request gave, carried through so a saved run's results refer
+    /// to its assets the same way the page does.
+    pub id: Option<String>,
     /// The normalised target, as a fraction.
     pub target: f64,
     /// Percent, as entered.

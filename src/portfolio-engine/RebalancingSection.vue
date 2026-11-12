@@ -40,11 +40,13 @@ watch(bandType, () => { bandAll.value = absolute.value ? 5 : 20; });
 const clamp = (x) => Math.round(Math.max(0, Math.min(100, x)) * 10) / 10;
 // The range the band for all assets gives an asset, around its target.
 const byBand = (a) => { const t = Number(a.weight) || 0, d = absolute.value ? bandAll.value : (t * bandAll.value) / 100; return { lo: clamp(t - d), hi: clamp(t + d) }; };
-const rangeOwn = rebalancing.threshold.rangeOwn; // asset name → { lo, hi } as edited; absent means the band for all assets
-const rangeOf = (a) => rangeOwn[a.name] ?? byBand(a);
-const edited = (a) => a.name in rangeOwn;
-const setBound = (a, key, v) => { if (v === '') return; rangeOwn[a.name] = { ...rangeOf(a), [key]: clamp(Number(v)) }; };
-const reset = (a) => { delete rangeOwn[a.name]; };
+// asset id → { lo, hi } as edited; absent means the band for all assets. By id, not by name: Gold is an asset
+// in India, the US and Global alike, and a band keyed by name moved all three together (identity.js).
+const rangeOwn = rebalancing.threshold.rangeOwn;
+const rangeOf = (a) => rangeOwn[a.id] ?? byBand(a);
+const edited = (a) => a.id in rangeOwn;
+const setBound = (a, key, v) => { if (v === '') return; rangeOwn[a.id] = { ...rangeOf(a), [key]: clamp(Number(v)) }; };
+const reset = (a) => { delete rangeOwn[a.id]; };
 // A range must hold the target: lower ≤ target ≤ upper, with lower below upper.
 const badRange = (a) => { const { lo, hi } = rangeOf(a), t = Number(a.weight) || 0; return !(lo <= t && t <= hi && lo < hi); };
 
@@ -139,7 +141,7 @@ const monthsLabel = (n) => `${n} month${n > 1 ? 's' : ''}`;
             <TableRow><TableHead>Asset</TableHead><TableHead class="text-right">Target</TableHead><TableHead class="text-right">Lower</TableHead><TableHead class="text-right">Upper</TableHead><TableHead><span class="sr-only">Reset</span></TableHead></TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="a in ASSETS" :key="a.name">
+            <TableRow v-for="a in ASSETS" :key="a.id">
               <TableCell class="py-1"><span class="flex items-center gap-2"><i class="inline-block h-2.5 w-2.5 shrink-0 rounded-sm" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span></TableCell>
               <TableCell class="py-1 text-right tabular-nums">{{ a.weight }}%</TableCell>
               <TableCell v-for="key in ['lo', 'hi']" :key="key" class="py-1">

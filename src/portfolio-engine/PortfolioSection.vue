@@ -66,9 +66,9 @@ const donutAssets = computed(() => ASSETS.map((a) => ({ ...a, series: selection.
           </TableHeader>
           <TableBody>
             <TableRow
-              v-for="(a, i) in ASSETS" :key="a.name" :draggable="dragFrom === i"
-              @mouseenter="active = a.name" @mouseleave="active = null"
-              :class="[active === a.name && 'bg-muted/50', dragFrom === i && 'opacity-50', dropAt === i && dragFrom !== i && (dropAt < dragFrom ? 'shadow-[inset_0_2px_0_hsl(var(--primary))]' : 'shadow-[inset_0_-2px_0_hsl(var(--primary))]')]"
+              v-for="(a, i) in ASSETS" :key="a.id" :draggable="dragFrom === i"
+              @mouseenter="active = a.id" @mouseleave="active = null"
+              :class="[active === a.id && 'bg-muted/50', dragFrom === i && 'opacity-50', dropAt === i && dragFrom !== i && (dropAt < dragFrom ? 'shadow-[inset_0_2px_0_hsl(var(--primary))]' : 'shadow-[inset_0_-2px_0_hsl(var(--primary))]')]"
               @dragstart="(e) => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', a.name); }"
               @dragover.prevent="dragFrom !== null && (dropAt = i)" @drop.prevent="onDrop" @dragend="dragFrom = dropAt = null"
             >

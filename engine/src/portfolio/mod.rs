@@ -57,6 +57,9 @@ pub fn run(request: &RunRequest, source: &dyn SeriesSource) -> Result<RunResult,
 
     // --- The data half ------------------------------------------------------
     let mut names = Vec::new();
+    // What identifies each asset. The page sends one; a request without them
+    // falls back to the name, which is what a run saved before ids existed has.
+    let mut ids = Vec::new();
     let mut weights = Vec::new();
     let mut buy = Vec::new();
     let mut mark = Vec::new();
@@ -110,8 +113,10 @@ pub fn run(request: &RunRequest, source: &dyn SeriesSource) -> Result<RunResult,
                     data::iso(last)
                 )
             })?;
+        let id = asset.id.clone().unwrap_or_else(|| asset.name.clone());
         assets_out.push(AssetOut {
             name: asset.name.clone(),
+            id: Some(id.clone()),
             target: 0.0,
             weight: asset.weight,
             currency,
@@ -120,6 +125,7 @@ pub fn run(request: &RunRequest, source: &dyn SeriesSource) -> Result<RunResult,
             last: data::iso(last),
         });
         names.push(asset.name.clone());
+        ids.push(id);
         weights.push(asset.weight.max(0.0));
         buy.push(sampled.buy);
         mark.push(sampled.mark);
@@ -168,6 +174,7 @@ pub fn run(request: &RunRequest, source: &dyn SeriesSource) -> Result<RunResult,
         buy: &buy,
         mark: &mark,
         names: &names,
+        ids: &ids,
         targets: &targets,
         contribution: &contribution,
         months,

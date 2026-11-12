@@ -13,6 +13,7 @@ import TxChart from './TxChart.vue';
 import WaterfallChart from './WaterfallChart.vue';
 import ReturnsChart from './ReturnsChart.vue';
 import { ASSETS } from './allocation.js';
+import { idOf } from './identity.js';
 import { planRows, salarySpan } from './plan.js';
 import { downloadCsv, downloadJson, downloadPng } from './exportFiles.js';
 import { history, MAX_COMPARE, remove, toggleCompare, clearAll, run as runEngine, runState, blocked, resultOf, runOf, isTrimmed, STRATEGIES, ASSUMPTIONS, ui } from './store.js';
@@ -67,8 +68,10 @@ const trimmed = computed(() => isTrimmed(entry.value));
 // The assets this run held, with their own targets, not the allocation as the steps above stand now: an older
 // result describes its own run. Colours follow the live allocation where the name is still there, so the legend
 // and the charts match what is on screen.
+// `id` is what identifies an asset here -- `:key`s, the drift legend, CSV headings -- and a run saved before
+// assets carried one falls back to its name, so old history charts exactly as it did (identity.js).
 const runAssets = computed(() => (runData.value?.assets ?? []).map((a, i) => ({
-  ...a, color: ASSETS.find((x) => x.name === a.name)?.color ?? `chart-${(i % 16) + 1}`,
+  ...a, id: idOf(a), color: ASSETS.find((x) => x.id === a.id || x.name === a.name)?.color ?? `chart-${(i % 16) + 1}`,
 })));
 const select = (e) => { history.selected = e.key; };
 // Opening a result (a History row, or View in Comparison) switches to the Result tab and brings it into view.
@@ -289,7 +292,7 @@ const driftTotal = ref(true);
 const toggleDrift = (name) => { const h = driftHidden.value; driftHidden.value = h.includes(name) ? h.filter((n) => n !== name) : [...h, name]; };
 const driftOnlyTotal = computed(() => driftTotal.value && driftHidden.value.length === runAssets.value.length);
 const driftAll = computed(() => driftTotal.value && !driftHidden.value.length);
-const showDriftTotalOnly = () => { driftTotal.value = true; driftHidden.value = runAssets.value.map((a) => a.name); };
+const showDriftTotalOnly = () => { driftTotal.value = true; driftHidden.value = runAssets.value.map((a) => a.id); };
 const showDriftAll = () => { driftTotal.value = true; driftHidden.value = []; };
 const signed = (x) => `${x > 0.0005 ? '+' : x < -0.0005 ? '−' : ''}${Math.abs(x * 100).toFixed(1)}%`;
 // --- Exports -------------------------------------------------------------------------------------------------
@@ -330,9 +333,9 @@ function exportAllocation() {
   if (allocView.value === 'Chart') return downloadPng(alBox.value, `${name}.png`, pngTitle(`${allocShow.value === 'Drift' ? 'Drift' : 'Allocation'} over time, ${allocStep.value.toLowerCase()}`));
   const period = allocStep.value === 'Yearly' ? 'year_end' : 'month';
   if (allocShow.value === 'Drift') {
-    return downloadCsv(`${name}.csv`, [[period, 'total_drift_pct', ...runAssets.value.map((a) => `${a.name}_pct`)], ...driftRows.value.map((r) => [r.label, percent(r.total), ...r.drift.map(percent)])]);
+    return downloadCsv(`${name}.csv`, [[period, 'total_drift_pct', ...runAssets.value.map((a) => `${a.id}_pct`)], ...driftRows.value.map((r) => [r.label, percent(r.total), ...r.drift.map(percent)])]);
   }
-  downloadCsv(`${name}.csv`, [[period, ...runAssets.value.map((a) => `${a.name}_pct`)], ['target', ...runAssets.value.map((a) => percent(a.target))], ...allocRows.value.map((r) => [r.label, ...r.w.map(percent)])]);
+  downloadCsv(`${name}.csv`, [[period, ...runAssets.value.map((a) => `${a.id}_pct`)], ['target', ...runAssets.value.map((a) => percent(a.target))], ...allocRows.value.map((r) => [r.label, ...r.w.map(percent)])]);
 }
 // Everything about the selected result: what it was run with, every figure in both units, the yearly and
 // monthly rows, the drawdowns, and every transaction.
@@ -706,7 +709,7 @@ function exportResult() {
               <template v-else-if="view === 'Chart'">
                 <FitChart v-slot="{ h }"><TxChart :h="h" :rows="txRows" /></FitChart>
                 <div class="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
-                  <span v-for="a in runAssets" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
+                  <span v-for="a in runAssets" :key="a.id"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
                   <span class="text-muted-foreground">Above the line: bought · below: sold to rebalance</span>
                 </div>
               </template>
@@ -751,7 +754,7 @@ function exportResult() {
                 <!-- The legend switches each line on and off -->
                 <div class="flex shrink-0 flex-wrap items-center gap-x-1 gap-y-1 text-xs mt-2">
                   <button type="button" class="rounded px-1.5 py-0.5 font-medium hover:bg-muted" :class="!driftTotal && 'opacity-40 line-through'" :aria-pressed="driftTotal" @click="driftTotal = !driftTotal"><i class="inline-block w-3 h-0.5 align-middle mr-1.5 bg-foreground" />Total drift</button>
-                  <button v-for="a in runAssets" :key="a.name" type="button" class="rounded px-1.5 py-0.5 hover:bg-muted" :class="driftHidden.includes(a.name) && 'opacity-40 line-through'" :aria-pressed="!driftHidden.includes(a.name)" @click="toggleDrift(a.name)"><i class="inline-block w-3 h-0.5 align-middle mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</button>
+                  <button v-for="a in runAssets" :key="a.id" type="button" class="rounded px-1.5 py-0.5 hover:bg-muted" :class="driftHidden.includes(a.id) && 'opacity-40 line-through'" :aria-pressed="!driftHidden.includes(a.id)" @click="toggleDrift(a.id)"><i class="inline-block w-3 h-0.5 align-middle mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</button>
                   <span class="mx-1 text-muted-foreground" data-export-skip>·</span>
                   <button type="button" data-export-skip class="rounded px-1.5 py-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent" :disabled="driftOnlyTotal" @click="showDriftTotalOnly">Total only</button>
                   <button type="button" data-export-skip class="rounded px-1.5 py-0.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent" :disabled="driftAll" @click="showDriftAll">Show all</button>
@@ -762,38 +765,38 @@ function exportResult() {
                   <TableRow>
                     <TableHead>{{ allocStep === 'Yearly' ? 'Year end' : 'Month' }}</TableHead>
                     <TableHead class="text-right whitespace-nowrap">Total drift</TableHead>
-                    <TableHead v-for="a in runAssets" :key="a.name" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
+                    <TableHead v-for="a in runAssets" :key="a.id" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow v-for="r in driftRows" :key="r.label">
                     <TableCell class="font-mono text-xs whitespace-nowrap">{{ r.label }}</TableCell>
                     <TableCell class="text-right tabular-nums font-semibold" :class="driftLimits.length && settings.strategy.id === 'perpetual' && r.total > driftLimits[0].value && 'text-status-critical-text'">{{ pct(r.total) }}</TableCell>
-                    <TableCell v-for="(a, k) in runAssets" :key="a.name" class="text-right tabular-nums" :class="Math.abs(r.drift[k]) < 0.0005 && 'text-muted-foreground'">{{ signed(r.drift[k]) }}</TableCell>
+                    <TableCell v-for="(a, k) in runAssets" :key="a.id" class="text-right tabular-nums" :class="Math.abs(r.drift[k]) < 0.0005 && 'text-muted-foreground'">{{ signed(r.drift[k]) }}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
               <template v-else-if="allocView === 'Chart'">
                 <FitChart v-slot="{ h }"><AllocationChart :h="h" :points="allocRows.map((r) => r.w)" :assets="runAssets" :start-year="ALLOC_START_YEAR" :step="allocStep === 'Monthly' ? 1 : 12" /></FitChart>
                 <div class="flex shrink-0 flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
-                  <span v-for="a in runAssets" :key="a.name"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
+                  <span v-for="a in runAssets" :key="a.id"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</span>
                 </div>
               </template>
               <Table v-else container-class="h-full">
                 <TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_hsl(var(--border))]">
                   <TableRow>
                     <TableHead>{{ allocStep === 'Yearly' ? 'Year end' : 'Month' }}</TableHead>
-                    <TableHead v-for="a in runAssets" :key="a.name" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
+                    <TableHead v-for="a in runAssets" :key="a.id" class="text-right whitespace-nowrap"><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1.5" :style="{ background: `hsl(var(--${a.color}))` }" />{{ a.name }}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow class="text-muted-foreground">
                     <TableCell>Target</TableCell>
-                    <TableCell v-for="a in runAssets" :key="a.name" class="text-right tabular-nums">{{ pct(a.target) }}</TableCell>
+                    <TableCell v-for="a in runAssets" :key="a.id" class="text-right tabular-nums">{{ pct(a.target) }}</TableCell>
                   </TableRow>
                   <TableRow v-for="r in allocRows" :key="r.label">
                     <TableCell class="font-mono text-xs whitespace-nowrap">{{ r.label }}</TableCell>
-                    <TableCell v-for="(a, k) in runAssets" :key="a.name" class="text-right tabular-nums">{{ pct(r.w[k]) }}</TableCell>
+                    <TableCell v-for="(a, k) in runAssets" :key="a.id" class="text-right tabular-nums">{{ pct(r.w[k]) }}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>

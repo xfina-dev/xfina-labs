@@ -36,6 +36,8 @@ pub struct SimInput<'a> {
     /// Per asset: the price the holding is marked at each month's end.
     pub mark: &'a [Vec<f64>],
     pub names: &'a [String],
+    /// What identifies each asset, in the same order (`in:Gold`).
+    pub ids: &'a [String],
     pub targets: &'a [f64],
     pub contribution: &'a [f64],
     pub months: usize,
@@ -123,6 +125,7 @@ pub fn simulate(input: &SimInput<'_>, strategy: &Strategy) -> SimOut {
                 &after,
                 total,
                 input.targets,
+                input.ids,
                 input.start_month_of_year,
                 &mut perpetual_left,
             );
@@ -317,6 +320,7 @@ fn rebalance_plan(
     held: &[f64],
     total: f64,
     targets: &[f64],
+    ids: &[String],
     start_month_of_year: u32,
     perpetual_left: &mut usize,
 ) -> Option<RebalancePlan> {
@@ -352,7 +356,7 @@ fn rebalance_plan(
             let outside: Vec<usize> = (0..n)
                 .filter(|&k| {
                     let w = if total > 0.0 { held[k] / total } else { 0.0 };
-                    let (lo, hi) = band_for(k, targets[k], band_type, *band_all, range_own);
+                    let (lo, hi) = band_for(&ids[k], targets[k], band_type, *band_all, range_own);
                     w < lo || w > hi
                 })
                 .collect();
@@ -410,19 +414,18 @@ fn rebalance_plan(
 }
 
 fn band_for(
-    k: usize,
+    id: &str,
     target: f64,
     band_type: &str,
     band_all: f64,
     range_own: &std::collections::BTreeMap<String, Band>,
 ) -> (f64, f64) {
-    // Own ranges are keyed by the asset's display name on the page; the engine
-    // sees them by index only when the page sent them in order, so an unkeyed
-    // asset falls back to the shared band.
-    if let Some(band) = range_own.values().nth(k) {
-        if range_own.len() == 1 {
-            return (band.lo / 100.0, band.hi / 100.0);
-        }
+    // An own range belongs to the asset it was set on, and is looked up by that
+    // asset's id. It used to be taken by position in this map, and only when
+    // exactly one range was set: a second one made both fall back to the shared
+    // band, and the one worked on whichever asset happened to sort first.
+    if let Some(band) = range_own.get(id) {
+        return (band.lo / 100.0, band.hi / 100.0);
     }
     if band_type == "Relative" {
         let w = band_all / 100.0;

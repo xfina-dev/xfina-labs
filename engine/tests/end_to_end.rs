@@ -105,6 +105,7 @@ fn a_dataset_in_two_files_runs_end_to_end() {
     let request = RunRequest {
         assets: vec![AssetRequest {
             name: "Nifty 50".into(),
+            id: None,
             weight: 100.0,
             files: vec![a, b],
             currency: Some("INR".into()),
@@ -162,6 +163,7 @@ fn a_dollar_asset_needs_a_usd_inr_series() {
     let request = RunRequest {
         assets: vec![AssetRequest {
             name: "S&P 500".into(),
+            id: None,
             weight: 100.0,
             files: vec![id],
             currency: Some("USD".into()),
@@ -199,6 +201,7 @@ fn a_cpi_series_sets_the_runs_inflation() {
     let request = RunRequest {
         assets: vec![AssetRequest {
             name: "Nifty 50".into(),
+            id: None,
             weight: 100.0,
             files: vec![id],
             currency: None,

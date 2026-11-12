@@ -5,6 +5,7 @@
 // `history.runs` -- the months, the contributions and the inflation, which do not depend on the strategy.
 import { reactive, watch, computed } from 'vue';
 import { ASSETS } from './allocation.js';
+import { assetId } from './identity.js';
 import { DEFAULT_PLAN, salarySpan } from './plan.js';
 import { runBacktest, referencePoints } from './engine.js';
 import { resident } from './imports.js';
@@ -75,9 +76,18 @@ watch(() => selection.series.map((x) => `${x.tab}|${x.asset}|${x.type}`).join(),
     }),
   ].map((a) => {
     const x = picks.find((y) => `${y.tab}|${y.asset}` === a.key);
-    return { ...a, name: shared(x) ? `${x.tab} · ${x.asset}` : x.asset, type: x.type };
+    // `id` is what identifies this asset everywhere -- maps, `:key`s, band
+    // overrides, chart series, CSV headings (identity.js). `name` is only what
+    // the page shows, and three assets share one across regions.
+    return { ...a, id: assetId(x.tab, x.asset), name: shared(x) ? `${x.tab} · ${x.asset}` : x.asset, type: x.type };
   });
   ASSETS.splice(0, ASSETS.length, ...next);
+  // An own band belongs to one asset, by id. A key for an asset that is no
+  // longer picked -- or one saved by name, before assets had ids, when a band
+  // on India Gold moved US Gold with it -- names no asset in this run, so it is
+  // dropped rather than left to look like a setting that is doing something.
+  const own = rebalancing.threshold.rangeOwn;
+  for (const key of Object.keys(own)) if (!next.some((a) => a.id === key)) delete own[key];
 }, { flush: 'sync', immediate: true });
 
 // Contributions fall inside the run: a start before the run's first month moves up to it, and an end past
@@ -279,6 +289,7 @@ export async function run() {
     const handles = await resident(picks.flatMap(({ picked }) => picked?.files ?? []));
     const assets = picks.map(({ asset, picked }) => ({
       name: asset.name,
+      id: asset.id,
       weight: num(asset.weight),
       files: (picked?.files ?? []).map((id) => handles.get(id)).filter(Boolean),
       currency: picked?.ccy ?? 'INR',

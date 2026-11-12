@@ -12,11 +12,11 @@ const props = defineProps({
   // The assets of the run being drawn, in the order its drift rows are in: a stored result is charted as it
   // was run, never as Select Assets happens to be set now.
   // Defaulted rather than required so a caller that forgets it gets the mismatch note below, not a crash.
-  assets: { type: Array, default: () => [] }, // [{ name, color }]
+  assets: { type: Array, default: () => [] }, // [{ id, name, color }]
   startYear: { type: Number, required: true },
   step: { type: Number, default: 1 }, // months per point
   limits: { type: Array, default: () => [] }, // [{ value, label, tone: 'critical' | 'good', below? }]: label above its line, or below
-  hidden: { type: Array, default: () => [] }, // names of the assets not drawn
+  hidden: { type: Array, default: () => [] }, // ids of the assets not drawn
   showTotal: { type: Boolean, default: true },
 });
 
@@ -25,7 +25,9 @@ const n = computed(() => props.rows.length);
 // A row carries one drift per asset of the run that produced it; if it does not, the chart would be fiction.
 const mismatch = computed(() => seriesMismatch(props.rows.map((r) => r.drift.length), props.assets));
 // The axis runs in round steps (1, 2, 5 or 10%), at most six of them, from the lowest drift to the highest.
-const shown = computed(() => props.assets.map((a, k) => (props.hidden.includes(a.name) ? -1 : k)).filter((k) => k >= 0));
+// Hidden by id, not by name: Gold is an asset in three regions, and hiding one of them must leave the others
+// drawn (identity.js).
+const shown = computed(() => props.assets.map((a, k) => (props.hidden.includes(a.id ?? a.name) ? -1 : k)).filter((k) => k >= 0));
 const visible = computed(() => finite(props.rows
   .flatMap((r) => [...shown.value.map((k) => r.drift[k]), ...(props.showTotal ? [r.total] : [])])));
 const top = computed(() => Math.max(0.02, ...visible.value, ...props.limits.map((l) => l.value)) * 1.08);
