@@ -370,6 +370,10 @@ function refile() {
         publisher: report.publisher,
         origin: 'imported',
         matchedBy: match.how,
+        // The catalogue instrument these files are, where the files say so, and
+        // the ones they could be where they do not: what a Datasets row is.
+        dataset: match.dataset ?? null,
+        candidates: match.candidates ?? null,
         files: [],
         from: null,
         to: null,

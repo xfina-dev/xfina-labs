@@ -69,6 +69,17 @@ live as soon as it lands; the dates below are when it did.
   bookmarklets are added or removed: today AMFI, NSE, NSE Indices, MCX, Tiingo
   and WSJ.
 
+### Added
+
+- **Datasets**, a screen of its own at `/portfolio-engine/datasets/`, where
+  getting data happens end to end: choose what you want, download it from the
+  publisher, import the files, and see what this browser holds. Import and Hold
+  are there now -- a drop area, and one row per dataset with the catalogue
+  instrument it resolved to, what it covers, its files and its checks, plus
+  anything read but unmatched and the storage this browser is using. Choose and
+  Get still live in How to get data and move across next. The screen draws
+  entirely from the stored metadata, so opening it fetches no WebAssembly.
+
 ### Changed
 
 - An imported file records what it is when it arrives -- which asset it belongs

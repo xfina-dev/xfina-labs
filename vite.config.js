@@ -18,6 +18,7 @@ export default defineConfig({
         main: path.resolve(import.meta.dirname, 'index.html'),
         portfolioEngine: path.resolve(import.meta.dirname, 'portfolio-engine/index.html'),
         getData: path.resolve(import.meta.dirname, 'portfolio-engine/get-data/index.html'),
+        datasets: path.resolve(import.meta.dirname, 'portfolio-engine/datasets/index.html'),
       },
     },
   },
