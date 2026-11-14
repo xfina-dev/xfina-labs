@@ -346,7 +346,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                 <TableCell class="whitespace-nowrap"><Badge :variant="tone(r.d.kind === 'ETF' || r.d.kind === 'MF' ? 'warn' : 'default')">{{ r.d.kind.toUpperCase() }}</Badge></TableCell>
                 <TableCell class="whitespace-nowrap font-mono text-xs text-muted-foreground" :title="r.d.inception ? 'Its history starts here' : ''">{{ r.d.inception || '—' }}</TableCell>
                 <TableCell class="text-right">
-                  <a v-if="!assisted(r.d)" href="/portfolio-engine/get-data/#download" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Where to download it, in How to get data">Get</a>
+                  <a v-if="!assisted(r.d)" href="/portfolio-engine/datasets/#download" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Where to download it, in Datasets">Get</a>
                 </TableCell>
               </TableRow>
             </template>
@@ -416,7 +416,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
             <span><i class="mr-1.5 inline-block h-2 w-2 rounded-sm bg-status-good/35" />Loaded, not used</span>
             <span><i class="mr-1.5 inline-block h-2 w-2 rounded-sm bg-muted" />Not loaded</span>
           </div>
-          <p v-if="wantedCount" class="text-xs text-muted-foreground"><Download v-if="wantedManual" class="mr-1 inline h-3 w-3" />{{ wantedCount }} dataset{{ wantedCount > 1 ? 's' : '' }} picked in <a href="/portfolio-engine/get-data/#download" class="underline underline-offset-4 hover:text-foreground">How to get data</a>, {{ wantedManual ? 'to download and import' : 'to bring down with their bookmarks and import' }}.</p>
+          <p v-if="wantedCount" class="text-xs text-muted-foreground"><Download v-if="wantedManual" class="mr-1 inline h-3 w-3" />{{ wantedCount }} dataset{{ wantedCount > 1 ? 's' : '' }} picked in <a href="/portfolio-engine/datasets/#download" class="underline underline-offset-4 hover:text-foreground">Datasets</a>, {{ wantedManual ? 'to download and import' : 'to bring down with their bookmarks and import' }}.</p>
         </section>
         <p class="text-xs text-muted-foreground">
           The first valid series is picked by default; click a picked one again to leave its asset out of the run. A series with an invalid file (red) can't be picked until it's fixed. Files are read and checked in your browser; nothing leaves it.

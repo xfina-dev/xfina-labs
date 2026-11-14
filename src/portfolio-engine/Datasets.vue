@@ -24,6 +24,7 @@ import {
 } from 'xfina-ui';
 import { ExternalLink, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
+import ChooseAndGet from './ChooseAndGet.vue';
 import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf } from './imports.js';
 import { findDataset, nodes } from './guide.js';
 import { tone } from './tone.js';
@@ -115,18 +116,8 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
       Everything is read in this tab and kept in this browser. Nothing is uploaded.
     </template>
 
-    <!-- Choose and Get live in How to get data until they move here -->
-    <Card class="bg-card border-border shadow-sm">
-      <CardHeader class="flex flex-col gap-3 space-y-0 pb-4 md:flex-row md:items-start md:justify-between">
-        <div class="space-y-1.5">
-          <CardTitle class="text-xl">Choose and get</CardTitle>
-          <CardDescription>Which datasets you want, and how to download each one from its publisher.</CardDescription>
-        </div>
-        <a href="/portfolio-engine/get-data/" class="no-underline shrink-0">
-          <Button variant="outline"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
-        </a>
-      </CardHeader>
-    </Card>
+    <!-- Choose and Get: the wizard, and how to download each dataset from its publisher -->
+    <ChooseAndGet />
 
     <!-- Import -->
     <Card class="bg-card border-border shadow-sm">

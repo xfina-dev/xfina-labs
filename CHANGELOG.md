@@ -71,6 +71,13 @@ live as soon as it lands; the dates below are when it did.
 
 ### Added
 
+- Choose and Get are on Datasets now, so the whole job is one screen: the
+  wizard, every asset for the path it leads to, the per-site download steps, the
+  bookmarklets and each publisher's terms, all moved whole -- the notes about a
+  publisher's limits (NSE one financial year per request, AMFI five years at a
+  time) are what this tool knows, and none of it changed in the move. The old
+  `/portfolio-engine/get-data/` URL redirects to the new screen and carries the
+  wizard's path with it, so a bookmark still lands where it meant to.
 - Where a file cannot say which instrument it is, Datasets asks once and
   remembers. AMFI's NAV export names a scheme without its plan, so a file of the
   ICICI gilt fund covering only recent months could be the Regular plan or the

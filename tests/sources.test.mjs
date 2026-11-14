@@ -72,7 +72,7 @@ test('Select Assets asks for it rather than keeping its own list', () => {
   assert.match(section, /import \{ hasBookmarklet \} from '\.\/bookmarklets\.js'/);
   assert.match(section, /const assisted = \(d\) => hasBookmarklet\(d\.how\)/);
   // The Get link and both Download counts go through it.
-  assert.match(section, /v-if="!assisted\(r\.d\)"[^>]*get-data\/#download/);
+  assert.match(section, /v-if="!assisted\(r\.d\)"[^>]*datasets\/#download/);
   assert.match(section, /wantedIn = \(sec\) =>[^\n]*!assisted\(d\)/);
   assert.match(section, /wantedManual = computed[^\n]*!assisted\(d\)/);
   // No source names written into the page.

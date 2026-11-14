@@ -58,7 +58,7 @@ const BUILDERS = {
     };
   },
   // NSE's own price and volume report for exchange-listed ETFs, by symbol. NSE's terms restrict automated data
-  // collection, so this one carries a plain caution on the card (see GetData.vue).
+  // collection, so this one carries a plain caution on the card (see ChooseAndGet.vue).
   NSE: (items) => {
     const etfs = items.filter((i) => i.kind === 'ETF' && i.how === 'nseEtf' && i.code);
     if (!etfs.length) return null;

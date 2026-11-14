@@ -101,7 +101,7 @@ const SECTIONS = [
         <span v-else>Import the files you downloaded: they are read in this tab, by the same parsers Xfina uses, and nothing is uploaded.</span>
       </div>
       <div class="flex shrink-0 flex-wrap justify-end gap-3 ml-auto">
-        <a :href="ui.region === 'provided' ? '/portfolio-engine/get-data/' : `/portfolio-engine/get-data/#equity/${ui.region}`" class="no-underline">
+        <a :href="ui.region === 'provided' ? '/portfolio-engine/datasets/' : `/portfolio-engine/datasets/#equity/${ui.region}`" class="no-underline">
           <Button variant="outline" size="lg"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
         </a>
         <Button size="lg" class="min-w-40 px-8" :disabled="imported.busy" @click="pickFiles"><Upload class="h-4 w-4 mr-2" />Import</Button>
