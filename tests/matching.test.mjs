@@ -319,13 +319,17 @@ test('an instrument that did not exist yet is not what a file is', () => {
 test('nothing reconciles the catalogue against imports by comparing names', () => {
   // The cause behind a week of bugs: the picks and the imports had no shared
   // key, so the page worked out what was held by comparing names as it drew.
-  // The match is recorded on the import now and the screen reads a state.
-  const section = readFileSync(new URL('../src/portfolio-engine/DataSection.vue', import.meta.url), 'utf8');
-  assert.doesNotMatch(section, /nameFit/, 'Select Assets must not compare names');
-  assert.doesNotMatch(section, /function fitOf|function unheld/, 'the comparison must be gone, not ported');
-  assert.match(section, /datasetState\(d\.id\)/, 'held-ness is a state read, by catalogue id');
-  const imports = readFileSync(new URL('../src/portfolio-engine/imports.js', import.meta.url), 'utf8');
-  assert.match(imports, /match: matchOf\(report\)|record\.match = matchOf\(report\)/, 'the match is made at import');
+  // The match is recorded on the import now and every screen reads a state.
+  const read = (f) => readFileSync(new URL(`../src/portfolio-engine/${f}`, import.meta.url), 'utf8');
+  for (const f of ['DataSection.vue', 'ChooseAndGet.vue', 'Datasets.vue']) {
+    assert.doesNotMatch(read(f), /nameFit/, `${f} must not compare names`);
+    assert.doesNotMatch(read(f), /function fitOf|function unheld/, `${f}: the comparison must be gone, not ported`);
+  }
+  // Held-ness is read by catalogue id, where the picks are shown and where what
+  // is held is listed.
+  assert.match(read('ChooseAndGet.vue'), /datasetState\(i\.id\)|holding = \(id\) => datasetState\(id\)/);
+  const imports = read('imports.js');
+  assert.match(imports, /record\.match = matchOf\(report\)/, 'the match is made at import');
   assert.match(imports, /matchedWith\(record\)/, 'and kept against what it was made from');
 });
 

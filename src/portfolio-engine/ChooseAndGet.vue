@@ -13,6 +13,8 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { ExternalLink, X, Check, Bookmark, ShieldCheck } from 'lucide-vue-next';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
+import { imported, datasetState, maybeWith, load as loadImports } from './imports.js';
+import { findDataset as findOne } from './guide.js';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, sourcesOf, returnsFor, basisFor, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
@@ -166,6 +168,15 @@ const hasGif = (site) => GIFS.has(slug(site));
 // content width otherwise wins over the column's 1fr share).
 const tile = (on) => ['w-full min-w-0 text-left rounded-md border p-3 transition-colors', on ? 'border-primary bg-primary/5' : 'hover:bg-muted'];
 const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
+
+// Whether a picked dataset is in this browser already. Read off the imports --
+// each one recorded which catalogue instrument it is when it arrived -- so the
+// state is native here rather than mirrored from somewhere else, which is what
+// the two stores with no shared key used to force.
+loadImports();
+const holding = (id) => datasetState(id);
+const alsoCouldBe = (id) => maybeWith(id).map((other) => findOne(other)?.name).filter(Boolean);
+const HOLD_BADGE = { held: ['good', 'Held'], maybe: ['warn', 'Which one?'] };
 </script>
 
 <template>
@@ -322,7 +333,16 @@ const clip = (t) => (t.length > 64 ? `${t.slice(0, 62)}…` : t);
                   <td class="py-2 pr-3 font-medium"><Badge :title="regionTitle(r.region)">{{ REGION_CODE[r.region] || r.region }}</Badge> {{ r.asset }}</td>
                   <td v-for="v in VEHICLES" :key="v.id" class="py-2 pr-3">
                     <div v-for="i in r.cells[v.id]" :key="i.id" class="flex items-start justify-between gap-1">
-                      <span class="min-w-0">{{ clip(i.name) }} <Badge v-if="i.code && i.code.length <= 10 && i.code !== i.name && HOW[i.how].site !== 'AMFI'">{{ i.code }}</Badge> <span class="text-xs text-muted-foreground">{{ HOW[i.how].site }}</span></span>
+                      <span class="min-w-0">
+                        {{ clip(i.name) }} <Badge v-if="i.code && i.code.length <= 10 && i.code !== i.name && HOW[i.how].site !== 'AMFI'">{{ i.code }}</Badge>
+                        <span class="text-xs text-muted-foreground">{{ HOW[i.how].site }}</span>
+                        <!-- Whether its file is in this browser yet, from what the imports recorded -->
+                        <Badge
+                          v-if="holding(i.id)" :variant="tone(HOLD_BADGE[holding(i.id)][0])"
+                          :title="holding(i.id) === 'held' ? 'Its file is imported' : `A file of this is imported, but it does not say which of these it is: ${alsoCouldBe(i.id).join(', ')}`"
+                        >{{ HOLD_BADGE[holding(i.id)][1] }}</Badge>
+                        <Badge v-else-if="imported.loaded" variant="soon" title="Not imported yet: download it below, then import it">To download</Badge>
+                      </span>
                       <button type="button" class="shrink-0 text-muted-foreground hover:text-foreground" title="Remove" @click="remove(i.id)"><X class="h-4 w-4" /></button>
                     </div>
                   </td>

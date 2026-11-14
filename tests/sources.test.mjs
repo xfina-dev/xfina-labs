@@ -67,14 +67,21 @@ test('an unknown source is treated as a manual download', () => {
   assert.equal(hasBookmarklet('nothing-like-this'), false);
 });
 
-test('Select Assets asks for it rather than keeping its own list', () => {
+test('the pages ask for it rather than keeping their own list', () => {
+  // The Get phase offers a site's bookmark where it has one and its download
+  // page otherwise, from the builders themselves -- no site names written into
+  // a page, so adding or dropping a bookmarklet needs no edit here.
+  const get = read('ChooseAndGet.vue');
+  assert.match(get, /import \{ bookmarkletFor \} from '\.\/bookmarklets\.js'/);
+  assert.match(get, /bookmarklet: bookmarkletFor\(site, its\)/, 'a card takes its bookmark from the builder');
+  assert.match(get, /v-if="g\.bookmarklet"/, 'and offers it only where there is one');
+  // It does name the sites in one place -- SITE_ORDER, which is the order the
+  // download cards appear in. That is presentation, not a decision about where
+  // data comes from, and a site missing from it still gets a card.
+  assert.match(get, /const SITE_ORDER = \[/);
+  assert.doesNotMatch(get, /hasBookmarklet/, 'the Get phase asks the builder, not a list of sites');
+  // The step that picks a series for a run holds none of this any more.
   const section = read('DataSection.vue');
-  assert.match(section, /import \{ hasBookmarklet \} from '\.\/bookmarklets\.js'/);
-  assert.match(section, /const assisted = \(d\) => hasBookmarklet\(d\.how\)/);
-  // The Get link and both Download counts go through it.
-  assert.match(section, /v-if="!assisted\(r\.d\)"[^>]*datasets\/#download/);
-  assert.match(section, /wantedIn = \(sec\) =>[^\n]*!assisted\(d\)/);
-  assert.match(section, /wantedManual = computed[^\n]*!assisted\(d\)/);
-  // No source names written into the page.
-  for (const site of builderSites) assert.doesNotMatch(section, new RegExp(`'${site}'`), site);
+  assert.doesNotMatch(section, /hasBookmarklet|guide_selection/, 'the Series step does not manage data');
+  assert.doesNotMatch(section, /get-data\/#download/, 'nor link at the old page');
 });

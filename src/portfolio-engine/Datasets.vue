@@ -27,11 +27,14 @@ import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
 import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf } from './imports.js';
 import { findDataset, nodes } from './guide.js';
+import { DATA, REFERENCE, refreshPublished } from './reference.js';
 import { tone } from './tone.js';
 
 // What this browser already holds, read back before anything else: the whole
 // screen draws from the metadata, without the engine being fetched at all.
 loadImports();
+// The reference series' own figures, live where they can be had (reference.js).
+refreshPublished();
 
 // --- Import ------------------------------------------------------------------
 const fileInput = ref(null);
@@ -216,6 +219,37 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
             </li>
           </ul>
         </div>
+
+        <!-- Comes with the tool: nothing to choose here, and nothing to download. Which of each pair a run
+             uses is a run decision, so it is picked in the engine's Series step, not here. -->
+        <section class="space-y-2 border-t pt-4">
+          <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Comes with the tool</div>
+          <p class="text-sm text-muted-foreground">
+            Two series every run can call on, published by
+            <a :href="DATA" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4">Xfina Data</a>
+            and fetched when a run needs them — nothing to download or import. Each comes in two versions: the
+            one to prefer, and one with a longer history for runs that start further back. Which a run uses is
+            picked with the run, in the engine's Series step, because it changes what the run reports.
+          </p>
+          <Table>
+            <TableHeader>
+              <TableRow><TableHead>Series</TableHead><TableHead>Publisher</TableHead><TableHead>Covers</TableHead><TableHead>Why</TableHead></TableRow>
+            </TableHeader>
+            <TableBody>
+              <template v-for="a in REFERENCE" :key="a.key">
+                <TableRow class="bg-muted/30 hover:bg-muted/30">
+                  <TableCell colspan="4" class="py-2"><span class="font-semibold">{{ a.name }}</span> <span class="text-xs text-muted-foreground">{{ a.what }}</span></TableCell>
+                </TableRow>
+                <TableRow v-for="s in a.series" :key="s.id">
+                  <TableCell class="whitespace-nowrap font-medium">{{ s.name }}</TableCell>
+                  <TableCell class="text-sm">{{ s.publisher }}</TableCell>
+                  <TableCell class="whitespace-nowrap font-mono text-xs">{{ s.first }} → {{ s.last }}</TableCell>
+                  <TableCell class="text-xs text-muted-foreground">{{ s.note }}</TableCell>
+                </TableRow>
+              </template>
+            </TableBody>
+          </Table>
+        </section>
 
         <!-- Kept in this browser, and where it is let go of -->
         <section v-if="imported.storage.files" class="space-y-2 border-t pt-4">

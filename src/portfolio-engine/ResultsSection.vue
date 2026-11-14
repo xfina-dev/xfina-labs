@@ -586,7 +586,7 @@ function exportResult() {
                 <div class="flex justify-between gap-3"><dt class="text-muted-foreground">Contributions</dt><dd class="font-mono text-xs">{{ settings.investments.startMonth }} → {{ settings.investments.endMonth }}</dd></div>
                 <!-- What the tax figures assume; the mock does not ask for it yet -->
                 <div class="flex justify-between gap-3" title="Long-term capital gains on lots held over a year, short-term on lots sold inside one; what the tax figures in Returns and risks assume"><dt class="text-muted-foreground">Tax on gains</dt><dd>{{ ASSUMPTIONS.ltcgRate }}% LTCG, {{ ASSUMPTIONS.stcgRate }}% STCG</dd></div>
-                <div v-if="runData" class="flex justify-between gap-3" :title="runData.inflationFrom === 'cpi' ? 'From the inflation series picked in Select Assets, over this run\'s own period' : 'No inflation series was picked, so a flat rate is assumed'"><dt class="text-muted-foreground">Inflation</dt><dd class="tabular-nums">{{ pct(runData.inflation) }} a year, {{ runData.inflationFrom === 'cpi' ? 'from CPI' : 'assumed' }}</dd></div>
+                <div v-if="runData" class="flex justify-between gap-3" :title="runData.inflationFrom === 'cpi' ? 'From the inflation series picked in Series, over this run\'s own period' : 'No inflation series was picked, so a flat rate is assumed'"><dt class="text-muted-foreground">Inflation</dt><dd class="tabular-nums">{{ pct(runData.inflation) }} a year, {{ runData.inflationFrom === 'cpi' ? 'from CPI' : 'assumed' }}</dd></div>
               </dl>
             </section>
             <section>

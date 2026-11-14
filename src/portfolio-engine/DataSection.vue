@@ -4,12 +4,12 @@ import {
   Dialog, DialogScrollContent, DialogDescription, DialogHeader, DialogTitle,
 } from 'xfina-ui';
 import { tone } from './tone.js';
-import { CLASSES, REGIONS, nodes, findDataset } from './guide.js';
-import { ref, reactive, computed, onMounted, onBeforeUnmount, watchEffect, toRef } from 'vue';
+import { CLASSES, REGIONS, nodes } from './guide.js';
+import { DATA, REFERENCE, refreshPublished } from './reference.js';
+import { ref, reactive, computed, onMounted, watchEffect, toRef } from 'vue';
 import { selection, ui, picks } from './store.js';
-import { hasBookmarklet } from './bookmarklets.js';
-import { imported, seriesFor, fileIdsOf, removeFile, clearImports, datasetState, maybeWith } from './imports.js';
-import { Check, Download, Trash2, X } from 'lucide-vue-next';
+import { imported, seriesFor, fileIdsOf, removeFile } from './imports.js';
+import { Check, Trash2, X } from 'lucide-vue-next';
 
 // --- Series ----------------------------------------------------------------------------------------
 // Every series on this page is real: an imported one is what `xfina` read from the files the user
@@ -17,17 +17,6 @@ import { Check, Download, Trash2, X } from 'lucide-vue-next';
 // Xfina Data publishes. A series says what its values are (basis) and whether they include income
 // (ret), as the get-data page does. Series are kept apart, never merged: a run uses one per asset
 // (see chosen).
-
-// Xfina Data's published series, as its metadata.json described them on 2026-10-07. The page reads the
-// live metadata.json on load (see onMounted) and keeps this copy if that fails.
-const DATA = 'https://data.xfina.dev';
-const PUBLISHED = {
-  'sbi-forex-card-usd': { path: 'v1/fx/sbi-forex-card-usd.csv', frequency: 'daily', rows: 1593, first: '2020-01-06', last: '2026-10-06' },
-  'bis-usd-inr': { path: 'v1/fx/bis-usd-inr.csv', frequency: 'daily', rows: 13610, first: '1973-01-02', last: '2026-09-29' },
-  'in-cpi': { path: 'v1/inflation/in-cpi.csv', frequency: 'monthly', rows: 164, first: '2013-01', last: '2026-08' },
-  'in-cpi-imf': { path: 'v1/inflation/in-cpi-imf.csv', frequency: 'monthly', rows: 835, first: '1957-01', last: '2026-07' },
-};
-const provided = (id, name, type, basis, note) => reactive({ id, key: `provided|${id}`, name, type, basis, ret: null, note, origin: 'provided', ...PUBLISHED[id] });
 
 // The data's end: the latest date any imported series reaches, which is what the timeline and the
 // "ends early" marks are measured against. With nothing imported yet there is no data, so today
@@ -59,28 +48,11 @@ const catalogue = REGIONS.map((r) => ({
 
 const sections = [
   ...catalogue,
-  {
-    id: 'provided', title: 'Reference', note: null, // has a link, so the template writes it
-    assets: [
-      { key: 'reference|fx', name: 'USD/INR', provided: true, series: [
-        provided('sbi-forex-card-usd', 'SBI forex card', 'FX', 'TT rate', 'TT buy and TT sell: what SBI charges to convert between rupees and dollars on a forex card. Preferred: it is what a transfer actually costs.'),
-        provided('bis-usd-inr', 'BIS USD/INR', 'FX', 'Reference rate', 'A reference rate from the Bank for International Settlements, rupees per dollar on each business day. The long history, for runs that start before SBI\'s sheets.'),
-      ] },
-      { key: 'reference|cpi', name: 'Inflation', provided: true, series: [
-        provided('in-cpi', 'MoSPI CPI', 'CPI', 'Index level', 'India\'s official consumer price index, all-India combined, 2024 = 100. Preferred: MoSPI\'s own figures.'),
-        provided('in-cpi-imf', 'IMF CPI', 'CPI', 'Index level', 'India\'s CPI as the IMF publishes it, on the same 2024 = 100 base. The long history, for runs that start before 2013.'),
-      ] },
-    ],
-  },
+  { id: 'provided', title: 'Reference', note: null, assets: REFERENCE }, // has a link, so the template writes it
 ];
 
-// Xfina Data's live metadata.json (it allows any site to read it). On failure the copy above stays.
-onMounted(async () => {
-  try {
-    const meta = await (await fetch(`${DATA}/v1/metadata.json`)).json();
-    for (const d of meta.datasets || []) for (const a of sections.at(-1).assets) for (const s of a.series) if (s.id === d.id) Object.assign(s, { path: d.path, rows: d.rows, first: d.first, last: d.last });
-  } catch { /* keep the copy */ }
-});
+// Xfina Data's live figures over the fallback (reference.js); on failure the fallback stands.
+onMounted(refreshPublished);
 
 // --- Which series a run uses -----------------------------------------------------------------------
 // An imported series runs from..to; a provided one first..last, where a monthly series' month stands for
@@ -122,6 +94,23 @@ const BASE = computed(() => overlap(assetsOf(false).filter((a) => !unpicked(a)).
 // starts in 2020 -- it takes the one with the longest history rather than the first in the list, which is the
 // shortest. Picking the shortest would quietly cut a hundred-year run down to six.
 const longest = (a) => [...a.series].sort((x, y) => String(startOf(x)).localeCompare(String(startOf(y))))[0];
+// Which reference series to convert with, or to deflate by, changes what a run reports, and the right one
+// depends on how far back the run goes: SBI's sheets and MoSPI's index are the ones to prefer, and neither
+// reaches as far as its alternative. So where a run starts before the preferred series covers, say so here,
+// at the point of choosing. Nothing switches on its own: the choice is the user's, and a line beats a number
+// quietly taken from the wrong series.
+const reach = (a) => {
+  if (!a.provided || !BASE.value.ok) return null;
+  const [preferred, ...rest] = a.series;
+  if (!preferred || spans(BASE.value)(preferred)) return null;
+  const further = rest.find(spans(BASE.value));
+  const from = startOf(preferred);
+  return {
+    from,
+    preferred: preferred.name,
+    further: further?.name ?? null,
+  };
+};
 const chosen = (a) => (unpicked(a) ? null : own(a) || (a.provided ? a.series.find(spans(BASE.value)) || longest(a) : a.series.find((x) => !invalid(x))) || null);
 const isChosen = (a, s) => chosen(a) === s;
 // A reference asset (USD/INR, inflation) always has one series picked: every run needs it, so picking
@@ -187,52 +176,10 @@ const TIMELINE = computed(() => {
 const share = (n) => `${(n / importable.length) * 100}%`;
 const runYears = computed(() => (RUN.value.ok ? ((new Date(RUN.value.to) - new Date(RUN.value.from)) / (365.25 * 864e5)).toFixed(1) : null));
 
-// What was picked in How to get data (saved in this browser by that page: dataset id → source), shown under each
-// asset as To download until its file is imported. Read again when this page comes back into view, so picks made
-// in another tab show up. A pick whose dataset has since been imported drops off the list: its series is in the
-// table above it, which is the row it was waiting to become.
-const GUIDE_STORE = 'xfina_labs_guide_selection_v4';
-const guidePicks = ref({});
-const readGuide = () => { try { guidePicks.value = JSON.parse(localStorage.getItem(GUIDE_STORE) || '{}') || {}; } catch { guidePicks.value = {}; } };
-onMounted(() => { readGuide(); addEventListener('focus', readGuide); addEventListener('storage', readGuide); });
-onBeforeUnmount(() => { removeEventListener('focus', readGuide); removeEventListener('storage', readGuide); });
-// Whether a picked dataset is already in. The import said what it was when it
-// arrived, and that is recorded on it (imports.js), so this reads a state: no names are compared here, which
-// is what the comparison that used to live in this file kept getting wrong.
-//
-//   held  -- a file says it is this instrument
-//   maybe -- a file is one of several instruments it could be, and does not say which. AMFI names a scheme
-//            without its plan, so a file of the ICICI gilt fund covering only recent months cannot say whether
-//            it is the Regular or the Direct plan. The row stays, and says so.
-const wanted = computed(() => {
-  const byAsset = {};
-  for (const [id, how] of Object.entries(guidePicks.value)) {
-    const d = findDataset(id);
-    if (!d || datasetState(d.id) === 'held') continue;
-    const unsure = datasetState(d.id) === 'maybe'
-      ? maybeWith(d.id).map((other) => findDataset(other)?.name).filter(Boolean)
-      : null;
-    (byAsset[`${d.region}|${d.cls}|${d.asset}`] ||= []).push({ ...d, how, ...(unsure?.length ? { unsure } : {}) });
-  }
-  return byAsset;
-});
-const wantedOf = (a) => wanted.value[a.key] || [];
-// Whether the site this dataset comes from has a bookmarklet (bookmarklets.js derives this from the builders
-// themselves). Those sites only serve their data to a page on the site, so there is no link to hand over: the
-// bookmark in How to get data is how the file arrives, and a "Get" pointing at a download section would send
-// the user looking for something that is not there. The row and its To download badge stay -- the pick is still
-// outstanding -- and only the download affordances go.
-const assisted = (d) => hasBookmarklet(d.how);
-const wantedCount = computed(() => Object.values(wanted.value).reduce((n, w) => n + w.length, 0));
-// What is left to fetch by hand, which is what a Download icon can honestly stand for.
-const wantedManual = computed(() => Object.values(wanted.value).reduce((n, w) => n + w.filter((d) => !assisted(d)).length, 0));
-const wantedIn = (sec) => sec.assets.reduce((n, a) => n + wantedOf(a).filter((d) => !assisted(d)).length, 0);
-
 const rows = computed(() => current.value.assets.flatMap((a) => [
   { kind: 'asset', key: `a:${a.key}`, a },
   ...a.series.map((s) => ({ kind: 'series', key: `r:${a.key}:${s.name}`, a, s })),
-  ...wantedOf(a).map((d) => ({ kind: 'wanted', key: `w:${a.key}:${d.id}`, a, d })),
-  ...(a.series.length || wantedOf(a).length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
+  ...(a.series.length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
 ]));
 
 const detail = ref(null);
@@ -244,8 +191,6 @@ const forget = async (a, s, f) => {
   if (!seriesFor(a.key).some((x) => x.key === s.key)) detail.value = null;
 };
 // Clearing asks once, in place: it deletes every imported file from this browser.
-const confirmClear = ref(false);
-const clearStored = async () => { await clearImports(); confirmClear.value = false; };
 const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
 </script>
@@ -255,8 +200,8 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
   <div class="grid gap-8 lg:grid-cols-[1.35fr_1fr] items-start [&>*]:min-w-0">
     <Card class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
-        <CardTitle class="text-xl">Assets</CardTitle>
-        <CardDescription>Pick the series each asset uses.</CardDescription>
+        <CardTitle class="text-xl">Series</CardTitle>
+        <CardDescription>One loaded series per asset: what this run reads.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
         <div class="flex gap-1 border-b overflow-x-auto overflow-y-hidden" role="tablist">
@@ -265,7 +210,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
             class="h-10 px-3 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors"
             :class="region === t.id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
             @click="region = t.id"
-          >{{ t.title }} <span class="ml-1 text-xs font-normal text-muted-foreground" :title="`${ready(t)} of ${t.assets.length} assets used in this run`">{{ ready(t) }}/{{ t.assets.length }}</span><Download v-if="wantedIn(t)" class="ml-1 inline h-3 w-3 text-muted-foreground" :title="`${wantedIn(t)} picked in How to get data, to download`" /></button>
+          >{{ t.title }} <span class="ml-1 text-xs font-normal text-muted-foreground" :title="`${ready(t)} of ${t.assets.length} assets used in this run`">{{ ready(t) }}/{{ t.assets.length }}</span></button>
         </div>
         <p v-if="current.note" class="text-sm text-muted-foreground">{{ current.note }}</p>
         <p v-else class="text-sm text-muted-foreground">Loaded for you from <a :href="DATA" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4 hover:decoration-2">Xfina Data</a>: USD/INR turns US and global assets into rupees, and inflation shows results in today's rupees.</p>
@@ -293,6 +238,9 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                     <span class="font-semibold">{{ r.a.name }}</span>
                     <span class="shrink-0 text-xs text-muted-foreground" :title="`The longest history any of this asset's datasets has: from ${sinceOf(r.a)}`">max <span class="font-semibold tabular-nums">{{ yearsSince(sinceOf(r.a)) }}</span> years</span>
                   </div>
+                  <p v-if="reach(r.a)" class="mt-0.5 text-xs text-status-warning-text">
+                    Your run starts {{ RUN.from }}, before {{ reach(r.a).preferred }} covers ({{ reach(r.a).from }}).{{ ' ' }}<template v-if="reach(r.a).further">{{ reach(r.a).further }} goes back further.</template>
+                  </p>
                 </TableCell>
               </TableRow>
 
@@ -331,41 +279,16 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                 </TableCell>
               </TableRow>
 
-              <!-- Picked in How to get data, waiting for its file -->
-              <TableRow v-if="r.kind === 'wanted'" class="hover:bg-transparent">
-                <TableCell class="pr-0" title="Picked in How to get data: import its file to use it">
-                  <span class="grid place-items-center h-5 w-5 rounded-full border border-dashed border-muted-foreground/50 text-muted-foreground"><Download class="h-3 w-3" /></span>
-                </TableCell>
-                <TableCell class="text-muted-foreground">
-                  <div class="flex min-w-0 items-center gap-2">
-                    <span class="truncate" :title="r.d.name">{{ r.d.name }}</span>
-                    <Badge variant="soon" class="shrink-0" :title="r.d.unsure ? 'A file of this fund is imported, but its name does not say which plan' : 'Picked in How to get data; not imported yet'">{{ r.d.unsure ? 'Which plan?' : 'To download' }}</Badge>
-                  </div>
-                  <div v-if="r.d.unsure" class="mt-0.5 text-xs">An imported file of this fund fits this and {{ r.d.unsure.join(', ') }}: AMFI's export names the scheme, not the plan, so it is not counted as either.</div>
-                </TableCell>
-                <TableCell class="whitespace-nowrap"><Badge :variant="tone(r.d.kind === 'ETF' || r.d.kind === 'MF' ? 'warn' : 'default')">{{ r.d.kind.toUpperCase() }}</Badge></TableCell>
-                <TableCell class="whitespace-nowrap font-mono text-xs text-muted-foreground" :title="r.d.inception ? 'Its history starts here' : ''">{{ r.d.inception || '—' }}</TableCell>
-                <TableCell class="text-right">
-                  <a v-if="!assisted(r.d)" href="/portfolio-engine/datasets/#download" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Where to download it, in Datasets">Get</a>
-                </TableCell>
-              </TableRow>
             </template>
           </TableBody>
         </Table>
 
-        <!-- Read, but not recognised as any asset in the catalogue. Listed rather than dropped: the file
-             parsed, so what it holds is known, and saying so beats a silent nothing. -->
-        <div v-if="imported.unmatched.length" class="space-y-2 rounded-md border border-status-warning/50 bg-status-warning/10 p-3">
-          <div class="text-sm font-medium">{{ imported.unmatched.length }} file{{ imported.unmatched.length > 1 ? 's' : '' }} read, but not matched to an asset</div>
-          <ul class="space-y-1">
-            <li v-for="u in imported.unmatched" :key="u.id" class="flex flex-wrap items-baseline gap-x-2 text-xs">
-              <span class="font-mono break-all">{{ u.filename }}</span>
-              <span class="text-muted-foreground">{{ u.publisher }}<template v-if="u.code"> · {{ u.code }}</template><template v-if="u.from"> · {{ u.from }} → {{ u.to }} · {{ u.rows.toLocaleString('en-IN') }} rows</template></span>
-              <span v-if="u.ambiguous" class="basis-full text-muted-foreground">Could be {{ u.ambiguous.join(', or ') }} — they are different assets, so the file is not filed under either. Rename it to the one you meant.</span>
-            </li>
-          </ul>
-          <p class="text-xs text-muted-foreground">The file holds price history, but nothing in it names an instrument this catalogue lists. Check it is the dataset you meant, and that the publisher's own filename was kept.</p>
-        </div>
+        <!-- Anything to fetch, fix or let go of is Datasets' job; this step only picks what a run uses. -->
+        <p class="text-xs text-muted-foreground">
+          <a href="/portfolio-engine/datasets/" class="underline underline-offset-4 hover:text-foreground">Datasets</a>
+          is where data is chosen, downloaded, imported and kept<template v-if="imported.unmatched.length">
+          — including {{ imported.unmatched.length }} file{{ imported.unmatched.length > 1 ? 's' : '' }} read but matched to no asset</template>.
+        </p>
       </CardContent>
     </Card>
 
@@ -416,35 +339,11 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
             <span><i class="mr-1.5 inline-block h-2 w-2 rounded-sm bg-status-good/35" />Loaded, not used</span>
             <span><i class="mr-1.5 inline-block h-2 w-2 rounded-sm bg-muted" />Not loaded</span>
           </div>
-          <p v-if="wantedCount" class="text-xs text-muted-foreground"><Download v-if="wantedManual" class="mr-1 inline h-3 w-3" />{{ wantedCount }} dataset{{ wantedCount > 1 ? 's' : '' }} picked in <a href="/portfolio-engine/datasets/#download" class="underline underline-offset-4 hover:text-foreground">Datasets</a>, {{ wantedManual ? 'to download and import' : 'to bring down with their bookmarks and import' }}.</p>
+
         </section>
         <p class="text-xs text-muted-foreground">
           The first valid series is picked by default; click a picked one again to leave its asset out of the run. A series with an invalid file (red) can't be picked until it's fixed. Files are read and checked in your browser; nothing leaves it.
         </p>
-
-        <!-- What this browser is holding. Imported files are kept here so a reload changes nothing; they are
-             this browser's alone, and this is where they are let go of. -->
-        <section v-if="imported.storage.files || imported.storageError" class="space-y-2 border-t pt-4">
-          <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Stored in this browser</div>
-          <div class="flex flex-wrap items-baseline gap-x-2">
-            <span class="text-3xl font-semibold tabular-nums">{{ imported.storage.files }}</span><span class="text-sm">files</span>
-            <span class="text-sm text-muted-foreground">{{ mb(imported.storage.stored) }}<template v-if="imported.storage.quota"> of about {{ mb(imported.storage.quota) }} this browser allows</template></span>
-          </div>
-          <p v-if="imported.storageError" class="text-xs text-status-critical-text">{{ imported.storageError }}</p>
-          <p class="text-xs text-muted-foreground">
-            Your imports stay here, so reloading the page changes nothing. They never leave this browser.
-            <template v-if="!imported.persisted"> This browser may clear them if it runs short of space.</template>
-          </p>
-          <div class="flex flex-wrap items-center gap-2">
-            <template v-if="confirmClear">
-              <span class="text-sm">Delete all {{ imported.storage.files }} imported files?</span>
-              <Button size="sm" variant="destructive" @click="clearStored">Delete</Button>
-              <Button size="sm" variant="outline" @click="confirmClear = false">Cancel</Button>
-            </template>
-            <Button v-else size="sm" variant="outline" @click="confirmClear = true"><Trash2 class="h-4 w-4 mr-2" />Clear imported files</Button>
-          </div>
-        </section>
-
 
       </CardContent>
     </Card>

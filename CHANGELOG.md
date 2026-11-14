@@ -69,6 +69,23 @@ live as soon as it lands; the dates below are when it did.
   bookmarklets are added or removed: today AMFI, NSE, NSE Indices, MCX, Tiingo
   and WSJ.
 
+### Changed
+
+- The Portfolio Engine's first step is **Series**, and only picks what a run
+  reads: one loaded series per asset, the reference series this run converts
+  with and deflates by, and the period they make. Importing, downloading, what
+  was read but matched nothing, and the storage this browser is using have all
+  moved to Datasets, with a line and a link where something is missing.
+- Which USD/INR and which CPI series a run uses stays with the run. Those are a
+  choice between the one to prefer and one with a longer history, and it changes
+  what a run reports -- the FX pick rescales every dollar asset, the CPI pick
+  drives every Real figure -- so it belongs where the run is set up, beside the
+  per-asset pick. What Datasets owns is the provision: that they exist, who
+  publishes them, what each covers and why the long-history one is there.
+- Where a run starts before the preferred reference series covers, the pick says
+  so: "Your run starts 2005-04-01, before SBI forex card covers (2020-01-06).
+  BIS USD/INR goes back further." Nothing switches on its own.
+
 ### Added
 
 - Choose and Get are on Datasets now, so the whole job is one screen: the

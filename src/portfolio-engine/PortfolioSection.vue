@@ -43,7 +43,7 @@ function onKey(e, i) {
 const onDrop = () => { if (dragFrom.value !== null && dropAt.value !== null) move(dragFrom.value, dropAt.value); dragFrom.value = dropAt.value = null; };
 
 // The donut and the table point at the same asset: hovering a row raises its slice, and a slice its row. The
-// donut also shows each asset's series, from Select Assets.
+// donut also shows each asset's series, from Series.
 const active = ref(null);
 const donutAssets = computed(() => ASSETS.map((a) => ({ ...a, series: selection.series.find((x) => `${x.tab}|${x.asset}` === a.key)?.series })));
 </script>
@@ -126,7 +126,7 @@ const donutAssets = computed(() => ASSETS.map((a) => ({ ...a, series: selection.
       </CardHeader>
       <CardContent class="space-y-6">
         <AllocationDonut v-model:active="active" :assets="donutAssets" />
-        <p class="text-xs text-muted-foreground">Type is that of the series picked for the asset under Select Assets. <Badge>Index</Badge> is the benchmark itself; <Badge variant="warning">ETF</Badge> and <Badge variant="warning">MF</Badge> are funds you could have held. They are not the same: results differ by fees and tracking.</p>
+        <p class="text-xs text-muted-foreground">Type is that of the series picked for the asset under Series. <Badge>Index</Badge> is the benchmark itself; <Badge variant="warning">ETF</Badge> and <Badge variant="warning">MF</Badge> are funds you could have held. They are not the same: results differ by fees and tracking.</p>
       </CardContent>
     </Card>
 

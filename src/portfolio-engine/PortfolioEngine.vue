@@ -1,7 +1,7 @@
 <script setup>
-import { computed, nextTick, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onMounted, reactive } from 'vue';
 import { Button, FeedbackCard } from 'xfina-ui';
-import { ChevronDown, HelpCircle, Play, Upload } from 'lucide-vue-next';
+import { ChevronDown, Database, Play } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import DataSection from './DataSection.vue';
 import PortfolioSection from './PortfolioSection.vue';
@@ -10,7 +10,7 @@ import InvestmentsSection from './InvestmentsSection.vue';
 import ResultsSection from './ResultsSection.vue';
 import { run, rebalancing, history, selection, investments, labelOf, changed, ui, runState, blocked } from './store.js';
 import { ASSETS } from './allocation.js';
-import { importFiles, imported, load as loadImports } from './imports.js';
+import { imported, load as loadImports } from './imports.js';
 import { planRows, salarySpan } from './plan.js';
 
 // The four steps fold to a one-line summary each. They start open; Run folds them all, so the results come
@@ -21,20 +21,11 @@ const toggle = (id) => { open[id] = !open[id]; };
 
 // Bringing data in, before the steps, as Run comes after them. How to get data opens at the region Select
 // Assets shows. The files are read here, in this tab, by the engine's `xfina` half: each one is identified,
-// parsed and filed under the asset it belongs to (imports.js), and Select Assets shows what came of it.
-const fileInput = ref(null);
-const pickFiles = () => fileInput.value.click();
-const lastImport = ref(null);
-// What this browser already holds, read back before anything else: the table and the run history come up
-// without the engine being fetched at all (see imports.js and vault.js).
+// parsed and filed under the asset it belongs to (imports.js). Datasets is where that happens now; this page's
+// first step only picks which loaded series each asset uses.
+// What this browser holds, read back on load: the table and the run history come up without the engine being
+// fetched at all (see imports.js and vault.js). Importing itself happens in Datasets.
 onMounted(() => loadImports());
-const onFiles = async (event) => {
-  const files = [...(event.target.files || [])];
-  // Clear the input, so importing the same file again still fires a change.
-  event.target.value = '';
-  if (!files.length) return;
-  lastImport.value = await importFiles(files);
-};
 
 // A run saves one result per ticked strategy, then shows Results.
 const runBacktest = async () => {
@@ -47,13 +38,6 @@ const runBacktest = async () => {
 // What a folded step shows in one line.
 const total = computed(() => ASSETS.reduce((n, a) => n + Number(a.weight || 0), 0));
 const years = computed(() => (selection.period.from ? ((new Date(selection.period.to) - new Date(selection.period.from)) / (365.25 * 864e5)).toFixed(1) : null));
-// The colour of the import notice follows what the last import came to.
-const importTone = computed(() => {
-  if (imported.busy) return 'border-border bg-muted/40';
-  if (lastImport.value?.errors.length) return 'border-status-critical/50 bg-status-critical/10';
-  if (lastImport.value?.read) return 'border-status-good/50 bg-status-good/10';
-  return 'border-border';
-});
 const SUMMARY = computed(() => ({
   data: selection.series.length
     ? `${selection.series.length} assets · ${selection.period.from} → ${selection.period.to} · ${years.value} years`
@@ -71,7 +55,7 @@ const problem = computed(() => ({ portfolio: total.value !== 100 ? `Allocation t
 // One page: four numbered steps in order, each reading what the ones above produced, then what they come to.
 // Results is not a step: its header (with a chart icon, not a number) is part of its pinned bar.
 const SECTIONS = [
-  { id: 'data', label: 'Select Assets', comp: DataSection },
+  { id: 'data', label: 'Series', comp: DataSection },
   { id: 'portfolio', label: 'Set Allocation', comp: PortfolioSection },
   { id: 'rebalancing', label: 'Choose Rebalancing', comp: RebalancingSection },
   { id: 'investments', label: 'Plan Investments', comp: InvestmentsSection },
@@ -86,26 +70,18 @@ const SECTIONS = [
       Bring your own data: everything runs in your browser, and nothing is uploaded.
     </template>
 
-    <!-- One row before step 1: what the last import came to, then where the data comes from (as Run sits
-         after step 4). The notice takes the room left; on a narrow screen the buttons go below it. -->
+    <!-- One row before step 1: where the data comes from. Choosing, downloading, importing and keeping it
+         is Datasets' job; this page picks what a run uses and runs it. -->
     <div class="flex flex-wrap items-center gap-3">
-      <div class="flex min-h-11 min-w-0 flex-1 basis-96 flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-4 py-2 text-sm" :class="importTone">
-        <span v-if="imported.busy">Reading your files…</span>
-        <template v-else-if="lastImport">
-          <span v-if="lastImport.read">{{ lastImport.read }} file{{ lastImport.read > 1 ? 's' : '' }} read and kept in this browser.</span>
-          <span v-if="lastImport.already" class="text-muted-foreground">{{ lastImport.already }} already imported.</span>
-          <span v-if="lastImport.errors.length" class="text-status-critical-text">{{ lastImport.errors.length }} could not be read: {{ lastImport.errors[0].message }}</span>
-          <span v-else-if="!lastImport.read && !lastImport.already">Nothing was read.</span>
-        </template>
-        <span v-else-if="imported.storage.files">{{ imported.storage.files }} file{{ imported.storage.files > 1 ? 's' : '' }} kept in this browser from before. Import more to add to them.</span>
-        <span v-else>Import the files you downloaded: they are read in this tab, by the same parsers Xfina uses, and nothing is uploaded.</span>
+      <div class="flex min-h-11 min-w-0 flex-1 basis-96 flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-4 py-2 text-sm">
+        <span v-if="!imported.loaded">Reading what this browser holds…</span>
+        <span v-else-if="imported.storage.files">{{ imported.storage.files }} file{{ imported.storage.files > 1 ? 's' : '' }} kept in this browser. Pick a series for each asset below.</span>
+        <span v-else>Nothing imported yet: choose your datasets, download them and import them in Datasets.</span>
       </div>
       <div class="flex shrink-0 flex-wrap justify-end gap-3 ml-auto">
-        <a :href="ui.region === 'provided' ? '/portfolio-engine/datasets/' : `/portfolio-engine/datasets/#equity/${ui.region}`" class="no-underline">
-          <Button variant="outline" size="lg"><HelpCircle class="h-4 w-4 mr-2" />How to get data</Button>
+        <a href="/portfolio-engine/datasets/" class="no-underline">
+          <Button :variant="imported.storage.files ? 'outline' : 'default'" size="lg"><Database class="h-4 w-4 mr-2" />Datasets</Button>
         </a>
-        <Button size="lg" class="min-w-40 px-8" :disabled="imported.busy" @click="pickFiles"><Upload class="h-4 w-4 mr-2" />Import</Button>
-        <input ref="fileInput" type="file" accept=".csv,.xls,.xlsx,.xlsm,.txt,.json" multiple class="sr-only" @change="onFiles" />
       </div>
     </div>
 

@@ -7,7 +7,7 @@ const props = defineProps({
   h: { type: Number, default: 220 }, // viewBox height: FitChart sets it to fill the room the chart has
   points: { type: Array, required: true }, // [[weight per asset, summing to 1], …]
   // The assets of the run being drawn, in the order its weights are in. A stored result is charted as it was
-  // run, never as Select Assets happens to be set now.
+  // run, never as the Series step happens to be set now.
   // Defaulted rather than required so a caller that forgets it gets the mismatch note below, not a crash.
   assets: { type: Array, default: () => [] }, // [{ name, color }]
   startYear: { type: Number, required: true },

@@ -20,7 +20,7 @@ const lumpsum = num('lumpsum'), salaryStart = num('salaryStart'), salaryEnd = nu
 const salaryGrowth = computed({ get: () => (plan.salaryGrowth === '' ? '' : Math.round(plan.salaryGrowth * 100) / 100), set: (v) => { plan.salaryGrowth = v === '' ? '' : Number(v); } });
 const rateStart = num('rateStart'), rateEnd = num('rateEnd');
 
-// The run's months bound the contributions (Select Assets sets the run). Until something is imported there is
+// The run's months bound the contributions (the series picked in Series set the run). Until something is imported there is
 // no run, so the fields are left unbounded rather than bounded by nothing.
 const runFirst = computed(() => selection.period.from?.slice(0, 7) ?? null);
 const runLast = computed(() => selection.period.to?.slice(0, 7) ?? null);

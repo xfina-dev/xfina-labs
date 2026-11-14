@@ -23,7 +23,7 @@ import * as matching from './matching.js';
 
 // key `region|class|asset` → [series]. A series is
 // `{ key, name, type, ret, basis, ccy, origin, files: [...], from, to }`,
-// the same shape Select Assets reads. A file's `id` is its content's, stable
+// the same shape the Series step reads. A file's `id` is its content's, stable
 // across visits; the engine's own handle for it lives in `RESIDENT`.
 export const imported = reactive({
   byAsset: {},
