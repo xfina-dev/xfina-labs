@@ -71,6 +71,17 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- What was chosen in Choose is kept beside the files, in this browser's own
+  store, instead of in `localStorage`. The picks and the files used to live in
+  two stores with no key in common, which is why the app reconciled them by
+  comparing names as it drew; the names went when a file started recording its
+  catalogue instrument, and this puts the two halves in one place. The old key
+  is read once and then left exactly where it is, so an earlier version of the
+  app still finds its picks, and a pick naming a dataset the catalogue no longer
+  has is dropped quietly rather than showing a row for something that is not
+  there. The database upgrade only adds a store: imported files and run history
+  are untouched by it, and a failure part way leaves the picks unmigrated rather
+  than losing anything.
 - The Portfolio Engine's first step is **Series**, and only picks what a run
   reads: one loaded series per asset, the reference series this run converts
   with and deflates by, and the period they make. Importing, downloading, what

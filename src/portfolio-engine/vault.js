@@ -17,9 +17,12 @@
 // leaves the browser.
 
 const DB = 'xfina_labs_portfolio_engine';
-const VERSION = 1;
+// 2 added `picks`. A version only ever adds a store here, so an upgrade cannot
+// touch what is already in `imports` or `blobs`.
+const VERSION = 2;
 export const IMPORTS = 'imports';
 export const BLOBS = 'blobs';
+export const PICKS = 'picks';
 
 let opening = null;
 
@@ -40,6 +43,9 @@ function open() {
       const db = request.result;
       if (!db.objectStoreNames.contains(IMPORTS)) db.createObjectStore(IMPORTS, { keyPath: 'id' });
       if (!db.objectStoreNames.contains(BLOBS)) db.createObjectStore(BLOBS, { keyPath: 'id' });
+      // What was chosen in Choose, so everything about a dataset lives in one
+      // store: `{ id, how }`, by catalogue instrument id.
+      if (!db.objectStoreNames.contains(PICKS)) db.createObjectStore(PICKS, { keyPath: 'id' });
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => resolve(null);
@@ -201,4 +207,29 @@ export async function persist() {
   } catch {
     return false;
   }
+}
+
+// --- Picks -------------------------------------------------------------------
+
+/// Everything chosen in Choose, as `{ id, how }` rows.
+export async function allPicks() {
+  const db = await open();
+  if (!db) return [];
+  try {
+    return await run(db, [PICKS], 'readonly', (tx) => request(tx.objectStore(PICKS).getAll()));
+  } catch {
+    return [];
+  }
+}
+
+/// Replaces what is chosen, in one transaction: either the whole set lands or
+/// none of it does.
+export async function putPicks(rows) {
+  const db = await open();
+  if (!db) throw new Error('This browser would not keep your picks.');
+  await run(db, [PICKS], 'readwrite', (tx) => {
+    const store = tx.objectStore(PICKS);
+    store.clear();
+    for (const row of rows) store.put(row);
+  });
 }

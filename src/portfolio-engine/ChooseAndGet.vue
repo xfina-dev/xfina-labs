@@ -14,6 +14,7 @@ import { ExternalLink, X, Check, Bookmark, ShieldCheck } from 'lucide-vue-next';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
 import { imported, datasetState, maybeWith, load as loadImports } from './imports.js';
+import { load as loadPicks, save as savePicks } from './picks.js';
 import { findDataset as findOne } from './guide.js';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, sourcesOf, returnsFor, basisFor, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
@@ -68,8 +69,7 @@ watch([cls, region, vehicle, listing], () => { try { history.replaceState(null, 
 // carries its own source plus any alternatives (sourcesOf); picking a source adds the
 // dataset from there, picking the chosen one again removes it. The list below takes each dataset as from its
 // chosen source, so the download cards, bookmarks and returns follow the choice.
-const STORE = 'xfina_labs_guide_selection_v4';
-const OLD_STORE = 'xfina_labs_guide_selection_v3';
+// Kept in this browser's own store, beside the files (picks.js).
 const picked = ref({});
 const chosen = (id) => picked.value[id] || null;
 const has = (id) => !!chosen(id);
@@ -111,20 +111,15 @@ const REGION_CODE = { india: 'IN', us: 'US', global: 'GL' };
 const TOTAL = new Set(nodes.flatMap((n) => n.instruments.map((i) => i.id))).size;
 const regionTitle = (id) => REGIONS.find((r) => r.id === id)?.title || id;
 
-onMounted(() => {
+let loading = true;
+onMounted(async () => {
   fromHash();
   window.addEventListener('hashchange', fromHash);
-  try {
-    const now = localStorage.getItem(STORE);
-    if (now) picked.value = JSON.parse(now);
-    else {
-      // A list saved before sources could be chosen: every dataset on its own source.
-      const old = JSON.parse(localStorage.getItem(OLD_STORE) || '[]');
-      picked.value = Object.fromEntries(old.map(findDataset).filter(Boolean).map((d) => [d.id, d.how]));
-    }
-  } catch { /* storage blocked: start empty */ }
+  picked.value = await loadPicks();
+  loading = false;
 });
-watch(picked, (v) => { try { localStorage.setItem(STORE, JSON.stringify(v)); } catch { /* ignore */ } }, { deep: true });
+// Written through as they change, but not while the first read is filling them in.
+watch(picked, (v) => { if (!loading) savePicks(v); }, { deep: true });
 
 // The download list is grouped by website, so each site is visited once. The site's one download page, where it
 // has one (HOW's `page`), shows once in the card header; links specific to one dataset (a ticker's own page) stay
