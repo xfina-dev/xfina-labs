@@ -46,6 +46,14 @@ live as soon as it lands; the dates below are when it did.
 
 ### Fixed
 
+- The Portfolio Engine page would not load at all when any saved run had no
+  drawdown episode. A cash-like series -- an overnight rate index, a liquid fund
+  -- never falls below its peak, so there is no trough to name, and the note
+  under Max drawdown read the first episode of an empty list. It threw inside a
+  computed the whole page is built from, so one such result among the saved runs
+  took down the page rather than one figure. It now reads "never fell below its
+  start", and the drawdown table says so too instead of showing an empty body.
+
 - A band of its own, set on one asset under Threshold rebalancing, was applied
   to the wrong asset -- and only when exactly one asset had one. The engine took
   a band by its position in the map it arrived in, so a second own band made
