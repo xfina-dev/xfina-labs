@@ -34,6 +34,12 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- The way to Datasets is a **Manage Series** button in the Series step itself,
+  above the step's cards and right aligned, the same size and in the same place
+  as Run below it -- so the two things the page asks of you, set the series and
+  then run them, are offered the same way. It replaces the row of text and a
+  Datasets button that sat above step 1.
+
 - An asset is identified by its region and its name together -- `in:Gold`,
   `us:Short duration` -- rather than by its name. Three of the catalogue's
   assets share a name across regions, so a name was never an identity, and

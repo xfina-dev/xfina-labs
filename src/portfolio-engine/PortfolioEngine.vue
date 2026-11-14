@@ -70,21 +70,6 @@ const SECTIONS = [
       Bring your own data: everything runs in your browser, and nothing is uploaded.
     </template>
 
-    <!-- One row before step 1: where the data comes from. Choosing, downloading, importing and keeping it
-         is Datasets' job; this page picks what a run uses and runs it. -->
-    <div class="flex flex-wrap items-center gap-3">
-      <div class="flex min-h-11 min-w-0 flex-1 basis-96 flex-wrap items-center gap-x-3 gap-y-1 rounded-md border px-4 py-2 text-sm">
-        <span v-if="!imported.loaded">Reading what this browser holds…</span>
-        <span v-else-if="imported.storage.files">{{ imported.storage.files }} file{{ imported.storage.files > 1 ? 's' : '' }} kept in this browser. Pick a series for each asset below.</span>
-        <span v-else>Nothing imported yet: choose your datasets, download them and import them in Datasets.</span>
-      </div>
-      <div class="flex shrink-0 flex-wrap justify-end gap-3 ml-auto">
-        <a href="/portfolio-engine/datasets/" class="no-underline">
-          <Button :variant="imported.storage.files ? 'outline' : 'default'" size="lg"><Database class="h-4 w-4 mr-2" />Datasets</Button>
-        </a>
-      </div>
-    </div>
-
     <template v-for="(s, i) in SECTIONS" :key="s.id">
       <!-- Run, enabled once a setting differs from the last run; then a rule setting the setup apart from the runs
            it produced -->
@@ -113,7 +98,24 @@ const SECTIONS = [
             <ChevronDown class="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:text-foreground" :class="!open[s.id] && '-rotate-90'" />
           </button>
         </h2>
-        <div v-show="s.results || open[s.id]" :id="`${s.id}-body`"><component :is="s.comp" /></div>
+        <div v-show="s.results || open[s.id]" :id="`${s.id}-body`" :class="s.id === 'data' && 'space-y-4'">
+          <!-- Managing the data is Datasets' job, and this is the step it serves. Above the step's own cards
+               and right aligned, the same shape as the Run button below, so the two things this page asks of
+               you -- set the series, then run them -- are offered the same way. -->
+          <div v-if="s.id === 'data'" class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+            <p class="min-w-0 flex-1 text-sm text-muted-foreground sm:text-right">
+              <template v-if="!imported.loaded">Reading what this browser holds…</template>
+              <template v-else-if="imported.storage.files">{{ imported.storage.files }} file{{ imported.storage.files > 1 ? 's' : '' }} kept in this browser. Choose, download and import more in Datasets.</template>
+              <template v-else>Nothing imported yet: choose your datasets, download them and import them in Datasets.</template>
+            </p>
+            <a href="/portfolio-engine/datasets/" class="no-underline shrink-0">
+              <Button :variant="imported.storage.files ? 'outline' : 'default'" size="lg" class="min-w-40 px-8" title="Choose, download, import and keep the data a run reads">
+                <Database class="h-4 w-4 mr-2" />Manage Series
+              </Button>
+            </a>
+          </div>
+          <component :is="s.comp" />
+        </div>
       </section>
     </template>
 
