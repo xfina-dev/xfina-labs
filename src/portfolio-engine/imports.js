@@ -18,7 +18,7 @@
 import { reactive } from 'vue';
 import { readBytes, dropFile, clearFiles, engineLoaded, engineReady, versions } from './engine.js';
 import * as vault from './vault.js';
-import { nodes } from './guide.js';
+import { nodes, generatedAt } from './guide.js';
 import * as matching from './matching.js';
 
 // key `region|class|asset` → [series]. A series is
@@ -28,6 +28,11 @@ import * as matching from './matching.js';
 export const imported = reactive({
   byAsset: {},
   unmatched: [],
+  // Catalogue instrument id → 'held' | 'maybe', and, for a 'maybe', the other
+  // instruments it could be. Rebuilt with the table (see refile), so a screen
+  // reads a state rather than working one out from names.
+  datasets: {},
+  maybe: {},
   busy: false,
   // Whether what is stored has been read back yet, so the table can say
   // "restoring" rather than "nothing imported" for the moment it takes.
@@ -49,6 +54,26 @@ const CATALOGUE = matching.catalogue(nodes);
 /// Which asset a parsed file belongs to. See matching.js for the passes and for
 /// what a match does and does not decide.
 export const matchAsset = (report) => matching.matchAsset(report, CATALOGUE);
+
+// What a file was matched against, so a stored match can be told from one that
+// would come out differently now: the reading of the file it was made from (a
+// newer parser may report a different code, and re-reading stamps the record
+// with its own build), and the catalogue it was matched in (a new alias may
+// resolve what did not resolve before).
+//
+// Taken from the record rather than from the engine, so a reload can tell
+// without loading the module -- which is the whole point of keeping the
+// metadata apart from the bytes. Matching is pure and in-memory, so re-making
+// one costs nothing.
+const matchedWith = (record) => `${record.engineVersion ?? '?'}/${generatedAt}`;
+
+/// The file's place in the catalogue, decided once and kept on the record:
+/// which asset it belongs to and, where the file says so, which instrument.
+///
+/// This is why nothing reconciles imports against the catalogue by comparing
+/// names at display time any more. A file arriving writes down what it is; a
+/// screen reads it.
+const matchOf = (report) => matching.matchDataset(report, CATALOGUE);
 
 // The type badge the table shows, from what the file itself said.
 const TYPE = { index: 'Index', etf: 'ETF', mutual_fund: 'MF', listed_security: 'ETF', commodity_spot: 'Spot' };
@@ -242,6 +267,8 @@ export async function importFiles(files) {
         engineVersion: versionTag(),
         report,
       };
+      record.match = matchOf(report);
+      record.matchedWith = matchedWith(record);
       RECORDS.set(id, record);
       read += 1;
       try {
@@ -262,17 +289,44 @@ export async function importFiles(files) {
   return { read, already, errors, unmatched: imported.unmatched.length };
 }
 
+/// The match on a record, re-made only when this build or this catalogue would
+/// make it differently. Nothing else matches: a screen reads what is here.
+///
+/// A re-made match is written back, and a write that fails changes nothing --
+/// the match still stands for this visit, and the record it belongs to is left
+/// exactly as it was found. Nothing here removes or replaces an import.
+function matchFor(record) {
+  const tag = matchedWith(record);
+  if (record.match && record.matchedWith === tag) return record.match;
+  const match = matchOf(record.report);
+  const next = { ...record, match, matchedWith: tag };
+  RECORDS.set(record.id, next);
+  vault.patch(next).catch(() => {});
+  return match;
+}
+
+/// What is held for a catalogue instrument, by its catalogue id: `'held'` where
+/// a file says it is that instrument, `'maybe'` where a file is one of several
+/// it could be, or null. Read off `imported.datasets`, which is rebuilt with
+/// the table from the matches already on the records -- no names are compared.
+export const datasetState = (id) => imported.datasets[id] ?? null;
+
+/// The other instruments an import could be, for one that is only `'maybe'`.
+export const maybeWith = (id) => imported.maybe[id] ?? [];
+
 // Rebuilds the table from the records. One path, whether a record has just been
 // imported or has just been read back from storage, so the two can never draw
 // differently.
 function refile() {
   const byAsset = {};
   const unmatched = [];
+  const datasets = {};
+  const maybe = {};
   // Newest wins for a filename within a series, so a corrected re-download
   // replaces the file it corrects.
   for (const record of [...RECORDS.values()].sort((a, b) => (a.savedAt ?? 0) - (b.savedAt ?? 0))) {
     const report = record.report;
-    const match = matchAsset(report);
+    const match = matchFor(record);
     // No asset, or several that do not agree: either way the file is not filed,
     // and an ambiguity says which entries it could have been rather than
     // leaving the user to guess why a fund the catalogue lists was not taken.
@@ -288,6 +342,12 @@ function refile() {
         ambiguous: match?.ambiguous ?? null,
       });
       continue;
+    }
+    // What this file settles about the catalogue, for the Datasets rows.
+    if (match.dataset) datasets[match.dataset] = 'held';
+    for (const id of match.candidates ?? []) {
+      datasets[id] ||= 'maybe';
+      maybe[id] = [...new Set([...(maybe[id] ?? []), ...match.candidates.filter((x) => x !== id)])];
     }
     const list = (byAsset[match.assetKey] ||= []);
     const key = seriesKey(report);
@@ -340,6 +400,8 @@ function refile() {
   }
   imported.byAsset = byAsset;
   imported.unmatched = unmatched;
+  imported.datasets = datasets;
+  imported.maybe = maybe;
 }
 
 /// Removes one file: from the table, from the engine, and from this browser.

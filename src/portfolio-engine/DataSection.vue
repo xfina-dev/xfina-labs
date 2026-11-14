@@ -7,9 +7,8 @@ import { tone } from './tone.js';
 import { CLASSES, REGIONS, nodes, findDataset } from './guide.js';
 import { ref, reactive, computed, onMounted, onBeforeUnmount, watchEffect, toRef } from 'vue';
 import { selection, ui, picks } from './store.js';
-import { nameFit } from './matching.js';
 import { hasBookmarklet } from './bookmarklets.js';
-import { imported, seriesFor, fileIdsOf, removeFile, clearImports } from './imports.js';
+import { imported, seriesFor, fileIdsOf, removeFile, clearImports, datasetState, maybeWith } from './imports.js';
 import { Check, Download, Trash2, X } from 'lucide-vue-next';
 
 // --- Series ----------------------------------------------------------------------------------------
@@ -197,49 +196,23 @@ const guidePicks = ref({});
 const readGuide = () => { try { guidePicks.value = JSON.parse(localStorage.getItem(GUIDE_STORE) || '{}') || {}; } catch { guidePicks.value = {}; } };
 onMounted(() => { readGuide(); addEventListener('focus', readGuide); addEventListener('storage', readGuide); });
 onBeforeUnmount(() => { removeEventListener('focus', readGuide); removeEventListener('storage', readGuide); });
-// Whether a picked dataset is already in: an imported series of that asset naming the same instrument. The
-// comparison is matching.js's, the same one that decides which asset a file belongs to -- this used to be a
-// second copy of it, and the copy went on failing on AMFI's shortened scheme names after the matcher stopped.
+// Whether a picked dataset is already in. The import said what it was when it
+// arrived, and that is recorded on it (imports.js), so this reads a state: no names are compared here, which
+// is what the comparison that used to live in this file kept getting wrong.
 //
-// A series carries no scheme code (AMFI prints none in the file), so where the name alone cannot tell two plans
-// of one fund apart, two further things can: a fund has no NAVs before it existed, so a series starting before a
-// dataset's inception is not that dataset; and if one file still fits two picked datasets, neither is claimed as
-// held -- the row stays and says so, rather than telling him he has data he may not have.
-function fitOf(dataset, s) {
-  const fit = nameFit(s.name, dataset.name) || (s.code && dataset.code ? nameFit(s.code, dataset.code) : null);
-  if (!fit) return null;
-  if (dataset.inception && s.from && s.from < dataset.inception) return null;
-  return fit;
-}
-// What is still to download for one asset: the picks no imported series settles.
-function unheld(key, picks) {
-  const series = seriesFor(key);
-  const out = [];
-  for (const d of picks) {
-    let unsure = null;
-    const held = series.some((s) => {
-      const fit = fitOf(d, s);
-      if (!fit) return false;
-      if (fit === 'exact') return true;
-      // The file names the scheme, not the plan. If it fits only this pick, it is this pick.
-      const also = picks.filter((o) => o.id !== d.id && fitOf(o, s));
-      if (!also.length) return true;
-      unsure = also.map((o) => o.name);
-      return false;
-    });
-    if (!held) out.push(unsure ? { ...d, unsure } : d);
-  }
-  return out;
-}
+//   held  -- a file says it is this instrument
+//   maybe -- a file is one of several instruments it could be, and does not say which. AMFI names a scheme
+//            without its plan, so a file of the ICICI gilt fund covering only recent months cannot say whether
+//            it is the Regular or the Direct plan. The row stays, and says so.
 const wanted = computed(() => {
   const byAsset = {};
   for (const [id, how] of Object.entries(guidePicks.value)) {
     const d = findDataset(id);
-    if (d) (byAsset[`${d.region}|${d.cls}|${d.asset}`] ||= []).push({ ...d, how });
-  }
-  for (const [key, picks] of Object.entries(byAsset)) {
-    const left = unheld(key, picks);
-    if (left.length) byAsset[key] = left; else delete byAsset[key];
+    if (!d || datasetState(d.id) === 'held') continue;
+    const unsure = datasetState(d.id) === 'maybe'
+      ? maybeWith(d.id).map((other) => findDataset(other)?.name).filter(Boolean)
+      : null;
+    (byAsset[`${d.region}|${d.cls}|${d.asset}`] ||= []).push({ ...d, how, ...(unsure?.length ? { unsure } : {}) });
   }
   return byAsset;
 });

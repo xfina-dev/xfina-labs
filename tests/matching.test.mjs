@@ -302,3 +302,29 @@ test('every sample download either resolves or says it cannot', () => {
   // source but AMFI's mutual funds.
   assert.equal(resolved, SEEN.length, 'all of these name their instrument');
 });
+
+test('an instrument that did not exist yet is not what a file is', () => {
+  // The discriminator that used to run at display time, now part of resolving
+  // the file once: the ICICI gilt fund's Regular plan opens 2006-04-02 and its
+  // Direct plan 2013-01-02, so a file starting in 2006 is the Regular one, and
+  // one covering only recent months could be either.
+  const gilt = (from) => matchDataset({ source: 'md-amfi-nav', code: 'ICICI Prudential Gilt Fund - Growth', name: null, from, filename: 'x.xlsx' }, CAT);
+  assert.equal(gilt('2006-04-02').dataset, 'mf100369');
+  assert.equal(gilt('2026-04-01').dataset, undefined);
+  assert.deepEqual(gilt('2026-04-01').candidates.sort(), ['mf100369', 'mf120590']);
+  // A file with no dates says nothing either way.
+  assert.equal(gilt(null).dataset, undefined);
+});
+
+test('nothing reconciles the catalogue against imports by comparing names', () => {
+  // The cause behind a week of bugs: the picks and the imports had no shared
+  // key, so the page worked out what was held by comparing names as it drew.
+  // The match is recorded on the import now and the screen reads a state.
+  const section = readFileSync(new URL('../src/portfolio-engine/DataSection.vue', import.meta.url), 'utf8');
+  assert.doesNotMatch(section, /nameFit/, 'Select Assets must not compare names');
+  assert.doesNotMatch(section, /function fitOf|function unheld/, 'the comparison must be gone, not ported');
+  assert.match(section, /datasetState\(d\.id\)/, 'held-ness is a state read, by catalogue id');
+  const imports = readFileSync(new URL('../src/portfolio-engine/imports.js', import.meta.url), 'utf8');
+  assert.match(imports, /match: matchOf\(report\)|record\.match = matchOf\(report\)/, 'the match is made at import');
+  assert.match(imports, /matchedWith\(record\)/, 'and kept against what it was made from');
+});

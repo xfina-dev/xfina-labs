@@ -69,6 +69,19 @@ live as soon as it lands; the dates below are when it did.
   bookmarklets are added or removed: today AMFI, NSE, NSE Indices, MCX, Tiingo
   and WSJ.
 
+### Changed
+
+- An imported file records what it is when it arrives -- which asset it belongs
+  to and, where the file says so, which catalogue instrument -- instead of the
+  page working that out by comparing names each time it drew. The picks made in
+  How to get data and the files in this browser had no shared key, so the two
+  were reconciled by name at display time, and that one decision is behind most
+  of the recent crop of bugs: the scheme name whose plan sits in the middle, the
+  `To download` badge that would not clear, the Regular-versus-Direct ambiguity.
+  The comparison is gone rather than ported. A stored match is re-made only when
+  the file is read by a newer parser or the catalogue changes, neither of which
+  happens while a screen is being drawn.
+
 ### Fixed
 
 - An index published under a name the catalogue does not use went unmatched.

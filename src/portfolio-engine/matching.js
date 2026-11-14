@@ -73,6 +73,10 @@ export function catalogue(nodes) {
       id: i.id,
       asset: n.asset,
       vehicle: n.vehicle,
+      // The first date this instrument can have a value for. A file that
+      // starts earlier is not it, whatever its name says, which is what tells
+      // a fund's Regular plan from the Direct plan opened years later.
+      inception: i.inception ?? null,
       // The sites this instrument can be downloaded from, used only to tell
       // two candidates apart.
       hows: [i.how, ...((i.alts ?? []).map((a) => a.how))].filter(Boolean),
@@ -222,10 +226,19 @@ export function matchDataset(report, cat) {
     && [name, code].some((text) => text && nameFit(text, n.name) === 'exact'));
   const byCode = mine.filter((i) => (i.code && (i.code === code || i.code === name)) || named(i, true));
   if (byCode.length === 1) return { ...asset, dataset: byCode[0].id };
+  if (byCode.length > 1) {
+    const could = byCode.filter(existed);
+    if (could.length === 1) return { ...asset, dataset: could[0].id };
+  }
   const how = SOURCE_HOW[report.source];
   const published = (i) => !how || !i.hows.length || i.hows.includes(how);
+  // An instrument has no values before it existed, so a file that starts
+  // earlier is not that instrument. This is what separates a fund's plans where
+  // the name cannot: the ICICI gilt fund's Regular plan opens 2006-04-02 and
+  // its Direct plan 2013-01-02, so a file starting in 2006 is the Regular one.
+  const existed = (i) => !i.inception || !report.from || report.from >= i.inception;
   const fits = mine.filter((i) => i.names.some((n) => [name, code].some((text) => text && nameFit(text, n.name))));
-  let left = (byCode.length ? byCode : fits).filter(published);
+  let left = (byCode.length ? byCode : fits).filter((i) => published(i) && existed(i));
   // Nothing of this asset is published where the file came from: the asset is
   // still right, the instrument is not established.
   if (!left.length) return { ...asset, candidates: (fits.length ? fits : mine).map((i) => i.id) };
