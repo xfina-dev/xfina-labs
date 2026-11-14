@@ -99,7 +99,6 @@ const rows = computed(() => held.value.reduce((n, h) => n + h.files.length, 0));
 const confirmClear = ref(false);
 const clearStored = async () => { confirmClear.value = false; await clearImports(); lastImport.value = null; };
 const mb = (bytes) => (bytes == null ? '—' : bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1e6))} MB`);
-const detail = ref(null);
 // Answering "which one is this?" for a series: the answer is kept against its
 // files, so it is asked once and survives a reload (imports.js).
 const answering = ref(null);
@@ -196,9 +195,7 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
               </TableCell>
               <TableCell class="whitespace-nowrap text-sm">{{ h.region }} · {{ h.asset }}</TableCell>
               <TableCell class="whitespace-nowrap font-mono text-xs">{{ h.series.from }} → {{ h.series.to }}</TableCell>
-              <TableCell class="text-right tabular-nums">
-                <button type="button" class="rounded-md px-1.5 py-0.5 hover:bg-muted" :title="`Details for each file of ${h.series.name}`" @click="detail = h">{{ h.files.length }}</button>
-              </TableCell>
+              <TableCell class="text-right tabular-nums text-muted-foreground">{{ h.files.length }}</TableCell>
               <TableCell><Badge :variant="tone(STATUS[h.worst][0])">{{ STATUS[h.worst][1] }}</Badge></TableCell>
               <TableCell class="text-right">
                 <a href="/portfolio-engine/" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Use it in a backtest">Use</a>

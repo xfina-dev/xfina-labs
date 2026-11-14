@@ -144,7 +144,6 @@ const tickTitle = (a, s) => {
   if (!isChosen(a, s)) return `Use ${s.name} for this run`;
   return a.provided ? 'Used for this run. Every run needs one; pick the other to switch' : 'Used for this run. Click again to leave this asset out';
 };
-const fileCount = (s) => (s.origin === 'provided' ? 1 : s.files.length);
 const checksOf = (f) => f.checks || [['ok', `${f.rows.toLocaleString('en-IN')} rows, sorted, no duplicate dates, all values positive.`]];
 
 // --- Table -----------------------------------------------------------------------------------------
@@ -225,8 +224,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
               <TableHead class="pr-0"><span class="sr-only">Used for this run</span></TableHead>
               <TableHead>Series</TableHead>
               <TableHead>Type</TableHead>
-              <TableHead>Since</TableHead>
-              <TableHead class="text-right">Files</TableHead>
+              <TableHead>Range</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -247,7 +245,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
               <!-- Nothing loaded for this asset yet -->
               <TableRow v-else-if="r.kind === 'empty'" class="hover:bg-transparent">
                 <TableCell />
-                <TableCell colspan="4" class="text-muted-foreground">{{ !imported.loaded ? 'Reading your imports…' : imported.refreshing ? 'Checking your imports against this version…' : 'No series yet' }}</TableCell>
+                <TableCell colspan="3" class="text-muted-foreground">{{ !imported.loaded ? 'Reading your imports…' : imported.refreshing ? 'Checking your imports against this version…' : 'No series yet' }}</TableCell>
               </TableRow>
 
               <!-- Series -->
@@ -263,19 +261,20 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                 </TableCell>
                 <TableCell :class="isChosen(r.a, r.s) ? 'font-medium' : 'text-muted-foreground'">
                   <div class="flex min-w-0 items-center gap-2">
-                    <span class="truncate" :title="`${r.s.name} · ${r.s.basis}`">{{ r.s.name }}</span>
+                    <button
+                      type="button" class="min-w-0 truncate text-left underline decoration-dotted underline-offset-4 hover:decoration-solid"
+                      :title="`${r.s.name} · ${r.s.basis} — the files behind it, and their checks`" @click="open(r.a, r.s)"
+                    >{{ r.s.name }}</button>
                     <Badge v-if="r.s.ret && r.s.ret !== 'Total return'" :variant="tone('warn')" class="shrink-0" title="Price only: income is not included, so returns are understated">Price only</Badge>
                   </div>
                 </TableCell>
                 <TableCell class="whitespace-nowrap"><Badge :variant="tone(r.s.type === 'ETF' || r.s.type === 'MF' ? 'warn' : 'default')" :title="r.s.basis">{{ r.s.type }}</Badge></TableCell>
-                <TableCell class="whitespace-nowrap font-mono text-xs">
-                  <div :class="RUN.first === r.s ? 'font-semibold text-foreground' : 'text-muted-foreground'" :title="RUN.first === r.s ? 'The run starts here: the latest start among the picked series' : ''">{{ shownStart(r.s) }}</div>
-                  <div v-if="endsEarly(r.s)" :class="RUN.last === r.s ? 'font-semibold text-foreground' : 'text-muted-foreground'" :title="RUN.last === r.s ? 'The run ends here: the earliest end among the picked series' : 'Ends before the data\'s end'">to {{ shownEnd(r.s) }}</div>
-                </TableCell>
-                <TableCell class="text-right">
-                  <button type="button" class="rounded-md px-1.5 py-0.5 -mr-1.5 hover:bg-muted" :title="`Details for each file of ${r.s.name}`" @click="open(r.a, r.s)">
-                    <span class="text-sm tabular-nums underline decoration-dotted underline-offset-4">{{ fileCount(r.s) }}</span>
-                  </button>
+                <!-- What it covers, on one line. The ends are marked where they set the run: the latest start
+                     among the picked series, and the earliest end. -->
+                <TableCell class="whitespace-nowrap font-mono text-xs text-muted-foreground">
+                  <span :class="RUN.first === r.s && 'font-semibold text-foreground'" :title="RUN.first === r.s ? 'The run starts here: the latest start among the picked series' : ''">{{ shownStart(r.s) }}</span>
+                  <span class="px-1">→</span>
+                  <span :class="RUN.last === r.s && 'font-semibold text-foreground'" :title="RUN.last === r.s ? 'The run ends here: the earliest end among the picked series' : endsEarly(r.s) ? 'Ends before the data\'s end' : ''">{{ shownEnd(r.s) }}</span>
                 </TableCell>
               </TableRow>
 

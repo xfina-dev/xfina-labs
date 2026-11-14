@@ -34,6 +34,12 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- The Series step's table drops its Files column, and `Since` becomes `Range`,
+  reading `1999-06-30 → 2026-11-09` on one line instead of a start with the end
+  beneath it. The files behind a series, and their checks, open from the series
+  name now that no column carries the count: file management is Datasets' job,
+  and this step is for picking what a run reads.
+
 - The way to Datasets is a **Manage** button in the Series step itself, above
   the step's cards and right aligned: the same width, height and colour as Run
   below it, from one shared definition, so the two things the page asks of you
