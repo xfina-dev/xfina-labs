@@ -213,7 +213,17 @@ const strategyRows = computed(() => {
 const NOTES = {
   'XIRR · your money': { title: 'The return on your rupees, given when each one went in: the lumpsum, every monthly investment and its yearly hike. It changes with the contribution plan.' },
   'CAGR · the portfolio': { title: '₹1 in this asset mix and strategy over the run, with nothing added after: the figure to set against an index\'s CAGR. The contributions don\'t change it.' },
-  'Max drawdown': { sub: (r, t) => `trough ${monthOf((t ? r.episodesReal : r.episodes)[0].trough)}` },
+  // A run can have no drawdown episode at all: a cash-like series -- an overnight
+  // rate index, a liquid fund -- never falls below its peak, so there is no
+  // trough to name. There was no guard here, and reading `[0].trough` of an
+  // empty list threw inside a computed the whole page depends on, so one such
+  // result took the page down rather than showing a figure of zero.
+  'Max drawdown': {
+    sub: (r, t) => {
+      const [worst] = (t ? r.episodesReal : r.episodes) ?? [];
+      return worst ? `trough ${monthOf(worst.trough)}` : 'never fell below its start';
+    },
+  },
   Sharpe: { sub: () => 'over the repo rate', title: 'Return above the risk-free rate per unit of volatility. Risk-free: the RBI repo rate (the bank rate before April 2001), a policy rate rather than a return anyone earns.' },
   Sortino: { sub: () => 'downside only', title: 'Like Sharpe, but only falls below the risk-free rate count as risk: return above the repo rate per unit of downside volatility.' },
   Calmar: { sub: () => 'CAGR ÷ drawdown', title: 'Return per unit of the worst fall: CAGR divided by the max drawdown, over the whole run.' },
@@ -823,6 +833,10 @@ function exportResult() {
               <Table v-else container-class="h-full">
                 <TableHeader><TableRow><TableHead>#</TableHead><TableHead>Peak</TableHead><TableHead>Trough</TableHead><TableHead>Recovered</TableHead><TableHead class="text-right">Depth</TableHead><TableHead class="text-right">Peak → trough</TableHead><TableHead class="text-right">Recovery</TableHead></TableRow></TableHeader>
                 <TableBody>
+                  <!-- A cash-like series never falls, so there may be nothing to list -->
+                  <TableRow v-if="!episodes.length" class="hover:bg-transparent">
+                    <TableCell colspan="7" class="text-muted-foreground">No fall below a previous peak over this run.</TableCell>
+                  </TableRow>
                   <TableRow v-for="(d, i) in episodes" :key="d.peak">
                     <TableCell>{{ i + 1 }}</TableCell>
                     <TableCell class="font-mono text-xs whitespace-nowrap">{{ monthOf(d.peak) }}</TableCell>

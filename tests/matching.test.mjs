@@ -346,3 +346,19 @@ test('an answer given by hand is kept beside the match, not inside it', () => {
   assert.match(imports, /const match = matchOf\(record\.report\)/);
   assert.doesNotMatch(imports, /matchOf\([^)]*assigned/);
 });
+
+test('a result with no drawdown episode does not take the page down', () => {
+  // Reported from Sakthi's browser: the Portfolio Engine page would not load,
+  // with `Cannot read properties of undefined (reading 'trough')`. A run can
+  // have no drawdown episode at all -- a cash-like series, an overnight rate
+  // index or a liquid fund, never falls below its peak -- and the trough note
+  // read `[0].trough` of an empty list. It threw inside a computed the whole
+  // page depends on, so one such result among the saved runs broke everything,
+  // not just that figure.
+  const results = readFileSync(new URL('../src/portfolio-engine/ResultsSection.vue', import.meta.url), 'utf8');
+  assert.doesNotMatch(results, /r\.episodes\)\[0\]\.trough|episodesReal : r\.episodes\)\[0\]/, 'no unguarded first episode');
+  assert.match(results, /const \[worst\] = \(t \? r\.episodesReal : r\.episodes\) \?\? \[\]/, 'the list may be empty, or absent on an older saved run');
+  assert.match(results, /worst \? `trough \$\{monthOf\(worst\.trough\)\}` : 'never fell below its start'/);
+  // And the drawdown table says so rather than showing an empty body.
+  assert.match(results, /v-if="!episodes\.length"[\s\S]{0,200}No fall below a previous peak/);
+});
