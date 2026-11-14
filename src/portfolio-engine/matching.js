@@ -41,7 +41,13 @@ const subsetOf = (give, have) => give.length > 0 && give.every((w) => have.has(w
 export function nameFit(got, want) {
   const g = norm(got), w = norm(want);
   if (!g || !w) return null;
-  if (g === w || g.includes(w) || w.includes(g)) return 'exact';
+  if (g === w) return 'exact';
+  // One name inside the other, on word boundaries. Raw substrings would make
+  // `NDX` a fit for `Nasdaq-100 Total Return (XNDX)`, and a short ticker is
+  // inside a longer one often enough to matter: both Nasdaq entries are the
+  // same asset, so nothing showed, but the two are not the same instrument.
+  const run = (x) => ` ${x} `;
+  if (run(w).includes(run(g)) || run(g).includes(run(w))) return 'exact';
   return subsetOf(words(g), new Set(words(w))) ? 'scheme' : null;
 }
 

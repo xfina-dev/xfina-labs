@@ -207,3 +207,19 @@ test('an alias goes through the same rules as the name, not a comparison of its 
   // The subset pass reads aliases too, so a publisher printing less still fits.
   assert.equal(matchAsset({ code: 'ACME OVERNIGHT', name: null }, cat).assetKey, 'india|debt|Overnight');
 });
+
+test('a name sits inside another on word boundaries, not as a raw substring', () => {
+  // `NDX` is a raw substring of `… (XNDX)`, and a short ticker inside a longer
+  // one is common enough to matter. Both Nasdaq entries are the same asset, so
+  // nothing showed in matching -- but they are not the same instrument, and
+  // anything resolving a file to one instrument would have had two to choose
+  // between.
+  assert.equal(nameFit('NDX', 'Nasdaq-100 Total Return (XNDX)'), null);
+  assert.equal(nameFit('NDX', 'Nasdaq-100 (NDX, price only)'), 'exact');
+  assert.equal(nameFit('XNDX', 'Nasdaq-100 Total Return (XNDX)'), 'exact');
+  // The same for a gold ETF whose ticker ends in another's.
+  assert.equal(nameFit('PHYS', 'iShares Physical Gold ETC'), null);
+  // And the ordinary case is untouched: the index's name inside the TRI entry's.
+  assert.equal(nameFit('NIFTY 50', 'Nifty 50 TRI'), 'exact');
+  assert.equal(nameFit('UTI Liquid Fund - Regular Plan - Growth Option', 'UTI - Liquid Fund - Regular Plan - Growth'), 'exact');
+});
