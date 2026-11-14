@@ -322,11 +322,25 @@ function refile() {
   const unmatched = [];
   const datasets = {};
   const maybe = {};
+  // An answer given by hand belongs to the whole series, not to the one file it
+  // was given on: AMFI names every file of a scheme the same way, so the files
+  // of one series are ambiguous in exactly the same way, and asking again for
+  // each would be asking the same question. A file arriving later into a series
+  // that has been answered inherits the answer.
+  const ANSWERED = new Map();
+  for (const record of RECORDS.values()) {
+    if (record.assigned) ANSWERED.set(seriesKey(record.report), record.assigned);
+  }
   // Newest wins for a filename within a series, so a corrected re-download
   // replaces the file it corrects.
   for (const record of [...RECORDS.values()].sort((a, b) => (a.savedAt ?? 0) - (b.savedAt ?? 0))) {
     const report = record.report;
-    const match = matchFor(record);
+    const found = matchFor(record);
+    // What the user said this file is, where the file could not say itself.
+    const answer = record.assigned ?? ANSWERED.get(seriesKey(report));
+    const match = found.assetKey && !found.dataset && answer
+      ? { ...found, dataset: answer, candidates: undefined, answered: true }
+      : found;
     // No asset, or several that do not agree: either way the file is not filed,
     // and an ambiguity says which entries it could have been rather than
     // leaving the user to guess why a fund the catalogue lists was not taken.
@@ -374,6 +388,10 @@ function refile() {
         // the ones they could be where they do not: what a Datasets row is.
         dataset: match.dataset ?? null,
         candidates: match.candidates ?? null,
+        // Set when the instrument is what the user said it is, not what the
+        // file said: the screen shows that it was answered, and offers to
+        // change it.
+        answered: !!match.answered,
         files: [],
         from: null,
         to: null,
@@ -434,6 +452,32 @@ export async function clearImports() {
 
 /// The ids of every valid file behind a series, which is what a run resolves to
 /// engine handles with `resident`.
+/// Records which catalogue instrument a file is, where the file itself could
+/// not say -- AMFI's NAV export names a scheme without its plan, so a file of
+/// the ICICI gilt fund covering only recent months could be the Regular plan or
+/// the Direct one.
+///
+/// The answer is the user's, kept beside the match rather than inside it, so
+/// re-reading the file or re-matching it against a newer catalogue leaves the
+/// answer alone. Passing `null` forgets it and the file goes back to naming its
+/// candidates.
+export async function assignDataset(fileIds, datasetId) {
+  for (const id of fileIds) {
+    const record = RECORDS.get(id);
+    if (!record) continue;
+    const next = { ...record };
+    if (datasetId) next.assigned = datasetId; else delete next.assigned;
+    RECORDS.set(id, next);
+    try {
+      await vault.patch(next);
+    } catch {
+      // Unwritable storage: the answer holds for this visit, and the record it
+      // belongs to is otherwise untouched.
+    }
+  }
+  refile();
+}
+
 export const fileIdsOf = (series) => series.files.filter((f) => f.status !== 'err').map((f) => f.id);
 
 export const seriesFor = (assetKey) => imported.byAsset[assetKey] || [];

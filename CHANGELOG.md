@@ -71,6 +71,16 @@ live as soon as it lands; the dates below are when it did.
 
 ### Added
 
+- Where a file cannot say which instrument it is, Datasets asks once and
+  remembers. AMFI's NAV export names a scheme without its plan, so a file of the
+  ICICI gilt fund covering only recent months could be the Regular plan or the
+  Direct one; the dates settle it where the plans began at different times, and
+  where they do not the row offers the candidates and keeps the answer against
+  the file. One answer covers every file of that series, including ones imported
+  later, and it survives the file being re-read. An unresolved file is still
+  usable in a run -- the asset is certain even when the instrument is not -- and
+  it is only the Datasets row that waits. Where the files argue with the answer,
+  starting before the plan that was chosen existed, the row says so.
 - **Datasets**, a screen of its own at `/portfolio-engine/datasets/`, where
   getting data happens end to end: choose what you want, download it from the
   publisher, import the files, and see what this browser holds. Import and Hold

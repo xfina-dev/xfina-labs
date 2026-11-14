@@ -24,7 +24,7 @@ import {
 } from 'xfina-ui';
 import { ExternalLink, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
-import { imported, importFiles, load as loadImports, removeFile, clearImports } from './imports.js';
+import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf } from './imports.js';
 import { findDataset, nodes } from './guide.js';
 import { tone } from './tone.js';
 
@@ -73,7 +73,20 @@ const held = computed(() => Object.entries(imported.byAsset).flatMap(([key, list
   region: ASSET_OF[key]?.region ?? '',
   // What the catalogue calls what these files are, where the files said so.
   instrument: s.dataset ? CATALOGUE_NAME(s.dataset) : null,
-  couldBe: s.candidates?.map(CATALOGUE_NAME) ?? null,
+  answered: s.answered,
+  // An answer the files argue with: an instrument has no values before it
+  // existed, so a series starting earlier than the plan it was said to be is
+  // evidence the answer is wrong. The answer still stands -- it is the user's
+  // -- but saying nothing about it would be hiding what the dates show.
+  argues: (() => {
+    if (!s.answered || !s.dataset) return null;
+    const inception = findDataset(s.dataset)?.inception;
+    return inception && s.from && s.from < inception ? inception : null;
+  })(),
+  // Where the file cannot say which instrument it is, the candidates it could
+  // be: the screen asks once, rather than leaving the row in a state with no
+  // way out of it.
+  couldBe: s.candidates?.map((id) => ({ id, name: CATALOGUE_NAME(id) })) ?? null,
   files: s.files,
   worst: s.files.some((f) => f.status === 'err') ? 'err' : s.files.some((f) => f.status === 'warn') ? 'warn' : 'ok',
 }))).sort((a, b) => a.region.localeCompare(b.region) || a.asset.localeCompare(b.asset)));
@@ -83,6 +96,14 @@ const confirmClear = ref(false);
 const clearStored = async () => { confirmClear.value = false; await clearImports(); lastImport.value = null; };
 const mb = (bytes) => (bytes == null ? '—' : bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1e6))} MB`);
 const detail = ref(null);
+// Answering "which one is this?" for a series: the answer is kept against its
+// files, so it is asked once and survives a reload (imports.js).
+const answering = ref(null);
+const answer = async (h, datasetId) => {
+  answering.value = null;
+  await assignDataset(h.files.map((f) => f.id), datasetId);
+};
+const forget = (h) => assignDataset(h.files.map((f) => f.id), null);
 const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical', 'Invalid'] };
 </script>
 
@@ -158,9 +179,25 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
             <TableRow v-for="h in held" :key="h.key">
               <TableCell>
                 <div class="font-medium">{{ h.series.name }}</div>
-                <div v-if="h.instrument" class="text-xs text-muted-foreground">{{ h.instrument }}</div>
-                <div v-else-if="h.couldBe" class="text-xs text-muted-foreground">
-                  {{ h.couldBe.join(', or ') }} — the file names the scheme, not the plan
+                <div v-if="h.instrument" class="text-xs text-muted-foreground">
+                  {{ h.instrument }}
+                  <button
+                    v-if="h.answered" type="button" class="ml-1 underline decoration-dotted underline-offset-2 hover:text-foreground"
+                    title="You chose this; ask me again" @click="forget(h)"
+                  >your answer</button>
+                </div>
+                <div v-if="h.argues" class="text-xs text-status-warning-text">
+                  These files start {{ h.series.from }}, before that plan existed ({{ h.argues }}) — so at least one of them is the other plan.
+                </div>
+                <!-- The file does not say which of these it is, so the screen asks, once -->
+                <div v-else-if="h.couldBe" class="space-y-1">
+                  <div class="text-xs text-muted-foreground">The file names the scheme, not the plan. Which is it?</div>
+                  <div class="flex flex-wrap gap-1.5">
+                    <Button
+                      v-for="c in h.couldBe" :key="c.id" size="sm" variant="outline" class="h-7 text-xs"
+                      :title="`These files are ${c.name}`" @click="answer(h, c.id)"
+                    >{{ c.name }}</Button>
+                  </div>
                 </div>
               </TableCell>
               <TableCell class="whitespace-nowrap text-sm">{{ h.region }} · {{ h.asset }}</TableCell>

@@ -328,3 +328,17 @@ test('nothing reconciles the catalogue against imports by comparing names', () =
   assert.match(imports, /match: matchOf\(report\)|record\.match = matchOf\(report\)/, 'the match is made at import');
   assert.match(imports, /matchedWith\(record\)/, 'and kept against what it was made from');
 });
+
+test('an answer given by hand is kept beside the match, not inside it', () => {
+  // The screen asks which instrument a file is where the file cannot say, and
+  // the answer must survive the file being re-read or re-matched against a
+  // newer catalogue. So it is stored on the record as `assigned`, and the
+  // match keeps its candidates untouched.
+  const imports = readFileSync(new URL('../src/portfolio-engine/imports.js', import.meta.url), 'utf8');
+  assert.match(imports, /next\.assigned = datasetId/, 'the answer is written on the record');
+  assert.match(imports, /record\.assigned \?\? ANSWERED\.get\(seriesKey\(report\)\)/, 'and read back for the whole series');
+  // Re-matching takes the file's own evidence only: `matchOf` is given the
+  // report, never the answer, so it cannot overwrite it.
+  assert.match(imports, /const match = matchOf\(record\.report\)/);
+  assert.doesNotMatch(imports, /matchOf\([^)]*assigned/);
+});
