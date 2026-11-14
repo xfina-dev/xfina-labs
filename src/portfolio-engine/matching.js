@@ -66,14 +66,26 @@ export function catalogue(nodes) {
   const instruments = nodes.flatMap((n) =>
     n.instruments.map((i) => ({
       assetKey: `${n.region}|${n.class}|${n.asset}`,
+      /// The catalogue's own id for this instrument (`mf100369`, `etf-gld`,
+      /// `idx-nifty-50-tri`). This is what a Datasets row is keyed by, and it
+      /// is NOT the asset id from identity.js: one asset holds many
+      /// instruments.
+      id: i.id,
       asset: n.asset,
       vehicle: n.vehicle,
+      // The sites this instrument can be downloaded from, used only to tell
+      // two candidates apart.
+      hows: [i.how, ...((i.alts ?? []).map((a) => a.how))].filter(Boolean),
       code: i.code ? norm(i.code) : null,
       name: norm(i.name),
       label: i.name,
       // Every name this instrument answers to, the catalogue's and the
       // publishers', each with its words for the subset pass.
-      names: [i.name, ...(i.aliases ?? [])].map((text) => ({ name: norm(text), words: new Set(words(text)) })),
+      // `alias: true` marks a name some publisher actually prints, as against
+      // the catalogue's own label: an alias is recorded because a file says
+      // exactly that, so it identifies an instrument the way a code does.
+      names: [{ text: i.name, alias: false }, ...(i.aliases ?? []).map((text) => ({ text, alias: true }))]
+        .map(({ text, alias }) => ({ name: norm(text), words: new Set(words(text)), alias })),
       words: new Set(words(i.name)),
       kind: i.kind,
     })),
@@ -155,4 +167,68 @@ export function matchAsset(report, cat) {
     if (hit) return hit;
   }
   return unsure;
+}
+
+// --- One instrument -----------------------------------------------------------
+// Which publisher a file came from, as `xfina` names the format, against the
+// `how` the catalogue downloads an instrument by. Written out because there is
+// nothing to derive it from: the two vocabularies are different libraries'.
+// Used only to tell two otherwise equal candidates apart, never to rule a
+// candidate out -- a user may download a dataset from a site the catalogue does
+// not document for it.
+const SOURCE_HOW = {
+  'md-nse-indices': 'nseTri',
+  'md-nse-security': 'nseEtf',
+  'md-amfi-nav': 'amfi',
+  'md-mcx-spot': 'mcxSpot',
+  'md-tiingo': 'tiingo',
+  'md-wsj': 'wsj',
+  'md-yahoo': 'yahoo',
+  'md-ishares': 'ishares',
+  'md-spdr-gold': 'spdrgold',
+  'md-msci': 'msci',
+  'md-nasdaq': 'nasdaqIndex',
+};
+
+/// Which catalogue instrument a file is, as far as the file can say.
+///
+/// `matchAsset` answers which asset a file belongs to, which is all a run
+/// needs. A Datasets row is one instrument, so it needs more: this narrows the
+/// asset's instruments to the ones the file's own name or code fits, and uses
+/// the publisher only to separate two that are otherwise equal.
+///
+/// Returns the asset's answer, plus either `dataset` (one instrument, certain)
+/// or `candidates` (several, and the file does not say which). The second is
+/// not a failure: AMFI's NAV export names the scheme without its plan, so a
+/// file of the ICICI gilt fund genuinely cannot say whether it is the Regular
+/// or the Direct plan. Every other publisher in the catalogue names its
+/// instrument exactly.
+export function matchDataset(report, cat) {
+  const asset = matchAsset(report, cat);
+  if (!asset?.assetKey) return asset;
+  const mine = cat.instruments.filter((i) => i.assetKey === asset.assetKey);
+  const code = norm(report.code);
+  const name = norm(report.name || report.code);
+  // A code is an identifier and a name is a description, so they are not equal
+  // evidence: an exchange symbol the file prints resolves an instrument on its
+  // own, while a name that merely fits has to agree with where the file came
+  // from. Quantum's gold fund-of-funds NAV, from AMFI, fits the name of the
+  // Quantum gold ETF listed on NSE -- same asset, different instrument, and
+  // only the publisher tells them apart.
+  // Identifier-strength: the publisher's own code, or a name recorded as one an
+  // instrument is published under (Yahoo names the Swisscanto gold ETF
+  // `ZGLDUS.SW`, which is why that alias is there).
+  const named = (i, only) => i.names.some((n) => (only ? n.alias : true)
+    && [name, code].some((text) => text && nameFit(text, n.name) === 'exact'));
+  const byCode = mine.filter((i) => (i.code && (i.code === code || i.code === name)) || named(i, true));
+  if (byCode.length === 1) return { ...asset, dataset: byCode[0].id };
+  const how = SOURCE_HOW[report.source];
+  const published = (i) => !how || !i.hows.length || i.hows.includes(how);
+  const fits = mine.filter((i) => i.names.some((n) => [name, code].some((text) => text && nameFit(text, n.name))));
+  let left = (byCode.length ? byCode : fits).filter(published);
+  // Nothing of this asset is published where the file came from: the asset is
+  // still right, the instrument is not established.
+  if (!left.length) return { ...asset, candidates: (fits.length ? fits : mine).map((i) => i.id) };
+  if (left.length === 1) return { ...asset, dataset: left[0].id };
+  return { ...asset, candidates: left.map((i) => i.id) };
 }

@@ -11,7 +11,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { catalogue, matchAsset, nameFit, norm } from '../src/portfolio-engine/matching.js';
+import { catalogue, matchAsset, matchDataset, nameFit, norm } from '../src/portfolio-engine/matching.js';
 
 const nodes = JSON.parse(readFileSync(new URL('../src/portfolio-engine/tree.json', import.meta.url), 'utf8')).nodes;
 const CAT = catalogue(nodes);
@@ -222,4 +222,83 @@ test('a name sits inside another on word boundaries, not as a raw substring', ()
   // And the ordinary case is untouched: the index's name inside the TRI entry's.
   assert.equal(nameFit('NIFTY 50', 'Nifty 50 TRI'), 'exact');
   assert.equal(nameFit('UTI Liquid Fund - Regular Plan - Growth Option', 'UTI - Liquid Fund - Regular Plan - Growth'), 'exact');
+});
+
+// --- Resolving a file to one catalogue instrument -----------------------------
+// A Datasets row is one instrument, so it needs more than the asset a run needs.
+// These pin what the file can and cannot establish, measured against the names
+// the sample downloads actually print.
+const dataset = (source, code) => matchDataset({ source, code, name: null, filename: `${code}_x.csv` }, CAT);
+
+test('a file that names its instrument resolves to exactly one', () => {
+  for (const [source, code, id] of [
+    ['md-nse-indices', 'NIFTY 50', 'idx-nifty-50-tri'],
+    ['md-nse-indices', 'NIFTY 1D RATE INDEX', 'idx-nse-short-duration-debt-index-liquid-or-1d-rate'],
+    ['md-nasdaq', 'NDX', 'idx-nasdaq-100-ndx-price-only'],
+    ['md-nasdaq', 'XNDX', 'idx-nasdaq-100-total-return-xndx'],
+    ['md-tiingo', 'TLT', 'etf-tlt'],
+    ['md-spdr-gold', 'GLD', 'etf-gld'],
+    ['md-nse-security', 'NIFTYBEES', 'nse-niftybees'],
+    ['md-amfi-nav', 'UTI Liquid Fund - Regular Plan - Growth Option', 'mf102012'],
+  ]) {
+    assert.equal(dataset(source, code).dataset, id, `${code}`);
+  }
+});
+
+test('an exchange symbol resolves whatever site the file came from', () => {
+  // The catalogue documents Tiingo for QQQ; a user may still take it from
+  // Yahoo. A code is an identifier, so it stands on its own.
+  assert.equal(dataset('md-yahoo', 'QQQ').dataset, 'etf-qqq');
+  assert.equal(dataset('md-tiingo', 'QQQ').dataset, 'etf-qqq');
+});
+
+test('a name that fits must agree with where the file came from', () => {
+  // Quantum's gold fund-of-funds NAV, from AMFI, fits the name of the Quantum
+  // gold ETF listed on NSE. Same asset, different instrument -- so the asset
+  // stands and the instrument does not.
+  const m = dataset('md-amfi-nav', 'Quantum Gold ETF FOF - Direct Plan Growth Option');
+  assert.equal(m.assetKey, 'india|gold|Gold');
+  assert.equal(m.dataset, undefined, 'must not claim an instrument it cannot establish');
+  assert.ok(m.candidates.length >= 1);
+});
+
+test("AMFI's plan pairs stay unresolved, and say which they could be", () => {
+  // The export names the scheme without its plan, so the file genuinely cannot
+  // say which. Surfacing both beats picking one.
+  const m = dataset('md-amfi-nav', 'ICICI Prudential Gilt Fund - Growth');
+  assert.equal(m.assetKey, 'india|debt|Long duration');
+  assert.equal(m.dataset, undefined);
+  assert.deepEqual(m.candidates.sort(), ['mf100369', 'mf120590']);
+});
+
+test('every sample download either resolves or says it cannot', () => {
+  // The whole round trip: nothing may resolve to the wrong instrument, and
+  // nothing may come back with no asset at all.
+  const SEEN = [
+    ['md-nse-indices', 'NIFTY 50'], ['md-nse-indices', 'NIFTY NEXT 50'],
+    ['md-nse-indices', 'NIFTY MIDCAP 150'], ['md-nse-indices', 'NIFTY SMALLCAP 250'],
+    ['md-nse-indices', 'NIFTY 1D RATE INDEX'], ['md-nse-indices', 'NIFTY 10 YR BENCHMARK G-SEC'],
+    ['md-yahoo', 'GSPC'], ['md-yahoo', 'SP500TR'], ['md-yahoo', 'QQQ'], ['md-yahoo', 'ZGLDUS.SW'],
+    ['md-nasdaq', 'NDX'], ['md-nasdaq', 'XNDX'], ['md-mcx-spot', 'GOLD AHMEDABAD'],
+    ['md-spdr-gold', 'GLD'], ['md-nse-security', 'NIFTYBEES'], ['md-nse-security', 'JUNIORBEES'],
+    ['md-nse-security', 'GOLDBEES'], ['md-nse-security', 'LICNETFGSC'], ['md-tiingo', 'VFINX'],
+    ['md-tiingo', 'TLT'], ['md-tiingo', 'SHV'], ['md-tiingo', 'VOO'], ['md-tiingo', 'SPY'],
+    ['md-wsj', 'ZGLDUS'], ['md-wsj', 'SGLD'], ['md-wsj', 'PHYS'],
+    ['md-ishares', 'iShares Core S&P 500 UCITS ETF'],
+  ];
+  const instruments = new Set(CAT.instruments.map((i) => i.id));
+  let resolved = 0;
+  for (const [source, code] of SEEN) {
+    const m = dataset(source, code);
+    assert.ok(m?.assetKey, `${code} must still name an asset`);
+    if (m.dataset) {
+      assert.ok(instruments.has(m.dataset), `${code} → ${m.dataset} must be a catalogue id`);
+      resolved += 1;
+    } else {
+      assert.ok(m.candidates?.length, `${code} must say what it could be`);
+    }
+  }
+  // Everything a publisher names by symbol or by its own name, which is every
+  // source but AMFI's mutual funds.
+  assert.equal(resolved, SEEN.length, 'all of these name their instrument');
 });
