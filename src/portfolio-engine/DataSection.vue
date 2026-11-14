@@ -66,6 +66,23 @@ const shownEnd = (s) => s.to ?? s.last;
 const STATE = { ok: ['ok', 'Valid'], warn: ['warn', 'Warn'], err: ['err', 'Invalid'] };
 // A series with an invalid file cannot be picked until the file is replaced or removed.
 const invalid = (s) => s.origin !== 'provided' && s.files.some((f) => f.status === 'err');
+// A series whose files read, but with something to look at: a gap, a cross-check that did not reconcile, a
+// move worth a second glance. It can be used, and a run that uses it is as sound as the user's judgement of
+// that note -- so it is not offered by default and is never picked automatically. Including one is a
+// deliberate act, taken after reading what the note says.
+const warned = (s) => s.origin !== 'provided' && !invalid(s) && s.files.some((f) => f.status === 'warn');
+// What a run may pick on its own: read, checked, nothing to weigh up.
+const clean = (s) => !invalid(s) && !warned(s);
+// Which assets have had their warned series brought out, by asset key.
+const revealed = reactive({});
+const reveal = (a) => { revealed[a.key] = !revealed[a.key]; };
+const warnedOf = (a) => a.series.filter(warned);
+// A warned series is listed once it has been brought out, or if it is the one picked: a run must never read a
+// series the table does not show.
+const listed = (a) => a.series.filter((x) => !warned(x) || revealed[a.key] || picked[a.key] === x.key);
+// What the offer is for: the warned series this asset is not already showing. A warned series that is picked
+// is shown, so it is not among them, and once nothing is left the offer goes.
+const heldBack = (a) => warnedOf(a).filter((x) => !listed(a).includes(x));
 const problem = (s) => s.files.find((f) => f.status === 'err')?.checks?.[0]?.[1] || 'a file failed its checks';
 
 // The dates a set of series shares: the latest start to the earliest end. A monthly series' latest month
@@ -86,9 +103,10 @@ const spans = (range) => (s) => startOf(s) <= range.from && (s.frequency === 'mo
 // position: the list is rebuilt on every import and on every visit, and a position means nothing across either.
 const picked = picks;
 const own = (a) => { const s = a.series.find((x) => x.key === picked[a.key]); return s && !invalid(s) ? s : null; };
+// A pick of the user's own stands whatever its checks say; nothing else reaches past a warning.
 const unpicked = (a) => picked[a.key] === null;
 const assetsOf = (provided) => sections.flatMap((x) => x.assets).filter((a) => !!a.provided === provided);
-const BASE = computed(() => overlap(assetsOf(false).filter((a) => !unpicked(a)).map((a) => own(a) || a.series.find((x) => !invalid(x))).filter(Boolean)));
+const BASE = computed(() => overlap(assetsOf(false).filter((a) => !unpicked(a)).map((a) => own(a) || a.series.find(clean)).filter(Boolean)));
 // A reference asset the user has not chosen for takes the series that covers what the imported picks share.
 // When none of them reaches that far back -- an index with a century of history, against a rate sheet that
 // starts in 2020 -- it takes the one with the longest history rather than the first in the list, which is the
@@ -111,7 +129,7 @@ const reach = (a) => {
     further: further?.name ?? null,
   };
 };
-const chosen = (a) => (unpicked(a) ? null : own(a) || (a.provided ? a.series.find(spans(BASE.value)) || longest(a) : a.series.find((x) => !invalid(x))) || null);
+const chosen = (a) => (unpicked(a) ? null : own(a) || (a.provided ? a.series.find(spans(BASE.value)) || longest(a) : a.series.find(clean)) || null);
 const isChosen = (a, s) => chosen(a) === s;
 // A reference asset (USD/INR, inflation) always has one series picked: every run needs it, so picking
 // another switches to it, but the picked one cannot be cleared.
@@ -177,8 +195,9 @@ const runYears = computed(() => (RUN.value.ok ? ((new Date(RUN.value.to) - new D
 
 const rows = computed(() => current.value.assets.flatMap((a) => [
   { kind: 'asset', key: `a:${a.key}`, a },
-  ...a.series.map((s) => ({ kind: 'series', key: `r:${a.key}:${s.name}`, a, s })),
-  ...(a.series.length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
+  ...listed(a).map((s) => ({ kind: 'series', key: `r:${a.key}:${s.name}`, a, s })),
+  ...(heldBack(a).length ? [{ kind: 'warned', key: `w:${a.key}`, a }] : []),
+  ...(listed(a).length || heldBack(a).length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
 ]));
 
 const detail = ref(null);
@@ -248,6 +267,18 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                 <TableCell colspan="3" class="text-muted-foreground">{{ !imported.loaded ? 'Reading your imports…' : imported.refreshing ? 'Checking your imports against this version…' : 'No series yet' }}</TableCell>
               </TableRow>
 
+              <!-- Held back: read, but with something to weigh up before a run uses it -->
+              <TableRow v-else-if="r.kind === 'warned'" class="hover:bg-transparent">
+                <TableCell />
+                <TableCell colspan="3" class="text-xs">
+                  <button
+                    type="button" class="text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground"
+                    :title="`Show the ${heldBack(r.a).length} series with something to check, to include one yourself`"
+                    @click="reveal(r.a)"
+                  >{{ heldBack(r.a).length }} more with something to check — show</button>
+                </TableCell>
+              </TableRow>
+
               <!-- Series -->
               <TableRow v-else-if="r.kind === 'series'" :class="isChosen(r.a, r.s) && 'bg-primary/5 hover:bg-primary/10'">
                 <TableCell class="pr-0" :title="tickTitle(r.a, r.s)">
@@ -265,6 +296,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                       type="button" class="min-w-0 truncate text-left underline decoration-dotted underline-offset-4 hover:decoration-solid"
                       :title="`${r.s.name} · ${r.s.basis} — the files behind it, and their checks`" @click="open(r.a, r.s)"
                     >{{ r.s.name }}</button>
+                    <Badge v-if="warned(r.s)" :variant="tone('warn')" class="shrink-0" title="Its files read, but something is worth checking: open it to read the notes before using it">Check</Badge>
                     <Badge v-if="r.s.ret && r.s.ret !== 'Total return'" :variant="tone('warn')" class="shrink-0" title="Price only: income is not included, so returns are understated">Price only</Badge>
                   </div>
                 </TableCell>

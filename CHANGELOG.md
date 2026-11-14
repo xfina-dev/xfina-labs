@@ -34,6 +34,14 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- The Series step offers only series whose files came back clean. One with a
+  note against it -- a gap, a cross-check that did not reconcile, a move worth a
+  second look -- is held back behind "N more with something to check", is never
+  picked automatically, and carries a `Check` badge once brought out. Including
+  one is then the user's own decision, taken after reading what the note says. A
+  warned series that is picked stays listed whatever happens, so a run can never
+  read a series the table does not show.
+
 - The Series step's table drops its Files column, and `Since` becomes `Range`,
   reading `1999-06-30 → 2026-11-09` on one line instead of a start with the end
   beneath it. The files behind a series, and their checks, open from the series
