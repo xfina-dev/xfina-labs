@@ -35,6 +35,10 @@ const runBacktest = async () => {
   nextTick(() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' }));
 };
 
+// The two things this page asks of you -- set the series, then run them -- are offered the same way: a
+// sentence saying where things stand, and a button of one size acting on it.
+const ACTION = 'w-44 shrink-0';
+
 // What a folded step shows in one line.
 const total = computed(() => ASSETS.reduce((n, a) => n + Number(a.weight || 0), 0));
 const years = computed(() => (selection.period.from ? ((new Date(selection.period.to) - new Date(selection.period.from)) / (365.25 * 864e5)).toFixed(1) : null));
@@ -78,7 +82,7 @@ const SECTIONS = [
           {{ runState.error || blocked || (changed.any ? (history.entries.length ? 'Settings changed since the last run.' : '') : 'Nothing changed since the last run.') }}
         </p>
         <Button
-          size="lg" class="min-w-40 px-8 shrink-0" :disabled="!!blocked || runState.busy || (!changed.any && !runState.error)" @click="runBacktest"
+          size="lg" :class="ACTION" :disabled="!!blocked || runState.busy || (!changed.any && !runState.error)" @click="runBacktest"
           :title="blocked || (runState.busy ? 'Running' : !changed.any ? 'Change a setting above to run again' : rebalancing.ticked.length > 1 ? `Backtest the ${rebalancing.ticked.length} ticked strategies` : 'Backtest the ticked strategy')"
         ><Play class="h-4 w-4 mr-2" />{{ runState.busy ? 'Running…' : 'Run' }}</Button>
       </div>
@@ -105,12 +109,12 @@ const SECTIONS = [
           <div v-if="s.id === 'data'" class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
             <p class="min-w-0 flex-1 text-sm text-muted-foreground sm:text-right">
               <template v-if="!imported.loaded">Reading what this browser holds…</template>
-              <template v-else-if="imported.storage.files">{{ imported.storage.files }} file{{ imported.storage.files > 1 ? 's' : '' }} kept in this browser. Choose, download and import more in Datasets.</template>
-              <template v-else>Nothing imported yet: choose your datasets, download them and import them in Datasets.</template>
+              <template v-else-if="imported.storage.files">{{ imported.storage.files }} file{{ imported.storage.files > 1 ? 's' : '' }} kept in this browser. Add more, or check what you have.</template>
+              <template v-else>Nothing imported yet: choose what you need, download it and import it.</template>
             </p>
             <a href="/portfolio-engine/datasets/" class="no-underline shrink-0">
-              <Button :variant="imported.storage.files ? 'outline' : 'default'" size="lg" class="min-w-40 px-8" title="Choose, download, import and keep the data a run reads">
-                <Database class="h-4 w-4 mr-2" />Manage Series
+              <Button size="lg" :class="ACTION" title="Choose, download, import and keep the data a run reads">
+                <Database class="h-4 w-4 mr-2" />Manage
               </Button>
             </a>
           </div>
