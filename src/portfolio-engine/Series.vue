@@ -27,9 +27,12 @@
 // Xfina uses, and kept in this browser's own storage.
 import { computed, ref, watch } from 'vue';
 import {
-  Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, SeriesExplorer, rowsFromCsv,
+  Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from 'xfina-ui';
+// Its own entry point since xfina-ui 0.11.0: a site that mounts no explorer
+// never resolves ECharts, so only the sites that use one install it.
+import { SeriesExplorer, rowsFromCsv } from 'xfina-ui/series-explorer';
 import { ExternalLink, FolderOpen, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
