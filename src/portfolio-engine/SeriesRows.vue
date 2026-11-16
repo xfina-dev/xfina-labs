@@ -53,14 +53,15 @@ defineEmits(['toggle', 'use', 'remove', 'confirm', 'cancel']);
     <TableCell class="whitespace-nowrap font-mono text-xs">{{ from }} → {{ to }}</TableCell>
     <TableCell class="text-right tabular-nums text-muted-foreground">{{ files ?? '—' }}</TableCell>
     <TableCell><Badge v-if="status" :variant="tone(status[0])">{{ status[1] }}</Badge></TableCell>
-    <TableCell class="text-right">
+    <!-- The controls are one group on one line: left to wrap, the column squeezes them onto three. -->
+    <TableCell class="text-right whitespace-nowrap">
       <!-- Deleting is asked about in the row it would empty, naming what goes -->
-      <div v-if="confirming" class="flex flex-wrap items-center justify-end gap-2">
+      <div v-if="confirming" class="flex flex-nowrap items-center justify-end gap-2">
         <span class="text-xs">Delete {{ files_ }} file{{ files_ === 1 ? '' : 's' }}?</span>
         <Button size="sm" variant="destructive" class="w-20" @click="$emit('remove')">Delete</Button>
         <Button size="sm" variant="outline" class="w-20" @click="$emit('cancel')">Cancel</Button>
       </div>
-      <div v-else class="flex flex-wrap items-center justify-end gap-2">
+      <div v-else class="flex flex-nowrap items-center justify-end gap-2">
         <!-- One width for both labels, so the column does not resize under the pointer when a series opens -->
         <Button
           size="sm" class="w-20" :variant="open ? 'secondary' : 'outline'"

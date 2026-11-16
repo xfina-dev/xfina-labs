@@ -60,6 +60,16 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- A series with something to check is no longer offered in the Assets step at
+  all. That step picks among series that are ready; what to make of a check
+  belongs with the notes themselves, on the Series screen, so the row that
+  offered to show them is gone. Such a series is still usable: **Use** on the
+  Series screen picks it for its asset, and a series picked that way is listed
+  in the step, badged `Check`, as the series the run reads.
+- The Assets table's header and its asset-class highlight reach the right edge
+  again. Its `colgroup` still declared the column the file count used to sit in,
+  and a fixed-layout table reserves a column nothing fills.
+
 - Manage's tables say where a series came from. With the same instrument
   available from several publishers, that is the column that settles which one
   you are looking at, and it shows in both tables since their rows match.
@@ -148,6 +158,10 @@ live as soon as it lands; the dates below are when it did.
   saved before assets carried an id falls back to its name and charts as it did.
 
 ### Fixed
+
+- A series' View, Use and delete controls sit on one line. The column they share
+  is narrower than the three of them, so each had wrapped onto a line of its
+  own.
 
 - The Portfolio Engine page would not load at all when any saved run had no
   drawdown episode. A cash-like series -- an overnight rate index, a liquid fund

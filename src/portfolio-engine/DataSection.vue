@@ -61,16 +61,11 @@ const invalid = (s) => s.origin !== 'provided' && s.files.some((f) => f.status =
 const warned = (s) => s.origin !== 'provided' && !invalid(s) && s.files.some((f) => f.status === 'warn');
 // What a run may pick on its own: read, checked, nothing to weigh up.
 const clean = (s) => !invalid(s) && !warned(s);
-// Which assets have had their warned series brought out, by asset key.
-const revealed = reactive({});
-const reveal = (a) => { revealed[a.key] = !revealed[a.key]; };
-const warnedOf = (a) => a.series.filter(warned);
-// A warned series is listed once it has been brought out, or if it is the one picked: a run must never read a
-// series the table does not show.
-const listed = (a) => a.series.filter((x) => !warned(x) || revealed[a.key] || picked[a.key] === x.key);
-// What the offer is for: the warned series this asset is not already showing. A warned series that is picked
-// is shown, so it is not among them, and once nothing is left the offer goes.
-const heldBack = (a) => warnedOf(a).filter((x) => !listed(a).includes(x));
+// A series with something to check is not offered here at all: this step picks among series that are ready,
+// and what to make of a check is the Series screen's business, where the notes themselves are. One can still
+// be used -- its Use button there picks it for its asset -- and a series picked that way is listed here,
+// because a run must never read a series the table does not show.
+const listed = (a) => a.series.filter((x) => !warned(x) || picked[a.key] === x.key);
 const problem = (s) => s.files.find((f) => f.status === 'err')?.checks?.[0]?.[1] || 'a file failed its checks';
 
 // The dates a set of series shares: the latest start to the earliest end. A monthly series' latest month
@@ -187,8 +182,7 @@ const runYears = computed(() => (RUN.value.ok ? ((new Date(RUN.value.to) - new D
 const rows = computed(() => current.value.assets.flatMap((a) => [
   { kind: 'asset', key: `a:${a.key}`, a },
   ...listed(a).map((s) => ({ kind: 'series', key: `r:${a.key}:${s.name}`, a, s })),
-  ...(heldBack(a).length ? [{ kind: 'warned', key: `w:${a.key}`, a }] : []),
-  ...(listed(a).length || heldBack(a).length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
+  ...(listed(a).length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
 ]));
 
 </script>
@@ -213,11 +207,11 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
         <p v-if="current.note" class="text-sm text-muted-foreground">{{ current.note }}</p>
         <p v-else class="text-sm text-muted-foreground">Loaded for you from <a :href="DATA" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4 hover:decoration-2">Xfina Data</a>: USD/INR turns US and global assets into rupees, and inflation shows results in today's rupees.</p>
 
-        <!-- Five columns: the pick, the series (a price-only one is tagged), its type, where it starts (and ends,
-             if before the data's end), and its files. Type sets the basis (an index level, a market price or a
-             NAV), and the files' details hold the rest. Narrower than the minimum, the table scrolls. -->
+        <!-- Four columns: the pick, the series (a price-only one is tagged), its type, and the range it
+             covers. Type sets the basis -- an index level, a market price or a NAV. Narrower than the
+             minimum, the table scrolls. -->
         <Table class="table-fixed min-w-[28rem]">
-          <colgroup><col class="w-9" /><col /><col class="w-[4.5rem]" /><col class="w-28" /><col class="w-16" /></colgroup>
+          <colgroup><col class="w-9" /><col /><col class="w-[4.5rem]" /><col class="w-28" /></colgroup>
           <TableHeader>
             <TableRow>
               <TableHead class="pr-0"><span class="sr-only">Used for this run</span></TableHead>
@@ -247,18 +241,6 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
               <TableRow v-else-if="r.kind === 'empty'" class="hover:bg-transparent">
                 <TableCell />
                 <TableCell colspan="3" class="text-muted-foreground">{{ !imported.loaded ? 'Reading your imports…' : imported.refreshing ? 'Checking your imports against this version…' : 'No series yet' }}</TableCell>
-              </TableRow>
-
-              <!-- Held back: read, but with something to weigh up before a run uses it -->
-              <TableRow v-else-if="r.kind === 'warned'" class="hover:bg-transparent">
-                <TableCell />
-                <TableCell colspan="3" class="text-xs">
-                  <button
-                    type="button" class="text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground"
-                    :title="`Show the ${heldBack(r.a).length} series with something to check, to include one yourself`"
-                    @click="reveal(r.a)"
-                  >{{ heldBack(r.a).length }} more with something to check — show</button>
-                </TableCell>
               </TableRow>
 
               <!-- Series -->
