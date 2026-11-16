@@ -319,6 +319,15 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
           </ul>
         </div>
 
+        <!-- Browsing a held series -- its chart, its calendar, a period by preset or by date, the change and
+             the CAGR over it -- belongs here, on the row it describes. It is not built here on purpose:
+             Xfina Data's explorer is being extracted into xfina-ui as `SeriesExplorer` (xfina-dev/xfina-ui#15),
+             taking rows or a loader rather than a path, precisely so this screen can hand it a series held in
+             WASM and IndexedDB. A second explorer written here would be the copy we would then have to keep in
+             step, which is the mistake this branch has spent a week undoing. When it ships, it opens from a
+             row above and reads that series' own rows.
+             TODO(xfina-ui#15): mount SeriesExplorer here. -->
+
         <!-- Comes with the tool: nothing to choose here, and nothing to download. Which of each pair a run
              uses is a run decision, so it is picked in the engine's Series step, not here. -->
         <section class="space-y-2 border-t pt-4">
