@@ -51,6 +51,15 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- The series that come with the Portfolio Engine have a box of their own on
+  Manage, beside what you hold rather than inside it: they are published by
+  Xfina Data and fetched, not files anybody imported, and the provenance is the
+  point. Their rows behave like any other now -- **View** opens the chart in the
+  row beneath, with the calendar and the table. The rate sheet draws both of its
+  columns, TT buy and TT sell, and the CPI series draw monthly. Where one cannot
+  be fetched, the row says so instead of showing an empty chart. Which of each
+  pair a run uses is still picked with the run, in the Assets step.
+
 - The Series screen reads as a page rather than a bar: its own header with what
   it is for and the way back to the Portfolio Engine; the note on where
   downloaded data goes lifted above the stages, since it is true of the whole

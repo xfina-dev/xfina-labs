@@ -26,20 +26,24 @@ const PUBLISHED = {
   'in-cpi-imf': { path: 'v1/inflation/in-cpi-imf.csv', frequency: 'monthly', rows: 835, first: '1957-01', last: '2026-07' },
 };
 
-const provided = (id, name, type, basis, publisher, note) => reactive({
-  id, key: `provided|${id}`, name, type, basis, publisher, note, ret: null, origin: 'provided', ...PUBLISHED[id],
+// `lines` is the published file's own columns, which differ by series: a rate
+// sheet prints what it costs to buy and to sell, an index one level. They are
+// here because this is where a series is described, and because a chart of one
+// has to name the columns it draws.
+const provided = (id, name, type, basis, publisher, lines, note) => reactive({
+  id, key: `provided|${id}`, name, type, basis, publisher, lines, note, ret: null, origin: 'provided', ...PUBLISHED[id],
 });
 
 /// The two pairs, preferred first. `reach` in DataSection.vue says so where a
 /// run starts before the preferred one covers.
 export const REFERENCE = [
   { key: 'reference|fx', name: 'USD/INR', provided: true, what: 'Turns US and global assets into rupees, day by day.', series: [
-    provided('sbi-forex-card-usd', 'SBI forex card', 'FX', 'TT rate', 'State Bank of India', 'TT buy and TT sell: what SBI charges to convert between rupees and dollars on a forex card. Preferred: it is what a transfer actually costs.'),
-    provided('bis-usd-inr', 'BIS USD/INR', 'FX', 'Reference rate', 'Bank for International Settlements', 'A reference rate from the Bank for International Settlements, rupees per dollar on each business day. The long history, for runs that start before SBI\'s sheets.'),
+    provided('sbi-forex-card-usd', 'SBI forex card', 'FX', 'TT rate', 'State Bank of India', [{ key: 'tt_buy', label: 'TT buy' }, { key: 'tt_sell', label: 'TT sell' }], 'TT buy and TT sell: what SBI charges to convert between rupees and dollars on a forex card. Preferred: it is what a transfer actually costs.'),
+    provided('bis-usd-inr', 'BIS USD/INR', 'FX', 'Reference rate', 'Bank for International Settlements', [{ key: 'inr_per_usd', label: 'Rupees per dollar' }], 'A reference rate from the Bank for International Settlements, rupees per dollar on each business day. The long history, for runs that start before SBI\'s sheets.'),
   ] },
   { key: 'reference|cpi', name: 'Inflation', provided: true, what: 'Shows results in today\'s rupees, from the run\'s own period.', series: [
-    provided('in-cpi', 'MoSPI CPI', 'CPI', 'Index level', 'MoSPI', 'India\'s official consumer price index, all-India combined, 2024 = 100. Preferred: MoSPI\'s own figures.'),
-    provided('in-cpi-imf', 'IMF CPI', 'CPI', 'Index level', 'IMF', 'India\'s CPI as the IMF publishes it, on the same 2024 = 100 base. The long history, for runs that start before 2013.'),
+    provided('in-cpi', 'MoSPI CPI', 'CPI', 'Index level', 'MoSPI', [{ key: 'index', label: 'Index' }], 'India\'s official consumer price index, all-India combined, 2024 = 100. Preferred: MoSPI\'s own figures.'),
+    provided('in-cpi-imf', 'IMF CPI', 'CPI', 'Index level', 'IMF', [{ key: 'index', label: 'Index' }], 'India\'s CPI as the IMF publishes it, on the same 2024 = 100 base. The long history, for runs that start before 2013.'),
   ] },
 ];
 

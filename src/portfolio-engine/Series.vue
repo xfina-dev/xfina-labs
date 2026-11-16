@@ -32,7 +32,8 @@ import {
 } from 'xfina-ui';
 // Its own entry point since xfina-ui 0.11.0: a site that mounts no explorer
 // never resolves ECharts, so only the sites that use one install it.
-import { SeriesExplorer, rowsFromCsv } from 'xfina-ui/series-explorer';
+import { rowsFromCsv } from 'xfina-ui/series-explorer';
+import SeriesRows from './SeriesRows.vue';
 import { ArrowLeft, ChevronRight, ExternalLink, FolderOpen, HelpCircle, ShieldCheck, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
@@ -183,9 +184,50 @@ const rows = computed(() => held.value.reduce((n, h) => n + h.files.length, 0));
 // series' rows for a screen that shows one at a time is what the stages were
 // split to avoid.
 const browsing = ref(null);
-const LINES = [{ key: 'value', label: 'Value' }];
-const loaderFor = (h) => async () => rowsFromCsv(await seriesRows(fileIdsOf(h.series)), LINES);
-const browse = (h) => { browsing.value = browsing.value?.key === h.key ? null : h; };
+const problem = ref(null);
+// Clearing the last failure on every open: a message about the series you were
+// looking at before, shown against the one you just opened, is worse than no
+// message at all.
+const browse = (key) => {
+  problem.value = null;
+  browsing.value = browsing.value === key ? null : key;
+};
+const failed = (key, message) => { if (browsing.value === key) problem.value = message; throw new Error(message); };
+
+// An imported series: its files stitched by the engine, the way a run stitches
+// them, and read only when somebody opens it.
+const HELD_LINES = [{ key: 'value', label: 'Value' }];
+const heldExplorer = (h, assetName) => ({
+  loader: async () => {
+    try { return rowsFromCsv(await seriesRows(fileIdsOf(h.series)), HELD_LINES); }
+    catch (e) { return failed(h.key, `This series could not be read back: ${e?.message || e}`); }
+  },
+  lines: HELD_LINES,
+  unit: h.series.ccy === 'INR' ? '₹' : h.series.ccy === 'USD' ? '$' : '',
+  views: ['chart', 'calendar', 'table'],
+  first: h.series.from,
+  last: h.series.to,
+  label: h.series.name,
+  note: `${assetName} · ${h.files.length} file${h.files.length > 1 ? 's' : ''} · as a run reads it`,
+});
+
+// A series that comes with the tool: one published file, fetched from Xfina
+// Data. Its own columns, because a rate sheet prints a buy and a sell where an
+// index prints one level, and its own frequency, because CPI is monthly.
+const providedExplorer = (a, s) => ({
+  loader: async () => {
+    try { return rowsFromCsv(await (await fetch(`${DATA}/${s.path}`)).text(), s.lines); }
+    catch (e) { return failed(`provided|${s.id}`, `This series could not be fetched from Xfina Data: ${e?.message || e}`); }
+  },
+  lines: s.lines,
+  frequency: s.frequency === 'monthly' ? 'monthly' : 'daily',
+  unit: s.type === 'FX' ? '₹' : '',
+  views: ['chart', 'calendar', 'table'],
+  first: s.first,
+  last: s.last,
+  label: s.name,
+  note: `${a.name} · ${s.publisher} · comes with the Portfolio Engine`,
+});
 
 const confirmClear = ref(false);
 const clearStored = async () => { confirmClear.value = false; await clearImports(); lastImport.value = null; };
@@ -341,60 +383,38 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
                 <TableRow class="bg-muted/30 hover:bg-muted/30">
                   <TableCell colspan="5" class="py-2 font-semibold">{{ a.name }}</TableCell>
                 </TableRow>
-                <template v-for="h in a.held" :key="h.key">
-                  <TableRow>
-                    <TableCell>
-                      <div class="font-medium">{{ h.series.name }}</div>
-                      <div v-if="h.instrument" class="text-xs text-muted-foreground">
-                        {{ h.instrument }}
-                        <button
-                          v-if="h.answered" type="button" class="ml-1 underline decoration-dotted underline-offset-2 hover:text-foreground"
-                          title="You chose this; ask me again" @click="forget(h)"
-                        >your answer</button>
+                <SeriesRows
+                  v-for="h in a.held" :key="h.key"
+                  :from="h.series.from" :to="h.series.to" :files="h.files.length"
+                  :status="STATUS[h.worst]" :label="h.series.name"
+                  :open="browsing === h.key" :explorer="heldExplorer(h, a.name)"
+                  :problem="browsing === h.key ? problem : null"
+                  @toggle="browse(h.key)"
+                >
+                  <template #name>
+                    <div class="font-medium">{{ h.series.name }}</div>
+                    <div v-if="h.instrument" class="text-xs text-muted-foreground">
+                      {{ h.instrument }}
+                      <button
+                        v-if="h.answered" type="button" class="ml-1 underline decoration-dotted underline-offset-2 hover:text-foreground"
+                        title="You chose this; ask me again" @click="forget(h)"
+                      >your answer</button>
+                    </div>
+                    <div v-if="h.argues" class="text-xs text-status-warning-text">
+                      These files start {{ h.series.from }}, before that plan existed ({{ h.argues }}) — so at least one of them is the other plan.
+                    </div>
+                    <!-- The file does not say which of these it is, so the screen asks, once -->
+                    <div v-else-if="h.couldBe" class="space-y-1">
+                      <div class="text-xs text-muted-foreground">The file names the scheme, not the plan. Which is it?</div>
+                      <div class="flex flex-wrap gap-1.5">
+                        <Button
+                          v-for="c in h.couldBe" :key="c.id" size="sm" variant="outline" class="h-7 text-xs"
+                          :title="`These files are ${c.name}`" @click="answer(h, c.id)"
+                        >{{ c.name }}</Button>
                       </div>
-                      <div v-if="h.argues" class="text-xs text-status-warning-text">
-                        These files start {{ h.series.from }}, before that plan existed ({{ h.argues }}) — so at least one of them is the other plan.
-                      </div>
-                      <!-- The file does not say which of these it is, so the screen asks, once -->
-                      <div v-else-if="h.couldBe" class="space-y-1">
-                        <div class="text-xs text-muted-foreground">The file names the scheme, not the plan. Which is it?</div>
-                        <div class="flex flex-wrap gap-1.5">
-                          <Button
-                            v-for="c in h.couldBe" :key="c.id" size="sm" variant="outline" class="h-7 text-xs"
-                            :title="`These files are ${c.name}`" @click="answer(h, c.id)"
-                          >{{ c.name }}</Button>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell class="whitespace-nowrap font-mono text-xs">{{ h.series.from }} → {{ h.series.to }}</TableCell>
-                    <TableCell class="text-right tabular-nums text-muted-foreground">{{ h.files.length }}</TableCell>
-                    <TableCell><Badge :variant="tone(STATUS[h.worst][0])">{{ STATUS[h.worst][1] }}</Badge></TableCell>
-                    <TableCell class="text-right whitespace-nowrap">
-                      <Button
-                        size="sm" :variant="browsing?.key === h.key ? 'secondary' : 'outline'"
-                        :title="`Chart, calendar and values for ${h.series.name}, as a run reads it`" @click="browse(h)"
-                      >{{ browsing?.key === h.key ? 'Close' : 'View' }}</Button>
-                    </TableCell>
-                  </TableRow>
-                  <!-- Opened from the row above and drawn under it: the chart belongs beside the series it
-                       is of. What it shows is the series as a run reads it -- the pieces stitched, the
-                       publisher's adjusted twin preferred, a polled day reduced to its last reading -- and
-                       the explorer is given a loader, so this is the only series ever parsed. -->
-                  <TableRow v-if="browsing?.key === h.key" class="hover:bg-transparent">
-                    <TableCell colspan="5" class="p-0">
-                      <div class="border-y bg-muted/20 p-3">
-                        <SeriesExplorer
-                          :key="h.key" :loader="loaderFor(h)" :lines="LINES"
-                          :unit="h.series.ccy === 'INR' ? '₹' : h.series.ccy === 'USD' ? '$' : ''"
-                          :views="['chart', 'calendar', 'table']"
-                          :first="h.series.from" :last="h.series.to"
-                          :label="h.series.name"
-                          :note="`${a.name} · ${h.files.length} file${h.files.length > 1 ? 's' : ''} · as a run reads it`"
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </template>
+                    </div>
+                  </template>
+                </SeriesRows>
               </template>
             </template>
           </TableBody>
@@ -412,37 +432,6 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
             </li>
           </ul>
         </div>
-
-        <!-- Comes with the tool: nothing to choose here, and nothing to download. Which of each pair a run
-             uses is a run decision, so it is picked in the engine's Series step, not here. -->
-        <section class="space-y-2 border-t pt-4">
-          <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Comes with the tool</div>
-          <p class="text-sm text-muted-foreground">
-            Two series every run can call on, published by
-            <a :href="DATA" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4">Xfina Data</a>
-            and fetched when a run needs them — nothing to download or import. Each comes in two versions: the
-            one to prefer, and one with a longer history for runs that start further back. Which a run uses is
-            picked with the run, in the engine's Series step, because it changes what the run reports.
-          </p>
-          <Table>
-            <TableHeader>
-              <TableRow><TableHead>Series</TableHead><TableHead>Publisher</TableHead><TableHead>Covers</TableHead><TableHead>Why</TableHead></TableRow>
-            </TableHeader>
-            <TableBody>
-              <template v-for="a in REFERENCE" :key="a.key">
-                <TableRow class="bg-muted/30 hover:bg-muted/30">
-                  <TableCell colspan="4" class="py-2"><span class="font-semibold">{{ a.name }}</span> <span class="text-xs text-muted-foreground">{{ a.what }}</span></TableCell>
-                </TableRow>
-                <TableRow v-for="s in a.series" :key="s.id">
-                  <TableCell class="whitespace-nowrap font-medium">{{ s.name }}</TableCell>
-                  <TableCell class="text-sm">{{ s.publisher }}</TableCell>
-                  <TableCell class="whitespace-nowrap font-mono text-xs">{{ s.first }} → {{ s.last }}</TableCell>
-                  <TableCell class="text-xs text-muted-foreground">{{ s.note }}</TableCell>
-                </TableRow>
-              </template>
-            </TableBody>
-          </Table>
-        </section>
 
         <!-- Kept in this browser, and where it is let go of -->
         <section v-if="imported.storage.files" class="space-y-2 border-t pt-4">
@@ -471,5 +460,55 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
         </p>
       </CardContent>
     </Card>
+
+    <!-- Comes with the tool, and so a different kind of thing from what you hold: published by Xfina Data and
+         fetched when a run needs it, rather than a file anybody imported. Its own box, at the same level, with
+         rows that behave the same (SeriesRows). Which of each pair a run uses is a run decision and stays in
+         the engine's Assets step; this is for seeing what they are. -->
+    <Card v-if="stage === 'manage'" class="bg-card border-border shadow-sm">
+      <CardHeader class="pb-4">
+        <CardTitle class="text-xl">Comes with the tool</CardTitle>
+        <CardDescription>
+          Published by <a :href="DATA" target="_blank" rel="noopener" class="underline underline-offset-4 hover:text-foreground">Xfina Data</a>
+          and fetched when a run needs them — nothing to download or import. Each comes in two: the one to
+          prefer, and one with a longer history for runs that start further back. Which a run uses is picked
+          with the run, in the engine's Assets step, because it changes what the run reports.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Series</TableHead><TableHead>Covers</TableHead>
+              <TableHead class="text-right">Files</TableHead><TableHead>Checks</TableHead><TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <template v-for="a in REFERENCE" :key="a.key">
+              <TableRow class="bg-muted/30 hover:bg-muted/30">
+                <TableCell colspan="5" class="py-2">
+                  <span class="font-semibold">{{ a.name }}</span>
+                  <span class="ml-2 text-xs text-muted-foreground">{{ a.what }}</span>
+                </TableCell>
+              </TableRow>
+              <SeriesRows
+                v-for="s in a.series" :key="s.id"
+                :from="s.first" :to="s.last" :files="null" :status="null" :label="s.name"
+                :open="browsing === `provided|${s.id}`" :explorer="providedExplorer(a, s)"
+                :problem="browsing === `provided|${s.id}` ? problem : null"
+                @toggle="browse(`provided|${s.id}`)"
+              >
+                <template #name>
+                  <div class="font-medium">{{ s.name }}</div>
+                  <div class="text-xs text-muted-foreground">{{ s.publisher }} · {{ s.basis }}</div>
+                  <div class="mt-0.5 text-xs text-muted-foreground">{{ s.note }}</div>
+                </template>
+              </SeriesRows>
+            </template>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+
   </AppShell>
 </template>
