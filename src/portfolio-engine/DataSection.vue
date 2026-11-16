@@ -1,15 +1,14 @@
 <script setup>
 import {
   Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge,
-  Dialog, DialogScrollContent, DialogDescription, DialogHeader, DialogTitle,
 } from 'xfina-ui';
 import { tone } from './tone.js';
 import { CLASSES, REGIONS, nodes } from './guide.js';
 import { DATA, REFERENCE, refreshPublished } from './reference.js';
-import { ref, reactive, computed, onMounted, watchEffect, toRef } from 'vue';
+import { reactive, computed, onMounted, watchEffect, toRef } from 'vue';
 import { selection, ui, picks } from './store.js';
-import { imported, seriesFor, fileIdsOf, removeFile } from './imports.js';
-import { Check, Trash2, X } from 'lucide-vue-next';
+import { imported, seriesFor, fileIdsOf } from './imports.js';
+import { Check } from 'lucide-vue-next';
 
 // --- Series ----------------------------------------------------------------------------------------
 // Every series on this page is real: an imported one is what `xfina` read from the files the user
@@ -63,7 +62,6 @@ const shownStart = (s) => s.from ?? s.first;
 const shownEnd = (s) => s.to ?? s.last;
 
 // --- Files and their state -------------------------------------------------------------------------
-const STATE = { ok: ['ok', 'Valid'], warn: ['warn', 'Warn'], err: ['err', 'Invalid'] };
 // A series with an invalid file cannot be picked until the file is replaced or removed.
 const invalid = (s) => s.origin !== 'provided' && s.files.some((f) => f.status === 'err');
 // A series whose files read, but with something to look at: a gap, a cross-check that did not reconcile, a
@@ -162,7 +160,6 @@ const tickTitle = (a, s) => {
   if (!isChosen(a, s)) return `Use ${s.name} for this run`;
   return a.provided ? 'Used for this run. Every run needs one; pick the other to switch' : 'Used for this run. Click again to leave this asset out';
 };
-const checksOf = (f) => f.checks || [['ok', `${f.rows.toLocaleString('en-IN')} rows, sorted, no duplicate dates, all values positive.`]];
 
 // --- Table -----------------------------------------------------------------------------------------
 // The table's tabs: the regions, and Reference (USD/INR and inflation, provided by Xfina Data). The one showing is
@@ -181,6 +178,10 @@ const assetsUsed = computed(() => importable.filter((a) => chosen(a)).length);
 // An imported asset's start comes from the catalogue; a reference asset's from its earliest series.
 const sinceOf = (a) => a.since ?? a.series.map(startOf).sort()[0];
 const yearsSince = (d) => ((new Date(END.value) - new Date(d)) / (365.25 * 864e5)).toFixed(1);
+// Whether the series picked for an asset reaches as far back as any of that asset's datasets does. Ticked, it
+// says at a glance that no history is being left behind; unticked is the signal worth having -- the pick, or
+// what has been imported for it, starts later than it could.
+const atFullHistory = (a) => { const s = chosen(a); return !!s && startOf(s) <= sinceOf(a); };
 // The run period box's timeline: from the earliest start among the picked asset series (reference series are
 // left out, their decades of history would squash the bar) to the data's end, with the run's window marked.
 const TIMELINE = computed(() => {
@@ -199,17 +200,6 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
   ...(heldBack(a).length ? [{ kind: 'warned', key: `w:${a.key}`, a }] : []),
   ...(listed(a).length || heldBack(a).length ? [] : [{ kind: 'empty', key: `e:${a.key}`, a }]),
 ]));
-
-const detail = ref(null);
-const open = (a, s) => { detail.value = { a, s }; };
-// Removing the last file of a series removes the series, so the dialog closes with it. The file goes from
-// this browser too, not just from the table.
-const forget = async (a, s, f) => {
-  await removeFile(f.id);
-  if (!seriesFor(a.key).some((x) => x.key === s.key)) detail.value = null;
-};
-// Clearing asks once, in place: it deletes every imported file from this browser.
-const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
 </script>
 
@@ -250,10 +240,12 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
             <template v-for="r in rows" :key="r.key">
               <!-- Asset -->
               <TableRow v-if="r.kind === 'asset'" class="bg-muted/30 hover:bg-muted/30">
-                <TableCell colspan="5" class="py-2">
+                <TableCell colspan="4" class="py-2">
                   <div class="flex items-baseline justify-between gap-4">
                     <span class="font-semibold">{{ r.a.name }}</span>
-                    <span class="shrink-0 text-xs text-muted-foreground" :title="`The longest history any of this asset's datasets has: from ${sinceOf(r.a)}`">max <span class="font-semibold tabular-nums">{{ yearsSince(sinceOf(r.a)) }}</span> years</span>
+                    <span class="shrink-0 text-xs text-muted-foreground" :title="atFullHistory(r.a) ? `The series picked reaches as far back as any of this asset's datasets: ${sinceOf(r.a)}` : `The longest history any of this asset's datasets has: from ${sinceOf(r.a)}. The series picked starts later.`">
+                      <Check v-if="atFullHistory(r.a)" class="mr-0.5 inline h-3 w-3 align-[-1px] text-status-good-text" />max <span class="font-semibold tabular-nums">{{ yearsSince(sinceOf(r.a)) }}</span> years
+                    </span>
                   </div>
                   <p v-if="reach(r.a)" class="mt-0.5 text-xs text-status-warning-text">
                     Your run starts {{ RUN.from }}, before {{ reach(r.a).preferred }} covers ({{ reach(r.a).from }}).{{ ' ' }}<template v-if="reach(r.a).further">{{ reach(r.a).further }} goes back further.</template>
@@ -292,10 +284,7 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
                 </TableCell>
                 <TableCell :class="isChosen(r.a, r.s) ? 'font-medium' : 'text-muted-foreground'">
                   <div class="flex min-w-0 items-center gap-2">
-                    <button
-                      type="button" class="min-w-0 truncate text-left underline decoration-dotted underline-offset-4 hover:decoration-solid"
-                      :title="`${r.s.name} · ${r.s.basis} — the files behind it, and their checks`" @click="open(r.a, r.s)"
-                    >{{ r.s.name }}</button>
+                    <span class="truncate" :title="`${r.s.name} · ${r.s.basis}`">{{ r.s.name }}</span>
                     <Badge v-if="warned(r.s)" :variant="tone('warn')" class="shrink-0" title="Its files read, but something is worth checking: open it to read the notes before using it">Check</Badge>
                     <Badge v-if="r.s.ret && r.s.ret !== 'Total return'" :variant="tone('warn')" class="shrink-0" title="Price only: income is not included, so returns are understated">Price only</Badge>
                   </div>
@@ -314,11 +303,10 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
           </TableBody>
         </Table>
 
-        <!-- Anything to fetch, fix or let go of is Datasets' job; this step only picks what a run uses. -->
-        <p class="text-xs text-muted-foreground">
-          <a href="/portfolio-engine/datasets/" class="underline underline-offset-4 hover:text-foreground">Datasets</a>
-          is where data is chosen, downloaded, imported and kept<template v-if="imported.unmatched.length">
-          — including {{ imported.unmatched.length }} file{{ imported.unmatched.length > 1 ? 's' : '' }} read but matched to no asset</template>.
+        <!-- The one thing this step cannot otherwise show: files that read but belong to no asset here, so they
+             are in none of the rows above. Fixing them is the Series screen's job; saying so is this one's. -->
+        <p v-if="imported.unmatched.length" class="text-xs text-status-warning-text">
+          {{ imported.unmatched.length }} imported file{{ imported.unmatched.length > 1 ? 's' : '' }} matched no asset, so {{ imported.unmatched.length > 1 ? 'they are' : 'it is' }} in none of these rows.
         </p>
       </CardContent>
     </Card>
@@ -380,64 +368,4 @@ const mb = (n) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max
     </Card>
   </div>
 
-  <!-- The files behind one series, each with its own checks -->
-  <Dialog :open="!!detail" @update:open="(v) => { if (!v) detail = null; }">
-    <DialogScrollContent v-if="detail" class="sm:max-w-3xl">
-      <DialogHeader>
-        <DialogTitle>{{ detail.s.name }}</DialogTitle>
-        <DialogDescription>
-          {{ detail.a.name }} · {{ detail.s.type }} · {{ detail.s.ret || 'no returns' }} · {{ detail.s.basis }}<template v-if="detail.s.ccy"> · <span :title="detail.s.ccyAssumed ? 'The file does not say which currency it is in; this one comes from where the asset is. A series in dollars is converted with the USD/INR series before a run.' : 'The currency the file states'">{{ detail.s.ccy }}<template v-if="detail.s.ccyAssumed"> (assumed)</template></span></template>
-          · {{ shownStart(detail.s) }} → {{ shownEnd(detail.s) }}
-        </DialogDescription>
-      </DialogHeader>
-
-      <p class="text-sm">
-        <template v-if="invalid(detail.s)">Cannot be used until the invalid file below is replaced or removed.</template>
-        <template v-else-if="isChosen(detail.a, detail.s)">Used for this run, {{ RUN.from }} → {{ RUN.to }}.</template>
-        <template v-else>Not used for this run. Pick it in the table to use it<template v-if="chosen(detail.a)"> instead of {{ chosen(detail.a).name }}</template>.</template>
-      </p>
-
-      <!-- Reference (provided by Xfina Data): one published file -->
-      <div v-if="detail.s.origin === 'provided'" class="space-y-3 text-sm">
-        <p class="text-muted-foreground">{{ detail.s.note }}</p>
-        <div class="rounded-md border p-3 space-y-1">
-          <div class="flex flex-wrap items-center gap-2">
-            <a :href="`${DATA}/${detail.s.path}`" target="_blank" rel="noopener" class="font-mono text-xs break-all text-foreground underline underline-offset-4 hover:decoration-2">{{ DATA.replace('https://', '') }}/{{ detail.s.path }}</a>
-            <Badge :variant="tone('ok')">Valid</Badge>
-          </div>
-          <div class="font-mono text-xs text-muted-foreground">{{ detail.s.frequency }} · {{ detail.s.rows.toLocaleString('en-IN') }} rows · {{ detail.s.first }} → {{ detail.s.last }}</div>
-          <div v-if="detail.s.frequency === 'monthly'" class="text-xs text-muted-foreground">Monthly: the latest month is carried forward to the run's end.</div>
-        </div>
-      </div>
-
-      <!-- Imported: every file, with its checks -->
-      <div v-else class="space-y-2">
-        <div class="text-sm text-muted-foreground">
-          {{ detail.s.files.length }} file{{ detail.s.files.length > 1 ? 's' : '' }} ·
-          {{ detail.s.files.filter((f) => f.status !== 'err').reduce((n, f) => n + f.rows, 0).toLocaleString('en-IN') }} rows used
-        </div>
-        <ul class="divide-y rounded-md border">
-          <li v-for="f in detail.s.files" :key="f.name" class="p-3 space-y-1.5">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-mono text-xs break-all" :class="f.status === 'err' && 'line-through text-muted-foreground'">{{ f.name }}</span>
-              <Badge :variant="tone(STATE[f.status][0])">{{ STATE[f.status][1] }}</Badge>
-              <!-- A file can be taken back out: an invalid one has to be, before its series can be used -->
-              <button
-                type="button" class="ml-auto grid place-items-center h-6 w-6 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                :title="`Remove ${f.name} from this series`" @click="forget(detail.a, detail.s, f)"
-              ><X class="h-3.5 w-3.5" /></button>
-            </div>
-            <div class="font-mono text-xs text-muted-foreground">{{ f.from }} → {{ f.to }}<template v-if="f.rows"> · {{ f.rows.toLocaleString('en-IN') }} rows</template></div>
-            <ul class="space-y-1">
-              <li v-for="(c, i) in checksOf(f)" :key="i" class="flex gap-2 text-xs">
-                <span class="shrink-0 font-medium" :class="c[0] === 'err' ? 'text-status-critical-text' : c[0] === 'warn' ? 'text-status-warning-text' : 'text-status-good-text'">{{ c[0] === 'err' ? 'Invalid' : c[0] === 'warn' ? 'Warn' : 'OK' }}</span>
-                <span class="text-muted-foreground">{{ c[1] }}</span>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-
-    </DialogScrollContent>
-  </Dialog>
 </template>

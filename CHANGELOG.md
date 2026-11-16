@@ -34,6 +34,16 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- The engine's first step sheds the last of its file management: the file-detail
+  dialog is gone, and with it the series name as a button -- the files behind a
+  series, and their checks, belong on the screen that manages them. The footer
+  line pointing at that screen goes too; what is left in its place is the one
+  thing this step could not otherwise say, a warning when imported files matched
+  no asset and so appear in none of its rows.
+- An asset whose picked series reaches as far back as any of that asset's
+  datasets is ticked beside its `max N years`. Unticked is the signal worth
+  having: the pick, or what has been imported for it, starts later than it could.
+
 - The Series step offers only series whose files came back clean. One with a
   note against it -- a gap, a cross-check that did not reconcile, a move worth a
   second look -- is held back behind "N more with something to check", is never
