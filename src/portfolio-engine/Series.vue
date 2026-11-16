@@ -7,10 +7,14 @@
 //
 // Four phases on one screen, in the order the work actually goes:
 //
-//   Choose  -- which datasets you want (the wizard; moves here next)
-//   Get     -- how to download them, per site (moves here next)
-//   Import  -- drop the files in; they are read, identified and checked
-//   Hold    -- what this browser holds: coverage, checks, what is unaccounted for
+//   Selection -- which datasets you want (the wizard)
+//   Download  -- how to get each one, per publisher, with its limits and terms
+//   Import    -- drop the files in; they are read, identified and checked
+//   Manage    -- what this browser holds: coverage, checks, what is unaccounted for
+//
+// One stage renders at a time, and the bar across the top is both where you are
+// and what is left. Arriving, the stage with outstanding work opens: downloading
+// happens outside the browser, so a user nearly always returns mid-pipeline.
 //
 // The screen is built on one state, not two. A file records what it is when it
 // arrives (imports.js), so a row here is one catalogue instrument and its state
@@ -21,7 +25,7 @@
 //
 // Nothing here is uploaded. Files are read in this tab by the same parsers
 // Xfina uses, and kept in this browser's own storage.
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import {
   Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -29,7 +33,8 @@ import {
 import { ExternalLink, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
-import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf } from './imports.js';
+import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf, datasetState } from './imports.js';
+import { picks, load as loadPicks } from './picks.js';
 import { findDataset, nodes } from './guide.js';
 import { DATA, REFERENCE, refreshPublished } from './reference.js';
 import { tone } from './tone.js';
@@ -37,6 +42,47 @@ import { tone } from './tone.js';
 // What this browser already holds, read back before anything else: the whole
 // screen draws from the metadata, without the engine being fetched at all.
 loadImports();
+loadPicks();
+
+// --- Stages ------------------------------------------------------------------
+// One stage at a time. The whole job is four of them and they are long -- a
+// wizard, a list of site cards, a drop area, a table -- so stacking them made
+// one scroll nobody could hold in their head. The bar across the top is both
+// where you are and what is left: always visible, always clickable, because a
+// wizard you cannot leave is worse than a long scroll.
+const STAGES = [
+  { id: 'selection', label: 'Selection' },
+  { id: 'download', label: 'Download' },
+  { id: 'import', label: 'Import' },
+  { id: 'manage', label: 'Manage' },
+];
+const stage = ref('selection');
+const go = (id) => { stage.value = id; window.scrollTo({ top: 0, behavior: 'smooth' }); };
+
+// What each stage has outstanding, which is what the bar counts.
+const selected = computed(() => Object.keys(picks.by));
+const toGet = computed(() => selected.value.filter((id) => datasetState(id) !== 'held'));
+const heldCount = computed(() => Object.values(imported.datasets).filter((v) => v === 'held').length);
+const counts = computed(() => ({
+  selection: selected.value.length ? `${selected.value.length} chosen` : null,
+  download: toGet.value.length ? `${toGet.value.length} to get` : null,
+  import: imported.unmatched.length ? `${imported.unmatched.length} unmatched` : null,
+  manage: heldCount.value ? `${heldCount.value} held` : null,
+}));
+
+// Where to start. Downloading happens outside the browser, so a user almost
+// always comes back mid-pipeline: landing them on the stage with work left is
+// worth more here than anything else. Only until they click, though -- after
+// that the stage is theirs.
+const steered = ref(false);
+watch([() => imported.loaded, () => picks.loaded], ([a, b]) => {
+  if (!a || !b || steered.value) return;
+  steered.value = true;
+  if (!selected.value.length && !heldCount.value) stage.value = 'selection';
+  else if (toGet.value.length) stage.value = 'download';
+  else if (imported.unmatched.length) stage.value = 'import';
+  else stage.value = 'manage';
+}, { immediate: true });
 // The reference series' own figures, live where they can be had (reference.js).
 refreshPublished();
 
@@ -122,11 +168,39 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
       Everything is read in this tab and kept in this browser. Nothing is uploaded.
     </template>
 
-    <!-- Choose and Get: the wizard, and how to download each dataset from its publisher -->
-    <ChooseAndGet />
+    <!-- Where you are, and what each stage has left. Both navigation and status. -->
+    <nav class="flex flex-wrap items-stretch gap-1 rounded-md border p-1" aria-label="Stages">
+      <button
+        v-for="s in STAGES" :key="s.id" type="button"
+        class="flex min-w-0 flex-1 basis-40 flex-col items-start rounded px-3 py-2 text-left transition-colors"
+        :class="stage === s.id ? 'bg-primary/10 text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'"
+        :aria-current="stage === s.id ? 'step' : undefined" @click="go(s.id)"
+      >
+        <span class="text-sm font-medium">{{ s.label }}</span>
+        <span class="text-xs" :class="counts[s.id] ? 'text-muted-foreground' : 'text-transparent'">{{ counts[s.id] || '—' }}</span>
+      </button>
+    </nav>
 
-    <!-- Import -->
-    <Card class="bg-card border-border shadow-sm">
+    <!-- Selection: which datasets you want -->
+    <ChooseAndGet v-if="stage === 'selection'" stage="selection" />
+
+    <!-- Download: where each one comes from, and how -->
+    <template v-else-if="stage === 'download'">
+      <ChooseAndGet stage="download" />
+      <!-- The one seam the app cannot close: it has no way to know a download happened. So it is handed
+           over rather than guessed at. -->
+      <Card class="bg-card border-border shadow-sm">
+        <CardContent class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 pt-6">
+          <p class="min-w-0 flex-1 text-sm text-muted-foreground sm:text-right">
+            Downloads land in your own Downloads folder — nothing here can see them. Bring them in when you have them.
+          </p>
+          <Button size="lg" class="w-44 shrink-0" @click="go('import')"><Upload class="h-4 w-4 mr-2" />Import</Button>
+        </CardContent>
+      </Card>
+    </template>
+
+    <!-- Import: the files, in the publisher's own format -->
+    <Card v-else-if="stage === 'import'" class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
         <CardTitle class="text-xl">Import</CardTitle>
         <CardDescription>Drop the files you downloaded, in the publisher's own format. They are identified, checked and kept.</CardDescription>
@@ -154,8 +228,8 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
       </CardContent>
     </Card>
 
-    <!-- Hold -->
-    <Card class="bg-card border-border shadow-sm">
+    <!-- Manage: what this browser holds -->
+    <Card v-else class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
         <CardTitle class="text-xl">What you hold</CardTitle>
         <CardDescription>

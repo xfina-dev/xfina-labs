@@ -34,6 +34,19 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- The Series screen is four stages -- Selection, Download, Import, Manage -- one
+  rendered at a time, with a bar across the top that is both where you are and
+  what each stage has left to do: `Selection 12 chosen · Download 9 to get`. The
+  four used to stack into a single scroll that held a wizard, a list of site
+  cards, a drop area and a table, all wanting different densities. The bar is
+  always clickable, because a wizard you cannot leave is worse than a long
+  scroll. Arriving, the stage with outstanding work opens -- nothing chosen
+  opens Selection, something chosen but not held opens Download, files that
+  matched nothing open Import, otherwise Manage -- since downloading happens
+  outside the browser and you nearly always come back mid-pipeline. Download
+  hands over to Import explicitly rather than pretending the app can tell a
+  download happened.
+
 - Two things were called Series. The screen is now **Series**, at
   `/portfolio-engine/series/`, named for what it holds; the Portfolio Engine's
   first step is **Assets**, named for what it does -- it picks which series each

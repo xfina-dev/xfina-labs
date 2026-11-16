@@ -18,6 +18,13 @@ import { load as loadPicks, save as savePicks } from './picks.js';
 import { findDataset as findOne } from './guide.js';
 import { CLASSES, REGIONS, VEHICLES, LISTINGS, HOW, sourcesOf, returnsFor, basisFor, nodes, vehiclesFor, listingsFor, groupsFor, findDataset, dateNote, dateSourceNote, yearsOf, distFlag } from './guide.js';
 
+// Choosing and getting are two stages of the one screen, rendered one at a
+// time, and they are one component because they share the wizard's path and the
+// picks it makes. `stage` says which half to draw.
+const props = defineProps({
+  stage: { type: String, default: 'selection' }, // 'selection' | 'download'
+});
+
 // The wizard: asset class → region → model as → (Irish or US ETFs, for US and Global ETFs only).
 // Every asset for that path is then listed as a group with its oldest three. The path lives in the
 // URL hash, e.g. #equity/us/etf/irish, so a link lands on the same step.
@@ -188,6 +195,7 @@ const HOLD_BADGE = { held: ['good', 'Held'], maybe: ['warn', 'Which one?'] };
       </div>
 
       <!-- 1. Picker, full width -->
+      <template v-if="props.stage === 'selection'">
       <section id="select" class="space-y-4 scroll-mt-8">
         <div class="flex items-center gap-3">
           <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">1</span>
@@ -350,7 +358,9 @@ const HOLD_BADGE = { held: ['good', 'Held'], maybe: ['warn', 'Which one?'] };
       </section>
 
       <!-- 3. Download list, by website -->
-      <section v-if="list.length" id="download" class="space-y-4 scroll-mt-8">
+      </template>
+
+      <section v-if="props.stage === 'download' && list.length" id="download" class="space-y-4 scroll-mt-8">
         <div class="flex items-center gap-3">
           <span class="inline-grid place-items-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">3</span>
           <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Download Datasets</h2>
