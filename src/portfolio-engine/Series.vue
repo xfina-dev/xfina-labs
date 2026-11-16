@@ -33,12 +33,13 @@ import {
 // Its own entry point since xfina-ui 0.11.0: a site that mounts no explorer
 // never resolves ECharts, so only the sites that use one install it.
 import { SeriesExplorer, rowsFromCsv } from 'xfina-ui/series-explorer';
-import { ExternalLink, FolderOpen, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
+import { ArrowLeft, ChevronRight, ExternalLink, FolderOpen, HelpCircle, ShieldCheck, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
 import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf, datasetState, seriesRows } from './imports.js';
 import { picks, load as loadPicks } from './picks.js';
-import { findDataset, nodes } from './guide.js';
+import { findDataset } from './guide.js';
+import { regionsWithAssets } from './catalogue.js';
 import { DATA, REFERENCE, refreshPublished } from './reference.js';
 import { tone } from './tone.js';
 
@@ -138,12 +139,9 @@ const tone_ = computed(() => {
 // not the asset id from identity.js, which names an asset; one asset holds
 // many instruments.
 const CATALOGUE_NAME = (id) => findDataset(id)?.name ?? id;
-const ASSET_OF = Object.fromEntries(nodes.map((n) => [`${n.region}|${n.class}|${n.asset}`, n]));
-const held = computed(() => Object.entries(imported.byAsset).flatMap(([key, list]) => list.map((s) => ({
+const describe = (key, s) => ({
   key: `${key}|${s.key}`,
   series: s,
-  asset: ASSET_OF[key]?.asset ?? key,
-  region: ASSET_OF[key]?.region ?? '',
   // What the catalogue calls what these files are, where the files said so.
   instrument: s.dataset ? CATALOGUE_NAME(s.dataset) : null,
   answered: s.answered,
@@ -162,7 +160,20 @@ const held = computed(() => Object.entries(imported.byAsset).flatMap(([key, list
   couldBe: s.candidates?.map((id) => ({ id, name: CATALOGUE_NAME(id) })) ?? null,
   files: s.files,
   worst: s.files.some((f) => f.status === 'err') ? 'err' : s.files.some((f) => f.status === 'warn') ? 'warn' : 'ok',
-}))).sort((a, b) => a.region.localeCompare(b.region) || a.asset.localeCompare(b.asset)));
+});
+
+// Grouped by region and asset, the way the Assets step groups the same
+// catalogue (catalogue.js). It is the same information about the same things,
+// and two shapes for it is what made this screen feel like a different app.
+// Only what is held shows: the whole catalogue would be a page of empty rows.
+const groups = computed(() => regionsWithAssets()
+  .map((r) => ({
+    ...r,
+    assets: r.assets.filter((a) => a.series.length).map((a) => ({ ...a, held: a.series.map((s) => describe(a.key, s)) })),
+  }))
+  .filter((r) => r.assets.length));
+const held = computed(() => groups.value.flatMap((r) => r.assets.flatMap((a) => a.held)));
+
 const rows = computed(() => held.value.reduce((n, h) => n + h.files.length, 0));
 
 // --- Browsing one series -----------------------------------------------------
@@ -194,21 +205,57 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
   <AppShell tool="/portfolio-engine/">
     <template #tagline>
       Get the data a backtest needs, and keep it: choose the datasets, download them from the publishers
-      themselves, import the files here.<br />
-      Everything is read in this tab and kept in this browser. Nothing is uploaded.
+      themselves, import the files here.
     </template>
 
-    <!-- Where you are, and what each stage has left. Both navigation and status. -->
-    <nav class="flex flex-wrap items-stretch gap-1 rounded-md border p-1" aria-label="Stages">
-      <button
-        v-for="s in STAGES" :key="s.id" type="button"
-        class="flex min-w-0 flex-1 basis-40 flex-col items-start rounded px-3 py-2 text-left transition-colors"
-        :class="stage === s.id ? 'bg-primary/10 text-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground'"
-        :aria-current="stage === s.id ? 'step' : undefined" @click="go(s.id)"
-      >
-        <span class="text-sm font-medium">{{ s.label }}</span>
-        <span class="text-xs" :class="counts[s.id] ? 'text-muted-foreground' : 'text-transparent'">{{ counts[s.id] || '—' }}</span>
-      </button>
+    <!-- The screen's own header: what this is, and the way back to the run it feeds. -->
+    <div class="flex flex-wrap items-start justify-between gap-4 border-b pb-4">
+      <div class="min-w-0 space-y-1">
+        <h1 class="text-2xl font-semibold">Series</h1>
+        <p class="text-sm text-muted-foreground">
+          Choose what you need, download it from the publisher, import it here, and keep it. The Portfolio
+          Engine reads what this holds.
+        </p>
+      </div>
+      <a href="/portfolio-engine/" class="no-underline shrink-0">
+        <Button variant="outline" size="lg"><ArrowLeft class="h-4 w-4 mr-2" />Portfolio Engine</Button>
+      </a>
+    </div>
+
+    <!-- True of the whole screen, not of one stage, and the thing worth saying first on a page that reads
+         your files. -->
+    <!-- Where the data goes, before anything is picked -->
+    <div class="rounded-md border bg-muted/30 p-4 space-y-2 text-sm">
+      <div class="flex items-center gap-2 font-semibold"><ShieldCheck class="h-4 w-4" />Data you download stays with you</div>
+      <ul class="list-disc pl-5 space-y-0.5 text-muted-foreground">
+        <li>You download the data from each source in your browser, and use it in your browser.</li>
+        <li>Xfina Labs and Portfolio Engine are a static website: there is no API or form that stores anything on a server, so Xfina never sees your data.</li>
+        <li>Each source's own terms of use apply (the Terms link on its card). Xfina isn't affiliated with any of them.</li>
+        <li>A few open, public series come with Portfolio Engine, so there is nothing to download for them: USD/INR and inflation (CPI).</li>
+      </ul>
+    </div>
+
+    <!-- Where you are, and what is left. The stages run left to right in the order the work does, so it
+         reads as a path rather than a set of tabs: the one you are on is filled, the rest are quiet, and a
+         count appears only where a stage has something outstanding. -->
+    <nav class="flex flex-wrap items-center gap-1" aria-label="Stages">
+      <template v-for="(s, i) in STAGES" :key="s.id">
+        <ChevronRight v-if="i" class="hidden h-4 w-4 shrink-0 text-muted-foreground/40 sm:block" />
+        <button
+          type="button"
+          class="flex min-w-0 flex-1 basis-36 items-baseline gap-2 rounded-md border px-3 py-2 text-left transition-colors sm:flex-none sm:basis-auto"
+          :class="stage === s.id
+            ? 'border-primary bg-primary text-primary-foreground'
+            : 'border-transparent text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground'"
+          :aria-current="stage === s.id ? 'step' : undefined" @click="go(s.id)"
+        >
+          <span class="text-sm font-medium">{{ s.label }}</span>
+          <span
+            v-if="counts[s.id]" class="shrink-0 rounded-full px-1.5 py-0.5 text-xs tabular-nums"
+            :class="stage === s.id ? 'bg-primary-foreground/15' : 'bg-muted-foreground/15'"
+          >{{ counts[s.id] }}</span>
+        </button>
+      </template>
     </nav>
 
     <!-- Selection: which datasets you want -->
@@ -277,50 +324,79 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-6">
-        <Table v-if="held.length">
+        <Table v-if="groups.length">
           <TableHeader>
             <TableRow>
-              <TableHead>Dataset</TableHead><TableHead>Asset</TableHead><TableHead>Covers</TableHead>
+              <TableHead>Series</TableHead><TableHead>Covers</TableHead>
               <TableHead class="text-right">Files</TableHead><TableHead>Checks</TableHead><TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="h in held" :key="h.key">
-              <TableCell>
-                <div class="font-medium">{{ h.series.name }}</div>
-                <div v-if="h.instrument" class="text-xs text-muted-foreground">
-                  {{ h.instrument }}
-                  <button
-                    v-if="h.answered" type="button" class="ml-1 underline decoration-dotted underline-offset-2 hover:text-foreground"
-                    title="You chose this; ask me again" @click="forget(h)"
-                  >your answer</button>
-                </div>
-                <div v-if="h.argues" class="text-xs text-status-warning-text">
-                  These files start {{ h.series.from }}, before that plan existed ({{ h.argues }}) — so at least one of them is the other plan.
-                </div>
-                <!-- The file does not say which of these it is, so the screen asks, once -->
-                <div v-else-if="h.couldBe" class="space-y-1">
-                  <div class="text-xs text-muted-foreground">The file names the scheme, not the plan. Which is it?</div>
-                  <div class="flex flex-wrap gap-1.5">
-                    <Button
-                      v-for="c in h.couldBe" :key="c.id" size="sm" variant="outline" class="h-7 text-xs"
-                      :title="`These files are ${c.name}`" @click="answer(h, c.id)"
-                    >{{ c.name }}</Button>
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell class="whitespace-nowrap text-sm">{{ h.region }} · {{ h.asset }}</TableCell>
-              <TableCell class="whitespace-nowrap font-mono text-xs">{{ h.series.from }} → {{ h.series.to }}</TableCell>
-              <TableCell class="text-right tabular-nums text-muted-foreground">{{ h.files.length }}</TableCell>
-              <TableCell><Badge :variant="tone(STATUS[h.worst][0])">{{ STATUS[h.worst][1] }}</Badge></TableCell>
-              <TableCell class="text-right whitespace-nowrap">
-                <button
-                  type="button" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground"
-                  :title="`Chart, calendar and values for ${h.series.name}, as a run reads it`" @click="browse(h)"
-                >{{ browsing?.key === h.key ? 'Close' : 'Open' }}</button>
-                <a href="/portfolio-engine/" class="ml-3 text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Use it in a backtest">Use</a>
-              </TableCell>
-            </TableRow>
+            <template v-for="r in groups" :key="r.id">
+              <!-- Region, then asset, as the Assets step reads -->
+              <TableRow class="hover:bg-transparent">
+                <TableCell colspan="5" class="pb-1 pt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{{ r.title }}</TableCell>
+              </TableRow>
+              <template v-for="a in r.assets" :key="a.key">
+                <TableRow class="bg-muted/30 hover:bg-muted/30">
+                  <TableCell colspan="5" class="py-2 font-semibold">{{ a.name }}</TableCell>
+                </TableRow>
+                <template v-for="h in a.held" :key="h.key">
+                  <TableRow>
+                    <TableCell>
+                      <div class="font-medium">{{ h.series.name }}</div>
+                      <div v-if="h.instrument" class="text-xs text-muted-foreground">
+                        {{ h.instrument }}
+                        <button
+                          v-if="h.answered" type="button" class="ml-1 underline decoration-dotted underline-offset-2 hover:text-foreground"
+                          title="You chose this; ask me again" @click="forget(h)"
+                        >your answer</button>
+                      </div>
+                      <div v-if="h.argues" class="text-xs text-status-warning-text">
+                        These files start {{ h.series.from }}, before that plan existed ({{ h.argues }}) — so at least one of them is the other plan.
+                      </div>
+                      <!-- The file does not say which of these it is, so the screen asks, once -->
+                      <div v-else-if="h.couldBe" class="space-y-1">
+                        <div class="text-xs text-muted-foreground">The file names the scheme, not the plan. Which is it?</div>
+                        <div class="flex flex-wrap gap-1.5">
+                          <Button
+                            v-for="c in h.couldBe" :key="c.id" size="sm" variant="outline" class="h-7 text-xs"
+                            :title="`These files are ${c.name}`" @click="answer(h, c.id)"
+                          >{{ c.name }}</Button>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell class="whitespace-nowrap font-mono text-xs">{{ h.series.from }} → {{ h.series.to }}</TableCell>
+                    <TableCell class="text-right tabular-nums text-muted-foreground">{{ h.files.length }}</TableCell>
+                    <TableCell><Badge :variant="tone(STATUS[h.worst][0])">{{ STATUS[h.worst][1] }}</Badge></TableCell>
+                    <TableCell class="text-right whitespace-nowrap">
+                      <Button
+                        size="sm" :variant="browsing?.key === h.key ? 'secondary' : 'outline'"
+                        :title="`Chart, calendar and values for ${h.series.name}, as a run reads it`" @click="browse(h)"
+                      >{{ browsing?.key === h.key ? 'Close' : 'View' }}</Button>
+                    </TableCell>
+                  </TableRow>
+                  <!-- Opened from the row above and drawn under it: the chart belongs beside the series it
+                       is of. What it shows is the series as a run reads it -- the pieces stitched, the
+                       publisher's adjusted twin preferred, a polled day reduced to its last reading -- and
+                       the explorer is given a loader, so this is the only series ever parsed. -->
+                  <TableRow v-if="browsing?.key === h.key" class="hover:bg-transparent">
+                    <TableCell colspan="5" class="p-0">
+                      <div class="border-y bg-muted/20 p-3">
+                        <SeriesExplorer
+                          :key="h.key" :loader="loaderFor(h)" :lines="LINES"
+                          :unit="h.series.ccy === 'INR' ? '₹' : h.series.ccy === 'USD' ? '$' : ''"
+                          :views="['chart', 'calendar', 'table']"
+                          :first="h.series.from" :last="h.series.to"
+                          :label="h.series.name"
+                          :note="`${a.name} · ${h.files.length} file${h.files.length > 1 ? 's' : ''} · as a run reads it`"
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </template>
+              </template>
+            </template>
           </TableBody>
         </Table>
 
@@ -336,24 +412,6 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
             </li>
           </ul>
         </div>
-
-        <!-- One series, as a run reads it: the pieces stitched, the publisher's adjusted twin preferred, a
-             polled day reduced to its last reading. The explorer is xfina-ui's (xfina-dev/xfina-ui#15) and is
-             given a loader, so this is the only series ever parsed. -->
-        <section v-if="browsing" class="space-y-2 border-t pt-4">
-          <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">{{ browsing.series.name }}</div>
-            <button type="button" class="text-xs text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground" @click="browsing = null">Close</button>
-          </div>
-          <SeriesExplorer
-            :key="browsing.key" :loader="loaderFor(browsing)" :lines="LINES"
-            :unit="browsing.series.ccy === 'INR' ? '₹' : browsing.series.ccy === 'USD' ? '$' : ''"
-            :views="['chart', 'calendar', 'table']"
-            :first="browsing.series.from" :last="browsing.series.to"
-            :label="browsing.series.name"
-            :note="`${browsing.asset} · ${browsing.files.length} file${browsing.files.length > 1 ? 's' : ''} · as a run reads it`"
-          />
-        </section>
 
         <!-- Comes with the tool: nothing to choose here, and nothing to download. Which of each pair a run
              uses is a run decision, so it is picked in the engine's Series step, not here. -->

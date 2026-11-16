@@ -4,6 +4,7 @@ import {
 } from 'xfina-ui';
 import { tone } from './tone.js';
 import { CLASSES, REGIONS, nodes } from './guide.js';
+import { regionsWithAssets } from './catalogue.js';
 import { DATA, REFERENCE, refreshPublished } from './reference.js';
 import { reactive, computed, onMounted, watchEffect, toRef } from 'vue';
 import { selection, ui, picks } from './store.js';
@@ -32,18 +33,7 @@ const NOTES = {
   us: 'Assets in the US: US indexes, US and Irish funds in dollars, plus Indian funds investing there, in rupees.',
   global: 'Assets across countries and currencies: world indexes, global bonds and gold, priced in dollars.',
 };
-const assetName = (cls, asset) => (cls === 'debt' ? `Debt · ${asset}` : asset);
-const catalogue = REGIONS.map((r) => ({
-  id: r.id, title: r.title, note: NOTES[r.id],
-  assets: CLASSES.flatMap((c) => [...new Set(nodes.filter((n) => n.region === r.id && n.class === c.id).map((n) => n.asset))].map((asset) => ({
-    key: `${r.id}|${c.id}|${asset}`,
-    name: assetName(c.id, asset),
-    since: nodes.filter((n) => n.region === r.id && n.class === c.id && n.asset === asset).flatMap((n) => n.instruments.map((i) => i.inception)).filter(Boolean).sort()[0],
-    // Read through to the imported store, so a file imported above this step
-    // shows up here without the catalogue being rebuilt.
-    get series() { return seriesFor(`${r.id}|${c.id}|${asset}`); },
-  }))),
-}));
+const catalogue = regionsWithAssets().map((r) => ({ ...r, note: NOTES[r.id] }));
 
 const sections = [
   ...catalogue,

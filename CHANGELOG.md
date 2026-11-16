@@ -51,6 +51,18 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- The Series screen reads as a page rather than a bar: its own header with what
+  it is for and the way back to the Portfolio Engine; the note on where
+  downloaded data goes lifted above the stages, since it is true of the whole
+  screen and not of choosing; and the stages themselves drawn as a path, left to
+  right in the order the work goes, the one you are on filled and a count only
+  where something is outstanding.
+- What you hold is grouped by region and asset, the way the Assets step groups
+  the same catalogue -- one grouping, in `catalogue.js`, read by both, rather
+  than two shapes for the same information. A series opens with **View** and the
+  chart is drawn directly under the row it belongs to; the per-row `Use` link is
+  gone, now that the header carries the way back.
+
 - The Series screen is four stages -- Selection, Download, Import, Manage -- one
   rendered at a time, with a bar across the top that is both where you are and
   what each stage has left to do: `Selection 12 chosen · Download 9 to get`. The

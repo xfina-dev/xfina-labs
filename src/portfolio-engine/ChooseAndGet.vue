@@ -10,7 +10,7 @@
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, Badge } from 'xfina-ui';
 import { tone } from './tone.js';
 import { ref, computed, watch, onMounted } from 'vue';
-import { ExternalLink, X, Check, Bookmark, ShieldCheck } from 'lucide-vue-next';
+import { ExternalLink, X, Check, Bookmark } from 'lucide-vue-next';
 import GifPreview from './GifPreview.vue';
 import { bookmarkletFor } from './bookmarklets.js';
 import { imported, datasetState, maybeWith, load as loadImports } from './imports.js';
@@ -183,17 +183,6 @@ const HOLD_BADGE = { held: ['good', 'Held'], maybe: ['warn', 'Which one?'] };
 
 <template>
   <div class="space-y-8">
-      <!-- Where the data goes, before anything is picked -->
-      <div class="rounded-md border bg-muted/30 p-4 space-y-2 text-sm">
-        <div class="flex items-center gap-2 font-semibold"><ShieldCheck class="h-4 w-4" />Data you download stays with you</div>
-        <ul class="list-disc pl-5 space-y-0.5 text-muted-foreground">
-          <li>You download the data from each source in your browser, and use it in your browser.</li>
-          <li>Xfina Labs and Portfolio Engine are a static website: there is no API or form that stores anything on a server, so Xfina never sees your data.</li>
-          <li>Each source's own terms of use apply (the Terms link on its card). Xfina isn't affiliated with any of them.</li>
-          <li>A few open, public series come with Portfolio Engine, so there is nothing to download for them: USD/INR and inflation (CPI).</li>
-        </ul>
-      </div>
-
       <!-- 1. Picker, full width -->
       <template v-if="props.stage === 'selection'">
       <section id="select" class="space-y-4 scroll-mt-8">
