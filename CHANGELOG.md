@@ -7,6 +7,15 @@ live as soon as it lands; the dates below are when it did.
 
 ### Added
 
+- A held series opens in Manage: chart, calendar and table, level or change,
+  a period by preset or by date, with the change and the CAGR over it. It is
+  xfina-ui's `SeriesExplorer`, given a loader rather than rows, so the only
+  series ever parsed is the one somebody opens -- the table itself still draws
+  from stored metadata without the WebAssembly module. What it shows is what a
+  run reads: `seriesCsv` in the engine stitches a series' files the way a
+  backtest does, preferring the publisher's adjusted twin and reducing a polled
+  day to its last reading, so the chart and the backtest cannot disagree.
+
 - Import takes a whole folder, not just files. Data downloaded per publisher is
   already one folder each, so a publisher's year of downloads is one action
   rather than ninety-seven. Notes, archives and whatever the OS leaves behind --

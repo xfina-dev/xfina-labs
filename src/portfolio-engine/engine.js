@@ -9,7 +9,7 @@
 //
 // Everything runs in this tab. The files a user imports are read here, the
 // parsed series stay inside the module, and nothing is uploaded.
-import init, { readFile as wasmReadFile, dropFile, clearFiles, fileCsv, run as wasmRun, version } from './engine-pkg/engine.js';
+import init, { readFile as wasmReadFile, dropFile, clearFiles, fileCsv, seriesCsv, run as wasmRun, version } from './engine-pkg/engine.js';
 
 /// What the module was built from, for the footer and the exported JSON, and
 /// for telling a stored reading of a file apart from what this build would
@@ -44,7 +44,7 @@ export async function readBytes(bytes, filename, modifiedTimestamp) {
   return wasmReadFile(bytes, { filename, modifiedTimestamp });
 }
 
-export { dropFile, clearFiles, fileCsv };
+export { dropFile, clearFiles, fileCsv, seriesCsv };
 
 /// Runs a backtest. Resolves to the run, or to `{ error }`.
 export async function runBacktest(request) {

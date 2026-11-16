@@ -27,13 +27,13 @@
 // Xfina uses, and kept in this browser's own storage.
 import { computed, ref, watch } from 'vue';
 import {
-  Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle,
+  Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, SeriesExplorer, rowsFromCsv,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from 'xfina-ui';
 import { ExternalLink, FolderOpen, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
-import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf, datasetState } from './imports.js';
+import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf, datasetState, seriesRows } from './imports.js';
 import { picks, load as loadPicks } from './picks.js';
 import { findDataset, nodes } from './guide.js';
 import { DATA, REFERENCE, refreshPublished } from './reference.js';
@@ -161,6 +161,17 @@ const held = computed(() => Object.entries(imported.byAsset).flatMap(([key, list
   worst: s.files.some((f) => f.status === 'err') ? 'err' : s.files.some((f) => f.status === 'warn') ? 'warn' : 'ok',
 }))).sort((a, b) => a.region.localeCompare(b.region) || a.asset.localeCompare(b.asset)));
 const rows = computed(() => held.value.reduce((n, h) => n + h.files.length, 0));
+
+// --- Browsing one series -----------------------------------------------------
+// xfina-ui's explorer (xfina-dev/xfina-ui#15), given a `loader` rather than
+// rows: a series here is parsed in the WASM module and its bytes are in
+// IndexedDB, so it is read when somebody opens it and not before. Holding every
+// series' rows for a screen that shows one at a time is what the stages were
+// split to avoid.
+const browsing = ref(null);
+const LINES = [{ key: 'value', label: 'Value' }];
+const loaderFor = (h) => async () => rowsFromCsv(await seriesRows(fileIdsOf(h.series)), LINES);
+const browse = (h) => { browsing.value = browsing.value?.key === h.key ? null : h; };
 
 const confirmClear = ref(false);
 const clearStored = async () => { confirmClear.value = false; await clearImports(); lastImport.value = null; };
@@ -299,8 +310,12 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
               <TableCell class="whitespace-nowrap font-mono text-xs">{{ h.series.from }} → {{ h.series.to }}</TableCell>
               <TableCell class="text-right tabular-nums text-muted-foreground">{{ h.files.length }}</TableCell>
               <TableCell><Badge :variant="tone(STATUS[h.worst][0])">{{ STATUS[h.worst][1] }}</Badge></TableCell>
-              <TableCell class="text-right">
-                <a href="/portfolio-engine/" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Use it in a backtest">Use</a>
+              <TableCell class="text-right whitespace-nowrap">
+                <button
+                  type="button" class="text-sm underline decoration-dotted underline-offset-4 hover:text-foreground"
+                  :title="`Chart, calendar and values for ${h.series.name}, as a run reads it`" @click="browse(h)"
+                >{{ browsing?.key === h.key ? 'Close' : 'Open' }}</button>
+                <a href="/portfolio-engine/" class="ml-3 text-sm underline decoration-dotted underline-offset-4 hover:text-foreground" title="Use it in a backtest">Use</a>
               </TableCell>
             </TableRow>
           </TableBody>
@@ -319,14 +334,23 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
           </ul>
         </div>
 
-        <!-- Browsing a held series -- its chart, its calendar, a period by preset or by date, the change and
-             the CAGR over it -- belongs here, on the row it describes. It is not built here on purpose:
-             Xfina Data's explorer is being extracted into xfina-ui as `SeriesExplorer` (xfina-dev/xfina-ui#15),
-             taking rows or a loader rather than a path, precisely so this screen can hand it a series held in
-             WASM and IndexedDB. A second explorer written here would be the copy we would then have to keep in
-             step, which is the mistake this branch has spent a week undoing. When it ships, it opens from a
-             row above and reads that series' own rows.
-             TODO(xfina-ui#15): mount SeriesExplorer here. -->
+        <!-- One series, as a run reads it: the pieces stitched, the publisher's adjusted twin preferred, a
+             polled day reduced to its last reading. The explorer is xfina-ui's (xfina-dev/xfina-ui#15) and is
+             given a loader, so this is the only series ever parsed. -->
+        <section v-if="browsing" class="space-y-2 border-t pt-4">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">{{ browsing.series.name }}</div>
+            <button type="button" class="text-xs text-muted-foreground underline decoration-dotted underline-offset-4 hover:text-foreground" @click="browsing = null">Close</button>
+          </div>
+          <SeriesExplorer
+            :key="browsing.key" :loader="loaderFor(browsing)" :lines="LINES"
+            :unit="browsing.series.ccy === 'INR' ? '₹' : browsing.series.ccy === 'USD' ? '$' : ''"
+            :views="['chart', 'calendar', 'table']"
+            :first="browsing.series.from" :last="browsing.series.to"
+            :label="browsing.series.name"
+            :note="`${browsing.asset} · ${browsing.files.length} file${browsing.files.length > 1 ? 's' : ''} · as a run reads it`"
+          />
+        </section>
 
         <!-- Comes with the tool: nothing to choose here, and nothing to download. Which of each pair a run
              uses is a run decision, so it is picked in the engine's Series step, not here. -->

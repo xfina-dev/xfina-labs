@@ -16,7 +16,7 @@
 // Nothing is uploaded. The bytes go to the WASM module in this tab, the parsed
 // series stay inside it, and IndexedDB is this browser's alone.
 import { reactive } from 'vue';
-import { readBytes, dropFile, clearFiles, engineLoaded, engineReady, versions } from './engine.js';
+import { readBytes, dropFile, clearFiles, seriesCsv, engineLoaded, engineReady, versions } from './engine.js';
 import * as vault from './vault.js';
 import { nodes, generatedAt } from './guide.js';
 import * as matching from './matching.js';
@@ -452,6 +452,21 @@ export async function clearImports() {
 
 /// The ids of every valid file behind a series, which is what a run resolves to
 /// engine handles with `resident`.
+/// The stitched series a set of files makes, as `date,value` CSV, read out of
+/// the engine.
+///
+/// Goes through `resident`, which is the one path that waits for the module and
+/// puts a file's bytes back into it, so a series is only parsed when something
+/// actually asks to see it. That is why the Series screen's Manage stage stays
+/// cheap to open: it draws a table from stored metadata, and only the one
+/// series somebody opens is ever read.
+export async function seriesRows(fileIds) {
+  const handles = await resident(fileIds);
+  const ids = fileIds.map((id) => handles.get(id)).filter(Boolean);
+  if (!ids.length) throw new Error('None of this series\' files could be read back.');
+  return seriesCsv(ids);
+}
+
 /// Records which catalogue instrument a file is, where the file itself could
 /// not say -- AMFI's NAV export names a scheme without its plan, so a file of
 /// the ICICI gilt fund covering only recent months could be the Regular plan or

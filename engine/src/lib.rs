@@ -353,6 +353,36 @@ pub fn read_file(bytes: &[u8], options: JsValue) -> Result<JsValue, JsValue> {
 }
 
 /// Forgets one imported file.
+/// The stitched series a set of files makes, as `date,value` CSV.
+///
+/// One series, not one file: the pieces are put together exactly as a run puts
+/// them together -- the publisher's adjusted twin taken over its headline where
+/// it prints one, a polled day reduced to its last reading, a later file
+/// winning a date an earlier one also carries (see `data::Daily::stitch`). So
+/// what a chart of this shows is what a backtest would read, rather than a
+/// separate reading of the same files.
+#[wasm_bindgen(js_name = seriesCsv)]
+pub fn series_csv(ids: Vec<String>) -> Result<String, JsValue> {
+    STORE.with(|store| {
+        let store = store.borrow();
+        let parts: Vec<&xfina::models::PriceSeries> = ids
+            .iter()
+            .map(|id| {
+                store
+                    .series
+                    .get(id)
+                    .ok_or_else(|| JsValue::from_str(&format!("No file {id} is loaded.")))
+            })
+            .collect::<Result<_, _>>()?;
+        let daily = data::Daily::stitch(&parts);
+        let mut out = String::from("date,value\n");
+        for (date, value) in &daily.0 {
+            out.push_str(&format!("{},{}\n", data::iso(*date), value));
+        }
+        Ok(out)
+    })
+}
+
 #[wasm_bindgen(js_name = dropFile)]
 pub fn drop_file(id: &str) {
     STORE.with(|store| {
