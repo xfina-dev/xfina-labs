@@ -30,7 +30,7 @@ import {
   Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from 'xfina-ui';
-import { ExternalLink, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
+import { ExternalLink, FolderOpen, HelpCircle, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
 import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf, datasetState } from './imports.js';
@@ -88,12 +88,28 @@ refreshPublished();
 
 // --- Import ------------------------------------------------------------------
 const fileInput = ref(null);
+const folderInput = ref(null);
 const lastImport = ref(null);
 const dragging = ref(false);
+
+// What a folder holds besides data. A publisher's download folder picks these
+// up -- the notes you keep beside the files, whatever the OS leaves behind --
+// and they are not failures to report, so they are passed over in silence and
+// counted as skipped.
+const NOT_DATA = /^(\.|~)|^(README|readme)[.\w]*$|\.(md|txt|json5|zip|gz|pdf|docx?|png|jpe?g|gif|webp|svg|html?)$/;
+const isData = (file) => !NOT_DATA.test(file.name);
+
 const onFiles = async (files) => {
-  const list = [...(files || [])];
-  if (!list.length) return;
-  lastImport.value = await importFiles(list);
+  const all = [...(files || [])];
+  if (!all.length) return;
+  // A folder is one action, so what it came to is one line: what read, what was
+  // already in, what was passed over, what would not read. A hundred rows of
+  // detail is what the Manage stage is for.
+  const data = all.filter(isData);
+  const skipped = all.length - data.length;
+  if (!data.length) { lastImport.value = { read: 0, already: 0, errors: [], skipped }; return; }
+  const out = await importFiles(data);
+  lastImport.value = { ...out, skipped };
 };
 const onPicked = async (event) => {
   // Copied out before the input is cleared: `files` is a live FileList, and
@@ -213,16 +229,24 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
           <p v-if="imported.busy" class="text-sm">Reading your files…</p>
           <template v-else-if="lastImport">
             <p class="text-sm">
-              <span v-if="lastImport.read">{{ lastImport.read }} file{{ lastImport.read > 1 ? 's' : '' }} read and kept in this browser.</span>
-              <span v-if="lastImport.already" class="text-muted-foreground"> {{ lastImport.already }} already imported.</span>
+              <span v-if="lastImport.read">{{ lastImport.read }} file{{ lastImport.read > 1 ? 's' : '' }} read and kept in this browser.{{ ' ' }}</span>
+              <span v-else-if="!lastImport.errors.length">Nothing new to read.</span>
+              <span v-if="lastImport.already" class="text-muted-foreground">{{ lastImport.already }} already imported.{{ ' ' }}</span>
+              <span v-if="lastImport.skipped" class="text-muted-foreground" title="Notes, archives and whatever the OS leaves behind: passed over, not failures">{{ lastImport.skipped }} skipped.</span>
             </p>
             <p v-if="lastImport.errors.length" class="text-sm text-status-critical-text">
               {{ lastImport.errors.length }} could not be read: {{ lastImport.errors[0].message }}
             </p>
           </template>
-          <p v-else class="text-sm text-muted-foreground">Drop files here, or pick them.</p>
-          <Button size="lg" :disabled="imported.busy" @click="fileInput.click()"><Upload class="h-4 w-4 mr-2" />Choose files</Button>
+          <p v-else class="text-sm text-muted-foreground">Drop files here, or pick a folder — a publisher's whole folder at once.</p>
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <Button size="lg" :disabled="imported.busy" @click="fileInput.click()"><Upload class="h-4 w-4 mr-2" />Choose files</Button>
+            <!-- A folder, read right through: his data is already one folder per publisher, so this turns
+                 ninety-seven files into one action. -->
+            <Button variant="outline" size="lg" :disabled="imported.busy" @click="folderInput.click()"><FolderOpen class="h-4 w-4 mr-2" />Choose a folder</Button>
+          </div>
           <input ref="fileInput" type="file" accept=".csv,.xls,.xlsx,.xlsm,.txt,.json" multiple class="sr-only" @change="onPicked" />
+          <input ref="folderInput" type="file" webkitdirectory directory multiple class="sr-only" @change="onPicked" />
         </div>
         <p v-if="imported.storageError" class="text-xs text-status-critical-text">{{ imported.storageError }}</p>
       </CardContent>

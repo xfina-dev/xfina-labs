@@ -7,6 +7,14 @@ live as soon as it lands; the dates below are when it did.
 
 ### Added
 
+- Import takes a whole folder, not just files. Data downloaded per publisher is
+  already one folder each, so a publisher's year of downloads is one action
+  rather than ninety-seven. Notes, archives and whatever the OS leaves behind --
+  a `README.md`, a `.DS_Store` -- are passed over quietly and counted as
+  skipped, not reported as failures, and a file that cannot be read is named
+  without stopping the rest. What a folder came to is one line: "2 files read
+  and kept in this browser. 2 skipped. 1 could not be read".
+
 - **The Portfolio Engine runs on real data.** A new Rust crate, `engine/`, built
   to WebAssembly, composes [`xfina`](https://github.com/xfina-dev/xfina) (which
   reads each publisher's download into a price series) and
