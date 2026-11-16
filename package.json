@@ -14,9 +14,10 @@
     "build:tree": "node scripts/build-tree.mjs"
   },
   "dependencies": {
+    "echarts": "6.1.0",
     "lucide-vue-next": "^1.0.0",
     "vue": "^3.5.34",
-    "xfina-ui": "0.9.0"
+    "xfina-ui": "0.10.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
