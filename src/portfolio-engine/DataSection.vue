@@ -211,7 +211,7 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
              covers. Type sets the basis -- an index level, a market price or a NAV. Narrower than the
              minimum, the table scrolls. -->
         <Table class="table-fixed min-w-[28rem]">
-          <colgroup><col class="w-9" /><col /><col class="w-[4.5rem]" /><col class="w-44" /></colgroup>
+          <colgroup><col class="w-9" /><col /><col class="w-[4.5rem]" /><col class="w-52" /></colgroup>
           <TableHeader>
             <TableRow>
               <TableHead class="pr-0"><span class="sr-only">Used for this run</span></TableHead>
