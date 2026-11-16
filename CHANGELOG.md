@@ -7,6 +7,15 @@ live as soon as it lands; the dates below are when it did.
 
 ### Added
 
+- A series can be deleted from the Manage stage, every file of it at once: a
+  Nifty 50 history is fifty-five files and an overnight rate index seventeen,
+  and there was only one file at a time or everything at once before. It asks
+  first, in the row it would empty and naming how many files go, and removes
+  them in one pass rather than one transaction per file.
+- **Use** takes a series to the Portfolio Engine with that series already picked
+  for its asset, rather than only landing on the page -- the Assets step reads
+  the same stored picks this writes.
+
 - A held series opens in Manage: chart, calendar and table, level or change,
   a period by preset or by date, with the change and the CAGR over it. It is
   xfina-ui's `SeriesExplorer`, given a loader rather than rows, so the only
@@ -50,6 +59,13 @@ live as soon as it lands; the dates below are when it did.
   last of these: several readings a day is what its series is.
 
 ### Changed
+
+- Manage's tables say where a series came from. With the same instrument
+  available from several publishers, that is the column that settles which one
+  you are looking at, and it shows in both tables since their rows match.
+- `View` and `Close` are one width, so the column no longer resizes and the rows
+  no longer shift under the pointer when a series opens. The same was true of
+  `View`/`Viewing` in the run history, and is fixed there too.
 
 - The series that come with the Portfolio Engine have a box of their own on
   Manage, beside what you hold rather than inside it: they are published by

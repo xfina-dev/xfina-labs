@@ -536,7 +536,7 @@ function exportResult() {
               <TableRow class="hover:bg-transparent">
                 <TableCell />
                 <TableCell v-for="e in compared" :key="e.key" class="pt-4 text-right" :class="entry === e && 'bg-primary/5'">
-                  <Button size="sm" :variant="entry === e ? 'selected' : 'outline'" :aria-pressed="entry === e" @click="openResult(e)">{{ entry === e ? 'Viewing' : 'View' }}</Button>
+                  <Button size="sm" class="w-20" :variant="entry === e ? 'selected' : 'outline'" :aria-pressed="entry === e" @click="openResult(e)">{{ entry === e ? 'Viewing' : 'View' }}</Button>
                 </TableCell>
               </TableRow>
             </TableBody>

@@ -438,6 +438,27 @@ export async function removeFile(fileId) {
   await refreshUsage();
 }
 
+/// Removes a whole series: every file behind it, from the table, the engine and
+/// this browser alike.
+///
+/// One pass, not a loop over `removeFile`. A series is routinely many files --
+/// fifty-five for a Nifty 50 history, seventeen for an overnight rate index --
+/// and removing them one at a time would open a transaction and redraw the
+/// table once per file.
+export async function removeSeries(fileIds) {
+  const ids = fileIds.filter((id) => RECORDS.has(id));
+  if (!ids.length) return 0;
+  for (const id of ids) {
+    RECORDS.delete(id);
+    const handle = RESIDENT.get(id);
+    if (handle) { dropFile(handle); RESIDENT.delete(id); }
+  }
+  refile();
+  await vault.removeMany(ids);
+  await refreshUsage();
+  return ids.length;
+}
+
 /// Removes every import, from the table, the engine and this browser alike.
 export async function clearImports() {
   RECORDS.clear();

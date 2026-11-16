@@ -25,7 +25,7 @@
 //
 // Nothing here is uploaded. Files are read in this tab by the same parsers
 // Xfina uses, and kept in this browser's own storage.
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import {
   Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -37,8 +37,9 @@ import SeriesRows from './SeriesRows.vue';
 import { ArrowLeft, ChevronRight, ExternalLink, FolderOpen, HelpCircle, ShieldCheck, Trash2, Upload } from 'lucide-vue-next';
 import AppShell from '@/components/AppShell.vue';
 import ChooseAndGet from './ChooseAndGet.vue';
-import { imported, importFiles, load as loadImports, removeFile, clearImports, assignDataset, fileIdsOf, datasetState, seriesRows } from './imports.js';
+import { imported, importFiles, load as loadImports, removeFile, removeSeries, clearImports, assignDataset, fileIdsOf, datasetState, seriesRows } from './imports.js';
 import { picks, load as loadPicks } from './picks.js';
+import { picks as assetPicks } from './store.js';
 import { findDataset } from './guide.js';
 import { regionsWithAssets } from './catalogue.js';
 import { DATA, REFERENCE, refreshPublished } from './reference.js';
@@ -229,6 +230,26 @@ const providedExplorer = (a, s) => ({
   note: `${a.name} · ${s.publisher} · comes with the Portfolio Engine`,
 });
 
+// Taking a series to a run. It arrives picked for its asset rather than just
+// landing on the page: the Assets step reads the same `picks` this writes, so
+// the series you were looking at is the one selected when you get there.
+// Waiting a tick first, because that pick is saved by a watcher and navigating
+// before it has run would lose it.
+const use = async (assetKey, series) => {
+  assetPicks[assetKey] = series.key;
+  await nextTick();
+  window.location.href = '/portfolio-engine/';
+};
+
+// Deleting a whole series: asked about in its own row, naming what goes, and
+// done in one pass (imports.js).
+const confirmingDelete = ref(null);
+const removeWholeSeries = async (h) => {
+  confirmingDelete.value = null;
+  if (browsing.value === h.key) browsing.value = null;
+  await removeSeries(h.files.map((f) => f.id));
+};
+
 const confirmClear = ref(false);
 const clearStored = async () => { confirmClear.value = false; await clearImports(); lastImport.value = null; };
 const mb = (bytes) => (bytes == null ? '—' : bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1e6))} MB`);
@@ -369,7 +390,7 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
         <Table v-if="groups.length">
           <TableHeader>
             <TableRow>
-              <TableHead>Series</TableHead><TableHead>Covers</TableHead>
+              <TableHead>Series</TableHead><TableHead>Source</TableHead><TableHead>Covers</TableHead>
               <TableHead class="text-right">Files</TableHead><TableHead>Checks</TableHead><TableHead />
             </TableRow>
           </TableHeader>
@@ -377,19 +398,22 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
             <template v-for="r in groups" :key="r.id">
               <!-- Region, then asset, as the Assets step reads -->
               <TableRow class="hover:bg-transparent">
-                <TableCell colspan="5" class="pb-1 pt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{{ r.title }}</TableCell>
+                <TableCell colspan="6" class="pb-1 pt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{{ r.title }}</TableCell>
               </TableRow>
               <template v-for="a in r.assets" :key="a.key">
                 <TableRow class="bg-muted/30 hover:bg-muted/30">
-                  <TableCell colspan="5" class="py-2 font-semibold">{{ a.name }}</TableCell>
+                  <TableCell colspan="6" class="py-2 font-semibold">{{ a.name }}</TableCell>
                 </TableRow>
                 <SeriesRows
                   v-for="h in a.held" :key="h.key"
-                  :from="h.series.from" :to="h.series.to" :files="h.files.length"
-                  :status="STATUS[h.worst]" :label="h.series.name"
+                  :from="h.series.from" :to="h.series.to" :files="h.files.length" :files_="h.files.length"
+                  :source="h.series.publisher" :status="STATUS[h.worst]" :label="h.series.name"
                   :open="browsing === h.key" :explorer="heldExplorer(h, a.name)"
                   :problem="browsing === h.key ? problem : null"
-                  @toggle="browse(h.key)"
+                  can-use can-remove :confirming="confirmingDelete === h.key"
+                  @toggle="browse(h.key)" @use="use(a.key, h.series)"
+                  @confirm="confirmingDelete = h.key" @cancel="confirmingDelete = null"
+                  @remove="removeWholeSeries(h)"
                 >
                   <template #name>
                     <div class="font-medium">{{ h.series.name }}</div>
@@ -479,14 +503,14 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Series</TableHead><TableHead>Covers</TableHead>
+              <TableHead>Series</TableHead><TableHead>Source</TableHead><TableHead>Covers</TableHead>
               <TableHead class="text-right">Files</TableHead><TableHead>Checks</TableHead><TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
             <template v-for="a in REFERENCE" :key="a.key">
               <TableRow class="bg-muted/30 hover:bg-muted/30">
-                <TableCell colspan="5" class="py-2">
+                <TableCell colspan="6" class="py-2">
                   <span class="font-semibold">{{ a.name }}</span>
                   <span class="ml-2 text-xs text-muted-foreground">{{ a.what }}</span>
                 </TableCell>
@@ -494,6 +518,7 @@ const STATUS = { ok: ['good', 'Valid'], warn: ['warn', 'Check'], err: ['critical
               <SeriesRows
                 v-for="s in a.series" :key="s.id"
                 :from="s.first" :to="s.last" :files="null" :status="null" :label="s.name"
+                :source="s.publisher"
                 :open="browsing === `provided|${s.id}`" :explorer="providedExplorer(a, s)"
                 :problem="browsing === `provided|${s.id}` ? problem : null"
                 @toggle="browse(`provided|${s.id}`)"

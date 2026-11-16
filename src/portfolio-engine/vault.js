@@ -167,6 +167,25 @@ export async function remove(id) {
   }
 }
 
+/// Forgets several imports in one transaction: a series is routinely many
+/// files, and fifty-five transactions to delete one series would be fifty-five
+/// chances to half-finish.
+export async function removeMany(ids) {
+  const db = await open();
+  if (!db) return false;
+  try {
+    await run(db, [IMPORTS, BLOBS], 'readwrite', (tx) => {
+      for (const id of ids) {
+        tx.objectStore(IMPORTS).delete(id);
+        tx.objectStore(BLOBS).delete(id);
+      }
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /// Forgets every import.
 export async function clear() {
   const db = await open();
