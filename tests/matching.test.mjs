@@ -321,7 +321,7 @@ test('nothing reconciles the catalogue against imports by comparing names', () =
   // key, so the page worked out what was held by comparing names as it drew.
   // The match is recorded on the import now and every screen reads a state.
   const read = (f) => readFileSync(new URL(`../src/portfolio-engine/${f}`, import.meta.url), 'utf8');
-  for (const f of ['DataSection.vue', 'ChooseAndGet.vue', 'Datasets.vue']) {
+  for (const f of ['DataSection.vue', 'ChooseAndGet.vue', 'Series.vue']) {
     assert.doesNotMatch(read(f), /nameFit/, `${f} must not compare names`);
     assert.doesNotMatch(read(f), /function fitOf|function unheld/, `${f}: the comparison must be gone, not ported`);
   }

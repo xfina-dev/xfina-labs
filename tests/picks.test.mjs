@@ -59,7 +59,7 @@ test('a pick naming a dataset the catalogue no longer has is dropped', () => {
 });
 
 test('nothing reads the picks out of localStorage any more', () => {
-  for (const f of ['ChooseAndGet.vue', 'DataSection.vue', 'Datasets.vue']) {
+  for (const f of ['ChooseAndGet.vue', 'DataSection.vue', 'Series.vue']) {
     assert.doesNotMatch(read(f), /guide_selection_v4/, `${f} must take the picks from picks.js`);
   }
   assert.match(read('ChooseAndGet.vue'), /from '\.\/picks\.js'/);
