@@ -21,10 +21,11 @@ const toggle = (id) => { open[id] = !open[id]; };
 
 // Bringing data in, before the steps, as Run comes after them. How to get data opens at the region Select
 // Assets shows. The files are read here, in this tab, by the engine's `xfina` half: each one is identified,
-// parsed and filed under the asset it belongs to (imports.js). Datasets is where that happens now; this page's
+// parsed and filed under the asset it belongs to (imports.js). The Series screen is where that happens now;
+// this page's
 // first step only picks which loaded series each asset uses.
 // What this browser holds, read back on load: the table and the run history come up without the engine being
-// fetched at all (see imports.js and vault.js). Importing itself happens in Datasets.
+// fetched at all (see imports.js and vault.js). Importing itself happens on the Series screen.
 onMounted(() => loadImports());
 
 // A run saves one result per ticked strategy, then shows Results.
@@ -59,7 +60,7 @@ const problem = computed(() => ({ portfolio: total.value !== 100 ? `Allocation t
 // One page: four numbered steps in order, each reading what the ones above produced, then what they come to.
 // Results is not a step: its header (with a chart icon, not a number) is part of its pinned bar.
 const SECTIONS = [
-  { id: 'data', label: 'Series', comp: DataSection },
+  { id: 'data', label: 'Assets', comp: DataSection },
   { id: 'portfolio', label: 'Set Allocation', comp: PortfolioSection },
   { id: 'rebalancing', label: 'Choose Rebalancing', comp: RebalancingSection },
   { id: 'investments', label: 'Plan Investments', comp: InvestmentsSection },
@@ -103,7 +104,7 @@ const SECTIONS = [
           </button>
         </h2>
         <div v-show="s.results || open[s.id]" :id="`${s.id}-body`" :class="s.id === 'data' && 'space-y-4'">
-          <!-- Managing the data is Datasets' job, and this is the step it serves. Above the step's own cards
+          <!-- Managing the series is the Series screen's job, and this is the step it serves. Above the cards
                and right aligned, the same shape as the Run button below, so the two things this page asks of
                you -- set the series, then run them -- are offered the same way. -->
           <div v-if="s.id === 'data'" class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
@@ -112,7 +113,7 @@ const SECTIONS = [
               <template v-else-if="imported.storage.files">{{ imported.storage.files }} file{{ imported.storage.files > 1 ? 's' : '' }} kept in this browser. Add more, or check what you have.</template>
               <template v-else>Nothing imported yet: choose what you need, download it and import it.</template>
             </p>
-            <a href="/portfolio-engine/datasets/" class="no-underline shrink-0">
+            <a href="/portfolio-engine/series/" class="no-underline shrink-0">
               <Button size="lg" :class="ACTION" title="Choose, download, import and keep the data a run reads">
                 <Database class="h-4 w-4 mr-2" />Manage
               </Button>

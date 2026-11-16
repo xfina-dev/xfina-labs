@@ -247,7 +247,7 @@ const planRequest = () => ({
 
 // Why a run cannot go ahead, in a sentence, or null when it can.
 export const blocked = computed(() => {
-  if (!selection.series.length) return 'Import a dataset in Datasets first: a run needs at least one asset with a series.';
+  if (!selection.series.length) return 'Import a dataset on the Series screen first: a run needs at least one asset with a series.';
   if (!selection.period.from) return 'No period: the picked series share no dates.';
   const allocated = ASSETS.filter((a) => Number(a.weight) > 0);
   if (!allocated.length) return 'Give at least one asset a weight in Set Allocation.';

@@ -1,5 +1,9 @@
 <script setup>
-// Datasets: where the whole job of getting data happens, end to end.
+// Series: where the whole job of getting a run's data happens, end to end.
+//
+// Named for what it holds. The Portfolio Engine's own first step is Assets --
+// it picks which of these series each asset uses -- so the two no longer share
+// a name. The old /portfolio-engine/datasets/ URL redirects here.
 //
 // Four phases on one screen, in the order the work actually goes:
 //

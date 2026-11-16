@@ -34,6 +34,12 @@ live as soon as it lands; the dates below are when it did.
 
 ### Changed
 
+- Two things were called Series. The screen is now **Series**, at
+  `/portfolio-engine/series/`, named for what it holds; the Portfolio Engine's
+  first step is **Assets**, named for what it does -- it picks which series each
+  asset uses. `/portfolio-engine/datasets/` redirects to the new URL and carries
+  its hash across, as `/get-data/` already did.
+
 - The engine's first step sheds the last of its file management: the file-detail
   dialog is gone, and with it the series name as a button -- the files behind a
   series, and their checks, belong on the screen that manages them. The footer

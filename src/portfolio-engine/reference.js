@@ -4,11 +4,11 @@
 //
 //   the provision -- that these exist, who publishes them, what each covers and
 //                    why you would reach for the long-history one. Data, so
-//                    Datasets explains it.
+//                    the Series screen explains it.
 //   the choice    -- which of each pair this run converts with and deflates by.
 //                    That changes what a run reports, and the right answer
 //                    depends on the run's own period, so it stays with the run,
-//                    in the engine's Series step, beside the per-asset pick.
+//                    in the engine's Assets step, beside the per-asset pick.
 //
 // Both read the definitions here, so there is one description of each series
 // rather than two to drift apart.

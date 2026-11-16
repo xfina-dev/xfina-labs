@@ -208,7 +208,7 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
   <div class="grid gap-8 lg:grid-cols-[1.35fr_1fr] items-start [&>*]:min-w-0">
     <Card class="bg-card border-border shadow-sm">
       <CardHeader class="pb-4">
-        <CardTitle class="text-xl">Series</CardTitle>
+        <CardTitle class="text-xl">Assets</CardTitle>
         <CardDescription>One loaded series per asset: what this run reads.</CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">

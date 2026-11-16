@@ -357,7 +357,7 @@ function refile() {
       });
       continue;
     }
-    // What this file settles about the catalogue, for the Datasets rows.
+    // What this file settles about the catalogue, for the Series screen's rows.
     if (match.dataset) datasets[match.dataset] = 'held';
     for (const id of match.candidates ?? []) {
       datasets[id] ||= 'maybe';
@@ -385,7 +385,7 @@ function refile() {
         origin: 'imported',
         matchedBy: match.how,
         // The catalogue instrument these files are, where the files say so, and
-        // the ones they could be where they do not: what a Datasets row is.
+        // the ones they could be where they do not: what a Series screen row is.
         dataset: match.dataset ?? null,
         candidates: match.candidates ?? null,
         // Set when the instrument is what the user said it is, not what the

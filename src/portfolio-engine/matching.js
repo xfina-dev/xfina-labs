@@ -67,7 +67,7 @@ export function catalogue(nodes) {
     n.instruments.map((i) => ({
       assetKey: `${n.region}|${n.class}|${n.asset}`,
       /// The catalogue's own id for this instrument (`mf100369`, `etf-gld`,
-      /// `idx-nifty-50-tri`). This is what a Datasets row is keyed by, and it
+      /// `idx-nifty-50-tri`). This is what a Series screen row is keyed by, and it
       /// is NOT the asset id from identity.js: one asset holds many
       /// instruments.
       id: i.id,
@@ -197,7 +197,7 @@ const SOURCE_HOW = {
 /// Which catalogue instrument a file is, as far as the file can say.
 ///
 /// `matchAsset` answers which asset a file belongs to, which is all a run
-/// needs. A Datasets row is one instrument, so it needs more: this narrows the
+/// needs. A Series screen row is one instrument, so it needs more: this narrows the
 /// asset's instruments to the ones the file's own name or code fits, and uses
 /// the publisher only to separate two that are otherwise equal.
 ///
