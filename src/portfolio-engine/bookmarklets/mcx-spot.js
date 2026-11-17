@@ -28,6 +28,7 @@
   var MON = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
   var q = function (id) { return document.getElementById(id); };
   var dmy = function (d) { return ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2) + '/' + d.getFullYear(); };
+  var iso = function (d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
   var parseShown = function (s) { var p = s.trim().split(' '); return new Date(+p[2], MON.indexOf(p[1]), +p[0]); };
   var set = function (el, v) { el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); };
   var has = function (id, v) { var el = q(id); return !!el && [].some.call(el.options, function (o) { return o.value === v; }); };
@@ -37,6 +38,14 @@
     var el = q(id);
     await c.look(el && el.closest('.SumoSelect') || el, what);
     if (el.sumo) el.sumo.selectItem(v); else set(el, v);
+  };
+  // Each date is two fields: the real `type=date` input, which takes ISO and
+  // rejects anything else outright, and a `…Display` text twin showing
+  // DD/MM/YYYY. Both are set, so whichever the page reads is right.
+  var setDate = async function (c, base, d, what) {
+    set(await c.look('#' + base, what), iso(d));
+    var disp = q(base + 'Display');
+    if (disp) set(disp, dmy(d));
   };
   var xlsShown = function () { var e = q('btnArchiveXLS'); return e && e.offsetParent !== null; };
   var xlsEmpty = function () { var t = document.querySelector('#Archive-tabledata tbody'); return t && /data not available/i.test(t.textContent); };
@@ -67,8 +76,8 @@
       if (q('ddlSelectSeesion')) await pick(c, 'ddlSelectSeesion', '0', 'the Session list (ALL)');
     },
     fetch: async function (it, w, c) {
-      set(await c.look('#ArchivefromDate', 'the From date'), dmy(w[0]));
-      set(await c.look('#ArchiveToDate', 'the To date'), dmy(w[1]));
+      await setDate(c, 'ArchiveFromDate', w[0], 'the From date');
+      await setDate(c, 'ArchiveToDate', w[1], 'the To date');
       await c.nap();
       var n0 = reqs();
       (await c.look('#btnArchive', 'the Show button')).click();
