@@ -95,23 +95,6 @@ const BASE = computed(() => overlap(assetsOf(false).filter((a) => !unpicked(a)).
 // starts in 2020 -- it takes the one with the longest history rather than the first in the list, which is the
 // shortest. Picking the shortest would quietly cut a hundred-year run down to six.
 const longest = (a) => [...a.series].sort((x, y) => String(startOf(x)).localeCompare(String(startOf(y))))[0];
-// Which reference series to convert with, or to deflate by, changes what a run reports, and the right one
-// depends on how far back the run goes: SBI's sheets and MoSPI's index are the ones to prefer, and neither
-// reaches as far as its alternative. So where a run starts before the preferred series covers, say so here,
-// at the point of choosing. Nothing switches on its own: the choice is the user's, and a line beats a number
-// quietly taken from the wrong series.
-const reach = (a) => {
-  if (!a.provided || !BASE.value.ok) return null;
-  const [preferred, ...rest] = a.series;
-  if (!preferred || spans(BASE.value)(preferred)) return null;
-  const further = rest.find(spans(BASE.value));
-  const from = startOf(preferred);
-  return {
-    from,
-    preferred: preferred.name,
-    further: further?.name ?? null,
-  };
-};
 const chosen = (a) => (unpicked(a) ? null : own(a) || (a.provided ? a.series.find(spans(BASE.value)) || longest(a) : a.series.find(clean)) || null);
 const isChosen = (a, s) => chosen(a) === s;
 // A reference asset (USD/INR, inflation) always has one series picked: every run needs it, so picking
@@ -231,9 +214,6 @@ const rows = computed(() => current.value.assets.flatMap((a) => [
                       <Check v-if="atFullHistory(r.a)" class="mr-0.5 inline h-3 w-3 align-[-1px] text-status-good-text" />max <span class="font-semibold tabular-nums">{{ yearsSince(sinceOf(r.a)) }}</span> years
                     </span>
                   </div>
-                  <p v-if="reach(r.a)" class="mt-0.5 text-xs text-status-warning-text">
-                    Your run starts {{ RUN.from }}, before {{ reach(r.a).preferred }} covers ({{ reach(r.a).from }}).{{ ' ' }}<template v-if="reach(r.a).further">{{ reach(r.a).further }} goes back further.</template>
-                  </p>
                 </TableCell>
               </TableRow>
 
