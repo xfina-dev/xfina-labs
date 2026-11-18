@@ -121,7 +121,12 @@ export function labelOf(id, s = rebalancing) {
   if (id === 'threshold') return `Threshold · ${s.threshold.bandType} ±${s.threshold.bandAll}%${Object.keys(s.threshold.rangeOwn).length ? ', own ranges' : ''}`;
   return `Perpetual · ${s.perpetual.maxDrift}% → ${s.perpetual.minDrift}% over ${s.perpetual.sellMonths} months${s.perpetual.ltcgOnly === 'Yes' ? ', LTCG only' : ''}`;
 }
-const allocationOf = () => ASSETS.map((a) => `${a.name} ${a.weight}`).join(' · ');
+// The one-line allocation a history row shows: only the assets the run actually
+// held. An asset left at zero is not part of the portfolio, and listing every
+// one of them buried the two or three that were in a line of noughts.
+// `snapshot` keeps the full allocation, zeros included, because comparing runs
+// needs to tell "nothing in Gold" apart from "Gold not in this run at all".
+const allocationOf = () => ASSETS.filter((a) => Number(a.weight) > 0).map((a) => `${a.name} ${a.weight}`).join(' · ');
 // Everything a result was run with, copied so later changes to the steps don't alter it.
 const snapshot = (id) => JSON.parse(JSON.stringify({
   allocation: ASSETS.map((a) => ({ name: a.name, weight: a.weight })),
